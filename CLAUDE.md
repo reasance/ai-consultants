@@ -6,7 +6,7 @@ AI Consultants is a multi-model coverage system that queries up to 11 AI consult
 
 **Self-Exclusion**: The invoking agent is automatically excluded from both the panel and synthesis. Claude Code won't query or synthesize with Claude, Codex CLI won't query or synthesize with Codex, etc.
 
-**Version**: 5.5.0
+**Version**: 5.5.1
 
 ## Distribution
 
@@ -787,6 +787,13 @@ curl -fsSL https://raw.githubusercontent.com/reasance/ai-consultants/main/script
 - **No internal jargon**: Avoid referencing issue tracker IDs or internal codenames without context.
 
 ## Changelog
+
+### v5.5.1 (2026-10-24)
+
+- **Org move** (user request, 2026-10-24: "sposta entrambi i repo dentro https://github.com/orgs/reasance/"). `matteoscurati/ai-consultants` was transferred to `reasance/ai-consultants`; GitHub answers the old URLs with a 301, so existing clones, `curl | bash` one-liners and links keep working. PR #36 (`6c46a4f`) replaced every repository link: `package.json` `repository`/`homepage`/`bugs`, `scripts/install.sh` (`REPO_URL` default and the one-liner), `bin/ai-consultants` help, README, `docs/SETUP.md`, the three `ai-consultants:help.md` commands, `SKILL.md`, `CLAUDE.md`, `.github/workflows/publish.yml` (the trusted-publisher comment) and `scripts/test_release.sh` (its README badge fixture). The "Upgrade Guide" one-liner in 41 earlier release notes was updated too, because GitHub shows those files as release bodies. Kept on purpose: `@matteoscurati` author credits, the `author` field and historical merge-commit titles.
+- **npm Trusted Publishing.** The transfer left the package with no trusted publisher (`npm trust list` reported none). `npm trust github` returned a bare HTTP 400 twice; the configuration was then created on npmjs.com (GitHub Actions, `reasance` / `ai-consultants` / `publish.yml`, no environment). This release is the end-to-end test: the OIDC exchange is only exercised by a real `npm publish` from `publish.yml`, and it also refreshes the registry's repository metadata, which still named `matteoscurati` for 5.5.0.
+- **Not changed:** no runtime behaviour, model tier or price. The site moved to `reasance/aiconsultants.sh` at the same time (separate repository; the Pages domain had to be verified for the org).
+- Evidence: PR #36 CI pass; `npm test` 36/36 plus lint in the release gate.
 
 ### v5.5.0 (2026-10-24)
 

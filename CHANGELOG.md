@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For longer-form release notes (rationale, upgrade guides, performance numbers), see `docs/releases/v<VERSION>.md`.
 
+## [5.5.1] - 2026-10-24
+
+### Changed
+- **The repository moved to the `reasance` organization**: https://github.com/reasance/ai-consultants. The old `matteoscurati/ai-consultants` URLs redirect, so existing clones and links keep working.
+- The npm package metadata (repository, homepage, issues) now points to `reasance/ai-consultants`. `scripts/install.sh` clones from the new URL, and the README, setup guide, help commands and past release notes link there.
+- This is the first release published to npm from `reasance/ai-consultants` through Trusted Publishing, with provenance.
+
 ## [5.5.0] - 2026-10-24
 
 ### Added
