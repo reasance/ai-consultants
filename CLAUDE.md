@@ -6,7 +6,7 @@ AI Consultants is a multi-model coverage system that queries up to 11 AI consult
 
 **Self-Exclusion**: The invoking agent is automatically excluded from both the panel and synthesis. Claude Code won't query or synthesize with Claude, Codex CLI won't query or synthesize with Codex, etc.
 
-**Version**: 5.5.1
+**Version**: 5.6.0
 
 ## Distribution
 
@@ -787,6 +787,15 @@ curl -fsSL https://raw.githubusercontent.com/reasance/ai-consultants/main/script
 - **No internal jargon**: Avoid referencing issue tracker IDs or internal codenames without context.
 
 ## Changelog
+
+### v5.6.0 (2026-10-25)
+
+- **Model data now comes from controller-models** (`../../controller-models`, a maintenance tool, never a runtime dependency). It owns `docs/cost_rates.json` and two managed blocks, `get_model_for_tier` (`scripts/config.sh:664`, between `BEGIN/END controller-models: model-tiers`) and `_builtin_rate` (`scripts/lib/costs.sh:115`, `builtin-rates`). Edit its registry and run `cm sync ai-consultants`, not the blocks; a hand edit inside them is overwritten. `cm lint ai-consultants` reports what sync does not own.
+- **Gemini on `agy` by model ID.** `agy models` prints `<id>\t<display name>`; the tiers and `GEMINI_MODEL` now use the ID (`gemini-4-argon-high`, `gemini-3.8-flash-high`, `gemini-3.8-flash-low`). `gemini_cli_exposes_requested_model` (`scripts/query_gemini.sh`) already normalises both sides to alphanumerics, so an ID and its display name match the same inventory line: no change was needed there. Display names stay as rate keys so a configuration that still names one is priced; `format_cost_caveats` (`scripts/lib/costs.sh:474`) now also recognises the IDs, which it missed. `configure` (`scripts/configure.sh:346`, `:352`) moves an unpinned managed `Gemini 4 Argon (High)` / `Gemini 3.8 Flash (Low)` to its ID, pins untouched. Evidence: one `query_gemini.sh` smoke by ID on 2026-10-25 (controller-models `cm smoke`): the code hidden in a 24K-token document found, schema-valid, ~21 s.
+- **Fix: Claude API mode dropped the effort.** The `anthropic` arm of `api_query.sh` (`scripts/lib/api_query.sh:132`) warned and ignored `CLAUDE_REASONING_EFFORT`, so the model default always applied (medium on Opus 5.5, high on Fable 5.1) although `.env.example` documented the setting for API mode. `build_anthropic_request` (`scripts/lib/api.sh:239`) now sends `output_config.effort` when one is set, and the arm rejects `none`/`minimal`, which the Messages API does not have, before spending a request. No `thinking` field is sent: thinking is always on for these models.
+- **Fix: DashScope requests had no output cap.** `build_qwen_request` (`scripts/lib/api.sh:142`) sent no `parameters.max_tokens`, so `QWEN3_API_MAX_TOKENS` (documented, default 16384) only reached the OpenAI-compatible wire. The `qwen` arm (`scripts/lib/api_query.sh:153`) now validates and passes it.
+- **Tests that pinned display names** now pin IDs (`test_configure`, `test_e2e`, `test_gemini38`, `test_suite`, `test_user_config`). The e2e model-echo stub scored `*Low*` as an economy answer; with `gemini-3.8-flash-low` it scored 9 and the escalation never ran, so the stub also matches `*-low`. `test_grok47_opus55` compared the built-in Opus output rate as the string `0.020`; the generated block writes `0.02`, the same number `cost_rates.json` has always returned.
+- **Not changed:** no price (every rate re-checked on its official page on 2026-10-25), no tier membership, no consultant. The `references/details.md` "stale" messages in a full `npm test` run come from `test_public_registry`'s deliberate drift check, which passes; they are not a failure. The Mistral CLI token figure (~243K for a 24K document) is the deliberate worst-case estimate `input × MISTRAL_MAX_TURNS × MAX_RETRIES` (`scripts/query_mistral.sh`), marked `estimated`, not a bug.
 
 ### v5.5.1 (2026-10-24)
 
