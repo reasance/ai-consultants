@@ -147,7 +147,7 @@ AGY_EXIT_GRACE_SECONDS="${AGY_EXIT_GRACE_SECONDS:-60}"
 
 # CLI mode uses the Antigravity CLI (`agy`), successor to the deprecated
 # Gemini CLI (transitioned 2026-06-18). Models are passed by display name.
-GEMINI_MODEL="${GEMINI_MODEL:-Gemini 4 Argon (High)}"
+GEMINI_MODEL="${GEMINI_MODEL:-gemini-4-argon-high}"
 GEMINI_TIMEOUT_SECONDS="${GEMINI_TIMEOUT:-0}"
 GEMINI_CMD="${GEMINI_CMD:-agy}"
 # API mode (GEMINI_USE_API=true) talks to the Google AI generativelanguage
@@ -661,6 +661,7 @@ fi
 # Get the provider-specific model name for a consultant, tier, and transport.
 # Usage: get_model_for_tier <consultant> <tier> [cli|api]
 # Returns: model name, or empty string for an unknown consultant/tier.
+# BEGIN controller-models: model-tiers
 get_model_for_tier() {
     local consultant="$1"
     local tier="${2:-premium}"
@@ -683,11 +684,11 @@ get_model_for_tier() {
         maximum|max_quality|max-quality)
             case "$consultant" in
                 claude)   echo "claude-fable-5-1" ;;
-                gemini)   [[ "$transport" == "api" ]] && echo "gemini-4-argon" || echo "Gemini 4 Argon (High)" ;;
+                gemini)   [[ "$transport" == "api" ]] && echo "gemini-4-argon" || echo "gemini-4-argon-high" ;;
                 codex)    echo "gpt-6-astra" ;;
                 mistral)  [[ "$transport" == "api" ]] && echo "mistral-large-4" || echo "mistral-medium-3.5" ;;
                 deepseek) echo "deepseek-flash" ;;
-                glm)      echo "glm-5.3" ;;  # flagship; Flash serves premium/standard
+                glm)      echo "glm-5.3" ;;
                 grok)     echo "grok-4.7" ;;
                 qwen3)    echo "qwen3.8-max" ;;
                 kimi)     echo "kimi-code/k3.1-pro" ;;
@@ -699,7 +700,7 @@ get_model_for_tier() {
         premium|max|best)
             case "$consultant" in
                 claude)   echo "claude-fable-5-1" ;;
-                gemini)   [[ "$transport" == "api" ]] && echo "gemini-4-argon" || echo "Gemini 4 Argon (High)" ;;
+                gemini)   [[ "$transport" == "api" ]] && echo "gemini-4-argon" || echo "gemini-4-argon-high" ;;
                 codex)    echo "gpt-6.1-sol" ;;
                 mistral)  [[ "$transport" == "api" ]] && echo "mistral-large-4" || echo "mistral-medium-3.5" ;;
                 deepseek) echo "deepseek-flash" ;;
@@ -715,11 +716,11 @@ get_model_for_tier() {
         standard|medium|balanced)
             case "$consultant" in
                 claude)   echo "claude-opus-5-5" ;;
-                gemini)   [[ "$transport" == "api" ]] && echo "gemini-3.8-flash" || echo "Gemini 3.8 Flash (High)" ;;
-                codex)    echo "gpt-6.1-sol" ;;  # No GPT-6 mid model; 6.1 Sol costs less than 5.6 Terra did
+                gemini)   [[ "$transport" == "api" ]] && echo "gemini-3.8-flash" || echo "gemini-3.8-flash-high" ;;
+                codex)    echo "gpt-6.1-sol" ;;
                 mistral)  [[ "$transport" == "api" ]] && echo "mistral-large-4" || echo "mistral-medium-3.5" ;;
                 deepseek) echo "deepseek-flash" ;;
-                glm)      echo "glm-5.3-flash" ;;  # Same as premium (no mid-tier GLM)
+                glm)      echo "glm-5.3-flash" ;;
                 grok)     echo "grok-4.7" ;;
                 qwen3)    echo "qwen3.8-flash" ;;
                 kimi)     echo "kimi-code/k3.1-pro" ;;
@@ -731,9 +732,9 @@ get_model_for_tier() {
         economy|fast|quick)
             case "$consultant" in
                 claude)   echo "claude-haiku-5-5" ;;
-                gemini)   [[ "$transport" == "api" ]] && echo "gemini-3.8-flash" || echo "Gemini 3.8 Flash (Low)" ;;
+                gemini)   [[ "$transport" == "api" ]] && echo "gemini-3.8-flash" || echo "gemini-3.8-flash-low" ;;
                 codex)    echo "gpt-6-luna" ;;
-                mistral)  [[ "$transport" == "api" ]] && echo "mistral-large-4" || echo "mistral-medium-3.5" ;;  # Devstral is retired
+                mistral)  [[ "$transport" == "api" ]] && echo "mistral-large-4" || echo "mistral-medium-3.5" ;;
                 deepseek) echo "deepseek-flash" ;;
                 glm)      echo "glm-5.3-flash" ;;
                 grok)     echo "grok-4.7" ;;
@@ -748,6 +749,7 @@ get_model_for_tier() {
             echo "" ;;
     esac
 }
+# END controller-models: model-tiers
 
 # Name of the variable that selects the model on a consultant's ACTIVE
 # transport. Gemini and Mistral keep separate CLI and API identifiers, so an

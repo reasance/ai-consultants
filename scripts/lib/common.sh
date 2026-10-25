@@ -316,7 +316,7 @@ guard_argv_prompt_size() {
 # The query is passed via stdin to the command.
 # Use the exec-safe array form under run_query (agy_env is same-shell only).
 # Example:
-#   echo "$QUERY" | run_query "Gemini" "/tmp/out.json" 120 "${AGY_ENV_PREFIX[@]}" agy -p "..." --model "Gemini 4 Argon (High)"
+#   echo "$QUERY" | run_query "Gemini" "/tmp/out.json" 120 "${AGY_ENV_PREFIX[@]}" agy -p "..." --model gemini-4-argon-high
 #
 run_query() {
     local consultant_name="$1"

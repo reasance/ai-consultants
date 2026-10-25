@@ -986,16 +986,20 @@ and [Grok 4.7](https://docs.x.ai/developers/grok-4-7).
 ### Gemini 4 Argon
 
 Gemini 4 Argon (GA 2026-10-13) serves the default (premium) and maximum tiers:
-`Gemini 4 Argon (High)` on `agy` (listed by `agy models` 1.3.6 with Medium and
-Low variants) and `gemini-4-argon` on the API. One authorized `agy` consultation
-smoke passed on 2026-10-16: structured answer, capability-probed identity, about
-49 s for a short question. The API transport has offline tests only; it needs a
+`gemini-4-argon-high` on `agy` (the model ID `agy models` prints before the
+display name "Gemini 4 Argon (High)"; Medium and Low variants exist) and
+`gemini-4-argon` on the API. One authorized `agy` consultation smoke passed on
+2026-10-16 by display name: structured answer, capability-probed identity,
+about 49 s for a short question. Another passed on 2026-10-25 by model ID: a
+code hidden in a 24K-token document, found and returned in the response
+schema, in about 21 s. The API transport has offline tests only; it needs a
 paid-tier key, because Google excludes Argon from the Free tier and the AI Pro
 plan. On the API, Argon defaults to the `high` thinking level, takes no sampling
 parameters, and spends thinking from `GEMINI_API_MAX_TOKENS` (default 32768).
 
 Configure migrates an unpinned `Gemini 3.8 Flash (High)`, `Gemini 3.7 Flash (High)`
-or `Gemini 3.1 Pro (High)` CLI value to `Gemini 4 Argon (High)`, and an unpinned
+or `Gemini 3.1 Pro (High)` CLI value, or the previous display-name default
+`Gemini 4 Argon (High)`, to `gemini-4-argon-high`, and an unpinned
 `gemini-3.1-pro-preview` API value to `gemini-4-argon`. Pin `Gemini 3.8 Flash
 (High)` with `# ai-consultants:pin` to keep it; Gemini 3.7 Flash and 3.1 Pro
 are retired and migrate even when pinned.

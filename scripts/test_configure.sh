@@ -561,7 +561,7 @@ test_catalog_default_migrations_and_pins() {
         'GROK_MODEL=grok-4.5' > "$cfg/.env"
     run_clean_configure "$cfg" --force >/dev/null 2>&1
     assert_eq qwen3.8-max "$(read_env "$cfg/.env" QWEN3_MODEL)" "managed Qwen default migrates to 3.8-max"
-    assert_eq "Gemini 4 Argon (High)" "$(read_env "$cfg/.env" GEMINI_MODEL)" "managed Gemini CLI default migrates"
+    assert_eq gemini-4-argon-high "$(read_env "$cfg/.env" GEMINI_MODEL)" "managed Gemini CLI default migrates"
     assert_eq mistral-large-4 "$(read_env "$cfg/.env" MISTRAL_MODEL)" "managed Mistral API default migrates to Large 4"
     assert_eq mistral-medium-3.5 "$(read_env "$cfg/.env" MISTRAL_CLI_MODEL)" "new Mistral CLI field is populated"
     assert_eq "0" "$(grep -c '^CURSOR_CMD=' "$cfg/.env" || true)" "removed Cursor command is dropped"
@@ -581,7 +581,7 @@ test_catalog_default_migrations_and_pins() {
         'GROK_MODEL=grok-4.5 # ai-consultants:pin' > "$cfg/.env"
     run_clean_configure "$cfg" --force >/dev/null 2>&1
     assert_eq qwen3.8-max "$(read_env "$cfg/.env" QWEN3_MODEL)" "pinned retired Qwen model migrates"
-    assert_eq "Gemini 4 Argon (High)" "$(read_env "$cfg/.env" GEMINI_MODEL)" "pinned retired Gemini CLI model migrates"
+    assert_eq gemini-4-argon-high "$(read_env "$cfg/.env" GEMINI_MODEL)" "pinned retired Gemini CLI model migrates"
     assert_eq mistral-large-4 "$(read_env "$cfg/.env" MISTRAL_MODEL)" "pinned retired Mistral API model migrates"
     assert_eq "0" "$(grep -c '^CURSOR_CMD=' "$cfg/.env" || true)" "removed pinned Cursor command is dropped"
     assert_eq glm-5.3 "$(read_env "$cfg/.env" GLM_MODEL)" "pinned retired GLM flagship moves to the current flagship"
@@ -616,7 +616,7 @@ test_catalog_default_migrations_and_pins() {
         "an uncatalogued Gemini CLI value is not force-upgraded"
     printf '%s\n' 'GEMINI_MODEL="Gemini 3.6 Flash (High)"' > "$cfg/.env"
     run_clean_configure "$cfg" --force >/dev/null 2>&1
-    assert_eq "Gemini 3.8 Flash (High)" "$(read_env "$cfg/.env" GEMINI_MODEL)" \
+    assert_eq gemini-3.8-flash-high "$(read_env "$cfg/.env" GEMINI_MODEL)" \
         "a retired Gemini CLI value moves to the same-level current Flash"
 }
 
@@ -715,9 +715,9 @@ test_gemini38_migration() {
             cfg="$TMP/gemini38-$level-${#marker}"; mkdir -p "$cfg"
             printf 'GEMINI_MODEL="Gemini 3.7 Flash (%s)"%s\n' "$level" "$marker" > "$cfg/.env"
             run_clean_configure "$cfg" --force >/dev/null 2>&1
-            expected="Gemini 3.8 Flash (Low)"
-            [[ "$level" == Low ]] || expected="Gemini 4 Argon (High)"
-            [[ "$marker" != *pin* ]] || expected="Gemini 3.8 Flash ($level)"
+            expected=gemini-3.8-flash-low
+            [[ "$level" == Low ]] || expected=gemini-4-argon-high
+            [[ "$marker" != *pin* ]] || expected="gemini-3.8-flash-$(printf '%s' "$level" | tr '[:upper:]' '[:lower:]')"
             assert_eq "$expected" "$(read_env "$cfg/.env" GEMINI_MODEL)" "Gemini $level migration respects pin state"
             run_clean_configure "$cfg" --force >/dev/null 2>&1
             assert_eq "$expected" "$(read_env "$cfg/.env" GEMINI_MODEL)" "Gemini migration is idempotent"
@@ -727,7 +727,7 @@ test_gemini38_migration() {
     printf 'GEMINI_MODEL="Gemini 3.7 Flash (High)"\n' > "$cfg/.env"
     env "${CLEAN_ENV_ARGS[@]}" PATH="$(clean_path)" AI_CONSULTANTS_CONFIG_DIR="$cfg" \
         GEMINI_MODEL='Gemini 3.7 Flash (High)' "$BIN" configure --force >/dev/null 2>&1
-    assert_eq 'Gemini 3.8 Flash (High)' "$(read_env "$cfg/.env" GEMINI_MODEL)" "a retired environment Gemini model is migrated in the file"
+    assert_eq gemini-3.8-flash-high "$(read_env "$cfg/.env" GEMINI_MODEL)" "a retired environment Gemini model is migrated in the file"
     run_clean_configure "$cfg" --force --set 'GEMINI_MODEL=Gemini 3.8 Flash (Medium)' >/dev/null 2>&1
     run_clean_configure "$cfg" --force >/dev/null 2>&1
     assert_eq 'Gemini 3.8 Flash (Medium)' "$(read_env "$cfg/.env" GEMINI_MODEL)" "Gemini Medium remains an explicit choice"
@@ -742,7 +742,7 @@ test_gemini38_migration() {
             assert_eq "Gemini 3.8 Flash (High)" "$(read_env "$cfg/.env" GEMINI_MODEL)" "pinned Gemini 3.8 Flash (High) survives"
             assert_eq gemini-4-argon "$(read_env "$cfg/.env" GEMINI_API_MODEL)" "a pinned retired Gemini API ID moves to Argon"
         else
-            assert_eq "Gemini 4 Argon (High)" "$(read_env "$cfg/.env" GEMINI_MODEL)" "unpinned Gemini CLI default migrates to Argon"
+            assert_eq gemini-4-argon-high "$(read_env "$cfg/.env" GEMINI_MODEL)" "unpinned Gemini CLI default migrates to Argon"
             assert_eq gemini-4-argon "$(read_env "$cfg/.env" GEMINI_API_MODEL)" "unpinned Gemini API default migrates to Argon"
             assert_contains "$(grep '^GEMINI_API_MODEL=' "$cfg/.env")" "# ai-consultants:default" "Gemini API migration records managed provenance"
         fi
@@ -762,7 +762,8 @@ test_gemini38_migration() {
     cfg="$TMP/gemini-argon-economy"; mkdir -p "$cfg"
     printf 'GEMINI_MODEL="Gemini 3.8 Flash (Low)"\n' > "$cfg/.env"
     run_clean_configure "$cfg" --force >/dev/null 2>&1
-    assert_eq "Gemini 3.8 Flash (Low)" "$(read_env "$cfg/.env" GEMINI_MODEL)" "Gemini 3.8 Flash (Low) is not promoted"
+    # The managed economy display name moves to its agy ID, not to Argon.
+    assert_eq gemini-3.8-flash-low "$(read_env "$cfg/.env" GEMINI_MODEL)" "Gemini 3.8 Flash (Low) is not promoted"
 }
 
 run_test "Test 1: public configure route and help" test_public_route_and_help

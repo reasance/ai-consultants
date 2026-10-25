@@ -339,18 +339,20 @@ esac
 # A # ai-consultants:pin marker keeps any current target or a nonstandard
 # binary name; retired targets are replaced by the retired-model pass below.
 # Gemini 3.8 Flash (High) was the generated CLI default through 5.1.2; it now
-# serves the standard tier only, so a pin keeps it as the default.
+# serves the standard tier only, so a pin keeps it as the default. agy is
+# addressed by model ID (`agy models` prints the ID before the display name);
+# a managed display-name default moves to its ID.
 case "$(read_value "$WORK_FILE" GEMINI_MODEL 2>/dev/null || true)" in
-    'Gemini 3.1 Pro (High)'|'Gemini 3.7 Flash (High)'|'Gemini 3.8 Flash (High)')
+    'Gemini 3.1 Pro (High)'|'Gemini 3.7 Flash (High)'|'Gemini 3.8 Flash (High)'|'Gemini 4 Argon (High)')
         if ! has_value_marker "$WORK_FILE" GEMINI_MODEL "$PIN_MARKER"; then
-            set_value GEMINI_MODEL "Gemini 4 Argon (High) $DEFAULT_MARKER"
-            echo "Migrated managed Gemini CLI default to Gemini 4 Argon (High)" >&2
+            set_value GEMINI_MODEL "gemini-4-argon-high $DEFAULT_MARKER"
+            echo "Migrated managed Gemini CLI default to gemini-4-argon-high" >&2
         fi
         ;;
-    'Gemini 3.7 Flash (Low)')
+    'Gemini 3.7 Flash (Low)'|'Gemini 3.8 Flash (Low)')
         if ! has_value_marker "$WORK_FILE" GEMINI_MODEL "$PIN_MARKER"; then
-            set_value GEMINI_MODEL "Gemini 3.8 Flash (Low) $DEFAULT_MARKER"
-            echo "Migrated managed Gemini CLI economy default to Gemini 3.8 Flash (Low)" >&2
+            set_value GEMINI_MODEL "gemini-3.8-flash-low $DEFAULT_MARKER"
+            echo "Migrated managed Gemini CLI economy default to gemini-3.8-flash-low" >&2
         fi
         ;;
 esac

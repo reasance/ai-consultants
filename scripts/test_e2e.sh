@@ -159,7 +159,9 @@ make_model_echo_stub() {
 #!/bin/bash
 if [[ ! -t 0 ]]; then cat >/dev/null; fi
 if [[ "${1:-}" == "models" ]]; then
-    printf '%s\n' 'Gemini 4 Argon (High)' 'Gemini 3.8 Flash (High)' 'Gemini 3.8 Flash (Low)'
+    # agy prints each model ID, a tab, then its display name.
+    printf '%s\t%s\n' gemini-4-argon-high 'Gemini 4 Argon (High)' gemini-3.8-flash-high 'Gemini 3.8 Flash (High)' \
+        gemini-3.8-flash-low 'Gemini 3.8 Flash (Low)'
     exit 0
 fi
 model=""; payload=""; prev=""
@@ -170,7 +172,7 @@ for arg in "$@"; do
 done
 printf '%s\n' "$model" >> "$STUB_MODEL_LOG"
 score=9
-case "$model" in *luna*|*Low*) score=4 ;; esac
+case "$model" in *luna*|*Low*|*-low) score=4 ;; esac
 answer=$(jq -n --argjson s "$score" --arg m "$model" \
     '{response:{summary:("answer from " + $m),detailed:"d",approach:"a",pros:[],cons:[],caveats:[]},confidence:{score:$s,reasoning:"r"}}')
 if [[ -n "$payload" ]]; then
@@ -224,7 +226,7 @@ test_cost_aware_escalation_and_cache_identity() {
     dir=$(printf '%s\n' "$out" | tail -n 1)
     assert_eq "gpt-6.1-sol|9" "$(jq -r '"\(.metadata.requested_model)|\(.confidence.score)"' "$dir/codex.json" 2>/dev/null)" \
         "a low-confidence economy Codex answer is re-asked on the premium model"
-    assert_eq "Gemini 4 Argon (High)|9" "$(jq -r '"\(.metadata.requested_model)|\(.confidence.score)"' "$dir/gemini.json" 2>/dev/null)" \
+    assert_eq "gemini-4-argon-high|9" "$(jq -r '"\(.metadata.requested_model)|\(.confidence.score)"' "$dir/gemini.json" 2>/dev/null)" \
         "a low-confidence economy Gemini answer is re-asked on the premium model"
 
     : > "$STUB_MODEL_LOG"
@@ -233,10 +235,10 @@ test_cost_aware_escalation_and_cache_identity() {
     out=$(run_model_echo_panel "$home" ENABLE_COST_AWARE_ROUTING=false ENABLE_SEMANTIC_CACHE=true \
         "Pick a cache key" 2>"$home/cache.err")
     dir=$(printf '%s\n' "$out" | tail -n 1)
-    assert_eq "gpt-6.1-sol|Gemini 4 Argon (High)" \
+    assert_eq "gpt-6.1-sol|gemini-4-argon-high" \
         "$(jq -rs 'map(.metadata.requested_model) | join("|")' "$dir/codex.json" "$dir/gemini.json" 2>/dev/null)" \
         "a cached cost-aware economy answer is not served to a premium run"
-    assert_eq "2" "$(grep -cE '^(gpt-6\.1-sol|Gemini 4 Argon \(High\))$' "$STUB_MODEL_LOG")" \
+    assert_eq "2" "$(grep -cE '^(gpt-6\.1-sol|gemini-4-argon-high)$' "$STUB_MODEL_LOG")" \
         "the premium run queries the configured models"
     unset STUB_MODEL_LOG
 }

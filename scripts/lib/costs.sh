@@ -18,7 +18,8 @@ COST_RATES_FILE="${COST_RATES_FILE:-$_COSTS_SCRIPT_DIR/../../docs/cost_rates.jso
 # Returns: rate as string, or exits with 1 if not found
 #
 # The match is CASE-INSENSITIVE: callers lowercase the model name, but several
-# rate keys are mixed-case (agy display names like "Gemini 4 Argon (High)").
+# rate keys are mixed-case (agy display names like "Gemini 4 Argon (High)",
+# kept so a configuration that still names one stays priced).
 # An exact-case jq lookup on a lowercased model would miss those keys and
 # report a catalogued model as unpriced. Downcasing both sides fixes it
 # generally (lowercase keys like minimax-m3.1-flash still match).
@@ -111,24 +112,30 @@ get_default_rate() {
 # Built-in rate for a current tier model.
 # Usage: _builtin_rate <lowercased model> <type: input|output>
 # Returns 1 for any other model.
+# BEGIN controller-models: builtin-rates
 _builtin_rate() {
     local pair
     case "$1" in
-        gemini-4-argon|"gemini 4 argon (high)"|"gemini 4 argon (medium)"|"gemini 4 argon (low)") pair="0.004 0.02" ;;
-        gemini-3.8-flash|"gemini 3.8 flash (high)"|"gemini 3.8 flash (medium)"|"gemini 3.8 flash (low)") pair="0.00075 0.00375" ;;
-        deepseek-flash)                pair="0.0003 0.0012" ;;
-        gpt-6-astra|claude-fable-5-1)  pair="0.01 0.05" ;;
-        gpt-6.1-sol)                   pair="0.002 0.01" ;;
-        gpt-6-luna)                    pair="0.0001 0.0005" ;;
-        claude-opus-5-5)               pair="0.004 0.020" ;;
-        claude-haiku-5-5)              pair="0.0001 0.0005" ;;
-        grok-4.7)                      pair="0.002 0.006" ;;
-        muse-wonder-1.0)               pair="0.004 0.02" ;;
-        muse-spark-1.3)                pair="0.00125 0.00425" ;;
+        claude-fable-5-1) pair="0.01 0.05" ;;
+        gemini-4-argon|gemini-4-argon-low|gemini-4-argon-medium|gemini-4-argon-high|"gemini 4 argon (low)"|"gemini 4 argon (medium)"|"gemini 4 argon (high)") pair="0.004 0.02" ;;
+        gpt-6-astra) pair="0.01 0.05" ;;
+        mistral-large-4|mistral-large-4-0) pair="0.00136 0.00418" ;;
+        mistral-medium-3.5|mistral-medium-3-5) pair="0.0015 0.0075" ;;
+        deepseek-flash) pair="0.0003 0.0012" ;;
+        grok-4.7) pair="0.002 0.006" ;;
+        minimax-m3.1-flash) pair="0.00015 0.0006" ;;
+        muse-wonder-1.0) pair="0.004 0.02" ;;
+        gpt-6.1-sol) pair="0.002 0.01" ;;
+        claude-opus-5-5) pair="0.004 0.02" ;;
+        gemini-3.8-flash|gemini-3.8-flash-low|gemini-3.8-flash-medium|gemini-3.8-flash-high|"gemini 3.8 flash (low)"|"gemini 3.8 flash (medium)"|"gemini 3.8 flash (high)") pair="0.00075 0.00375" ;;
+        muse-spark-1.3) pair="0.00125 0.00425" ;;
+        claude-haiku-5-5) pair="0.0001 0.0005" ;;
+        gpt-6-luna) pair="0.0001 0.0005" ;;
         *) return 1 ;;
     esac
     if [[ "$2" == "input" ]]; then echo "${pair% *}"; else echo "${pair#* }"; fi
 }
+# END controller-models: builtin-rates
 
 # Check whether a model has a rate (catalogued, or built in). Subscription
 # models rated 0 in the catalog count as rated; see is_unpriced_model.
@@ -459,12 +466,12 @@ format_cost_caveats() {
             [[ "$model" != claude-opus-5-5 ]] || opus_55_estimate=1
         fi
         case "$model" in
-            gemini-3.8-flash|'Gemini 3.8 Flash (High)'|'Gemini 3.8 Flash (Medium)'|'Gemini 3.8 Flash (Low)')
+            gemini-3.8-flash|gemini-3.8-flash-high|gemini-3.8-flash-medium|gemini-3.8-flash-low|'Gemini 3.8 Flash (High)'|'Gemini 3.8 Flash (Medium)'|'Gemini 3.8 Flash (Low)')
                 if ! jq -e '.metadata.provider_cost_usd | numbers' "$f" >/dev/null 2>&1; then
                     gemini_38_estimate=1
                 fi
                 ;;
-            gemini-4-argon|'Gemini 4 Argon (High)'|'Gemini 4 Argon (Medium)'|'Gemini 4 Argon (Low)')
+            gemini-4-argon|gemini-4-argon-high|gemini-4-argon-medium|gemini-4-argon-low|'Gemini 4 Argon (High)'|'Gemini 4 Argon (Medium)'|'Gemini 4 Argon (Low)')
                 if ! jq -e '.metadata.provider_cost_usd | numbers' "$f" >/dev/null 2>&1; then
                     gemini_argon_estimate=1
                 fi

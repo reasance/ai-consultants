@@ -138,14 +138,16 @@ extract_retry_after() {
 # oversized --arg made jq fail and left an empty request body.
 
 # Build request body for Qwen3 (Alibaba DashScope format)
-# Usage: build_qwen_request <prompt> <model>
+# Usage: build_qwen_request <prompt> <model> [max_tokens]
 build_qwen_request() {
     local prompt="$1"
     local model="${2:-qwen3.8-max}"
+    local max_tokens="${3:-16384}"
 
     printf '%s' "$prompt" | jq -n \
         --arg model "$model" \
         --rawfile prompt /dev/stdin \
+        --argjson max_tokens "$max_tokens" \
         '{
             model: $model,
             input: {
@@ -154,7 +156,8 @@ build_qwen_request() {
                 ]
             },
             parameters: {
-                result_format: "message"
+                result_format: "message",
+                max_tokens: $max_tokens
             }
         }'
 }
@@ -230,23 +233,28 @@ build_openai_request() {
 }
 
 # Build request body for Anthropic API (Claude API mode)
-# Usage: build_anthropic_request <prompt> <model> [max_tokens]
+# Usage: build_anthropic_request <prompt> <model> [max_tokens] [effort]
+# The effort goes in output_config.effort; without it the model's own
+# default applies (medium on Opus 5.5 and Haiku 5.5, high elsewhere).
 build_anthropic_request() {
     local prompt="$1"
     local model="${2:-claude-fable-5-1}"
     local max_tokens="${3:-16384}"
+    local effort="${4:-}"
 
     printf '%s' "$prompt" | jq -n \
         --arg model "$model" \
         --rawfile prompt /dev/stdin \
         --argjson max_tokens "$max_tokens" \
+        --arg effort "$effort" \
         '{
             model: $model,
             max_tokens: $max_tokens,
             messages: [
                 { role: "user", content: $prompt }
             ]
-        }'
+        }
+        + (if $effort == "" then {} else { output_config: { effort: $effort } } end)'
 }
 
 # Build request body for Google AI API (Gemini API mode)

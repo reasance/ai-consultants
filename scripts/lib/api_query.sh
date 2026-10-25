@@ -106,7 +106,7 @@ run_api_mode_query() {
                         esac
                     elif [[ "$model" == gemini-4-argon ]]; then
                         # The provider default is medium; the matching CLI
-                        # target is "Gemini 4 Argon (High)".
+                        # target is gemini-4-argon-high.
                         google_thinking_level=high
                     fi
                     ;;
@@ -130,8 +130,15 @@ run_api_mode_query() {
             auth_style="google_ai"
             ;;
         anthropic)
+            # Messages API effort levels: none and minimal do not exist there.
             if [[ -n "$effort" ]]; then
-                log_warn "[$consultant_name] $effort_var is not supported on the 'anthropic' wire format and is ignored."
+                case "$effort" in
+                    low|medium|high|xhigh|max) ;;
+                    *)
+                        log_error "[$consultant_name] $effort_var=$effort is unsupported on the 'anthropic' wire format (expected low|medium|high|xhigh|max)"
+                        return 1
+                        ;;
+                esac
             fi
             local max_tokens_var api_max_tokens
             max_tokens_var="$(to_upper "$consultant_name")_API_MAX_TOKENS"
@@ -140,7 +147,7 @@ run_api_mode_query() {
                 log_error "[$consultant_name] $max_tokens_var must be a positive integer (got: $api_max_tokens)"
                 return 1
             fi
-            request_body=$(build_anthropic_request "$query" "$model" "$api_max_tokens")
+            request_body=$(build_anthropic_request "$query" "$model" "$api_max_tokens" "$effort")
             auth_style="anthropic"
             ;;
         qwen)
@@ -151,7 +158,14 @@ run_api_mode_query() {
                 consultant_upper=$(to_upper "$consultant_name")
                 log_warn "[$consultant_name] $effort_var is ignored on the '$api_format' wire format (no reasoning_effort field). Set ${consultant_upper}_FORMAT=openai and an OpenAI-compatible ${consultant_upper}_API_URL to use it."
             fi
-            request_body=$(build_qwen_request "$query" "$model")
+            local max_tokens_var api_max_tokens
+            max_tokens_var="$(to_upper "$consultant_name")_API_MAX_TOKENS"
+            api_max_tokens="${!max_tokens_var:-16384}"
+            if ! [[ "$api_max_tokens" =~ ^[1-9][0-9]*$ ]]; then
+                log_error "[$consultant_name] $max_tokens_var must be a positive integer (got: $api_max_tokens)"
+                return 1
+            fi
+            request_body=$(build_qwen_request "$query" "$model" "$api_max_tokens")
             ;;
         *)  # openai format
             local max_tokens_var api_max_tokens

@@ -522,7 +522,7 @@ and cannot support a comprehensive coverage claim.
 | Consultant | `max_quality` | Premium | Standard | Economy |
 |------------|---------------|---------|----------|---------|
 | Claude | claude-fable-5-1 | claude-fable-5-1 | claude-opus-5-5 | claude-haiku-5-5 |
-| Gemini CLI | Gemini 4 Argon (High) | Gemini 4 Argon (High) | Gemini 3.8 Flash (High) | Gemini 3.8 Flash (Low) |
+| Gemini CLI | gemini-4-argon-high | gemini-4-argon-high | gemini-3.8-flash-high | gemini-3.8-flash-low |
 | Gemini API | gemini-4-argon | gemini-4-argon | gemini-3.8-flash | gemini-3.8-flash |
 | Codex | gpt-6-astra | gpt-6.1-sol | gpt-6.1-sol | gpt-6-luna |
 | Mistral CLI | mistral-medium-3.5 | mistral-medium-3.5 | mistral-medium-3.5 | mistral-medium-3.5 |
@@ -566,7 +566,7 @@ Code 1.4.12, Muse Wonder, 2026-10-24) returned a structured persona answer in
 offline-tested.
 
 Promotion is transport-specific. Gemini 4 Argon (GA 2026-10-13) is the Gemini
-default and maximum target: `Gemini 4 Argon (High)` on `agy` and `gemini-4-argon`
+default and maximum target: `gemini-4-argon-high` on `agy` and `gemini-4-argon`
 on the API. An authorized `agy` consultation smoke returned a structured answer
 with capability-probed identity on 2026-10-16; the API transport is covered by
 offline tests only. Google excludes Argon from the Free tier and the AI Pro
@@ -718,7 +718,7 @@ KIMI_MODEL=kimi-code/k3.1-pro # Pin the Kimi consultant to K3.1 Pro
 KIMI_REASONING_EFFORT=max    # Kimi thinking effort (empty = the Kimi CLI's own)
 CLAUDE_API_MAX_TOKENS=16384  # Shared thinking + visible-output budget in API mode
 MISTRAL_CLI_MODEL=mistral-medium-3.5 # Vibe alias; MISTRAL_MODEL remains API-only
-GEMINI_MODEL="Gemini 4 Argon (High)" # agy CLI; API uses GEMINI_API_MODEL
+GEMINI_MODEL="gemini-4-argon-high" # agy CLI; API uses GEMINI_API_MODEL
 ```
 
 Full reference: [`references/configuration.md`](references/configuration.md). Copy-paste workflows: [`docs/RECIPES.md`](docs/RECIPES.md). For category-aware preset suggestions: `ai-consultants doctor --suggest-preset --question "..."`.

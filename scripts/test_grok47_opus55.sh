@@ -30,7 +30,7 @@ jq -e '.consultant_fallbacks.grok == "grok-4.7" and
 [[ $(estimate_query_cost claude-haiku-5-5 100001 1000) == 0.052500 ]] || exit 1
 COST_RATES_FILE="$TMP/missing" bash -c 'source "$1/lib/costs.sh";
     [[ $(get_input_cost_per_1k grok-4.7) == 0.002 && $(get_output_cost_per_1k grok-4.7) == 0.006 &&
-       $(get_input_cost_per_1k claude-opus-5-5) == 0.004 && $(get_output_cost_per_1k claude-opus-5-5) == 0.020 ]]' _ "$SCRIPT_DIR"
+       $(get_input_cost_per_1k claude-opus-5-5) == 0.004 && $(get_output_cost_per_1k claude-opus-5-5) == 0.02 ]]' _ "$SCRIPT_DIR"
 build_anthropic_request hello claude-opus-5-5 16384 | jq -e '
     .model == "claude-opus-5-5" and .max_tokens == 16384 and
     (has("thinking") or has("tools") or has("tool_choice") or has("temperature") or has("top_p") | not)' >/dev/null
