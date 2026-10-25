@@ -262,7 +262,7 @@ ENABLE_META=false
 ### Model Overrides
 
 ```bash
-GEMINI_MODEL="Gemini 4 Argon (High)" # CLI smoke passed; capability-probed identity; API uses GEMINI_API_MODEL
+GEMINI_MODEL="gemini-4-argon-high" # CLI smoke passed; capability-probed identity; API uses GEMINI_API_MODEL
 GEMINI_API_MODEL=gemini-4-argon       # API only; needs a paid-tier key
 GEMINI_API_MAX_TOKENS=32768           # API only: Argon thinking + visible output
 CODEX_MODEL=gpt-6.1-sol    # max_quality uses gpt-6-astra
@@ -393,7 +393,7 @@ IDs `mistral-medium-3-5` and `mistral-small-2603` remain catalogued opt-ins
 until an authenticated API smoke passes in this project.
 
 Gemini 4 Argon (GA 2026-10-13) is the Gemini default and maximum target:
-`GEMINI_MODEL="Gemini 4 Argon (High)"` on `agy` and `GEMINI_API_MODEL=gemini-4-argon`
+`GEMINI_MODEL="gemini-4-argon-high"` on `agy` and `GEMINI_API_MODEL=gemini-4-argon`
 on the API. An authorized `agy` consultation smoke returned a structured answer
 on 2026-10-16 (capability-probed identity, about 49 s for a short question). The
 API transport has offline tests only. On the API, Argon defaults to the `high`
@@ -401,7 +401,7 @@ thinking level of its CLI target (`GEMINI_REASONING_EFFORT` accepts
 low|medium|high), sends no sampling parameters, and spends thinking tokens from
 `GEMINI_API_MAX_TOKENS` (default 32768). Google excludes Argon from the Free tier
 and the AI Pro plan, so an `agy models` listing is not an access check. Pin
-`GEMINI_MODEL="Gemini 3.8 Flash (High)" # ai-consultants:pin` or
+`GEMINI_MODEL="gemini-3.8-flash-high" # ai-consultants:pin` or
 `GEMINI_API_MODEL=gemini-3.8-flash # ai-consultants:pin` to use Gemini 3.8
 Flash, the standard and economy target on both transports, by default.
 

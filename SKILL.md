@@ -123,7 +123,7 @@ the observed version is recorded only as response provenance.
 The `max_quality` preset enables all 11 consultants. It uses the separately
 Kimi K3.1 Pro at max thinking effort (every Kimi tier), MiniMax-M3.1-Flash (every MiniMax tier), GLM-5.3 (the flagship; Flash serves
 premium/standard/economy) and Qwen3.8-Max (also the Qwen default; Flash serves
-standard/economy). Gemini 4 Argon (High) is the `agy` target for the default
+standard/economy). `gemini-4-argon-high` is the `agy` target for the default
 and maximum tiers (`gemini-4-argon` on the API); one authorized `agy` smoke passed on
 2026-10-16 with capability-probed identity, and the API transport is offline-tested only.
 Gemini 3.8 Flash serves the standard/economy tiers (High/Low on the CLI, `gemini-3.8-flash`

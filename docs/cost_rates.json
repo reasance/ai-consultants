@@ -1,93 +1,130 @@
 {
   "version": "5.5.1",
-  "updated": "2026-10-24",
+  "updated": "2026-10-25",
   "models": {
     "_comment_units": "All rates are USD per 1,000 tokens (per-1K). lib/costs.sh computes cost as (token_count / 1000) * rate, so every value here MUST be a per-1K rate = (provider $/1M price) / 1000. Do NOT paste $/MTok figures directly.",
     "_comment_scope": "Current models only (5.5.0). Superseded models are listed in retired_models with their replacement; configure migrates them and the runtime warns. A model absent from this table is reported as unpriced, never priced at a guessed rate. Rates are official list prices, Verified 2026-10-24.",
+    "_comment_agy": "Antigravity CLI (agy) addresses Gemini models by display name and runs on subscription auth; these rates mirror the matching Gemini API model so the estimator stays consistent.",
+    "_comment_unpriced": "Subscription-billed transports: these consultants run on a plan that bills by quota (Kimi Code, Qwen Token Plan, GLM coding-plan endpoint), not per token. Rated 0 and listed in unpriced_models, so the session report discloses the exclusion instead of implying the model was free. For reference, the pay-as-you-go API prices per 1M are: kimi-k3.1-pro $2/$10, qwen3.8-max $2/$6, qwen3.8-flash $0.15/$0.47, GLM-5.3 $1.40/$4.40, GLM-5.3-Flash $0.15/$0.50 (Verified 2026-10-24.)",
     "claude-fable-5-1": {
       "input": 0.01,
       "output": 0.05,
       "provider": "Anthropic",
-      "notes": "Standard API list rate ($10/$50 per 1M). Cache/service adjustments excluded. Verified 2026-10-24."
+      "notes": "Standard API list rate ($10/$50 per 1M). Cache and batch adjustments excluded. Verified 2026-10-25 (https://platform.claude.com/docs/en/about-claude/pricing)."
     },
     "claude-opus-5-5": {
       "input": 0.004,
       "output": 0.02,
       "provider": "Anthropic",
-      "notes": "Standard API list rate ($4/$20 per 1M); 1M context at standard pricing. Cache/service adjustments excluded. Verified 2026-10-24."
+      "notes": "Standard API list rate ($4/$20 per 1M). Cache and batch adjustments excluded. Verified 2026-10-25 (https://platform.claude.com/docs/en/about-claude/pricing)."
+    },
+    "claude-sonnet-5-5": {
+      "input": 0.002,
+      "output": 0.01,
+      "provider": "Anthropic",
+      "notes": "Standard API list rate ($2/$10 per 1M). Cache and batch adjustments excluded. Verified 2026-10-25 (https://platform.claude.com/docs/en/about-claude/pricing)."
     },
     "claude-haiku-5-5": {
       "input": 0.0001,
       "output": 0.0005,
       "provider": "Anthropic",
-      "notes": "Standard API list rate ($0.10/$0.50 per 1M) for prompts up to 100K tokens; over 100K the whole request bills at $0.50/$2.50 (5x). Verified 2026-10-24."
+      "notes": "Standard API list rate ($0.10/$0.50 per 1M). Cache and batch adjustments excluded. Above 100K input tokens: $0.50/$2.50 (the whole request bills at this rate). Verified 2026-10-25 (https://platform.claude.com/docs/en/about-claude/pricing)."
     },
     "gemini-4-argon": {
       "input": 0.004,
       "output": 0.02,
       "provider": "Google",
-      "notes": "List rate from 2026-12-01 ($4/$20 per 1M); the introductory $2/$10 through 2026-11-30 is not applied, so budgets fail safe. Thinking tokens bill as output; cache discounts excluded. Verified 2026-10-24."
+      "notes": "Standard API list rate ($4/$20 per 1M). List rate from 2026-12-01; introductory 2/10 through 2026-11-30. Verified 2026-10-25 (https://ai.google.dev/gemini-api/docs/pricing)."
     },
-    "_comment_agy": "Antigravity CLI (agy) addresses Gemini models by display name and runs on subscription auth; these rates mirror the matching Gemini API model so the estimator stays consistent.",
-    "Gemini 4 Argon (High)": {
+    "gemini-4-argon-low": {
       "input": 0.004,
       "output": 0.02,
-      "notes": "API-equivalent list-rate estimate for the agy display name (gemini-4-argon); introductory 0.002/0.01 per 1K through 2026-11-30 not applied. Not a CLI invoice."
+      "notes": "API-equivalent estimate for gemini-4-argon-low (gemini-4-argon); not a CLI invoice."
     },
-    "Gemini 4 Argon (Medium)": {
+    "gemini-4-argon-medium": {
       "input": 0.004,
       "output": 0.02,
-      "notes": "API-equivalent list-rate estimate for the agy display name (gemini-4-argon); introductory 0.002/0.01 per 1K through 2026-11-30 not applied. Not a CLI invoice."
+      "notes": "API-equivalent estimate for gemini-4-argon-medium (gemini-4-argon); not a CLI invoice."
+    },
+    "gemini-4-argon-high": {
+      "input": 0.004,
+      "output": 0.02,
+      "notes": "API-equivalent estimate for gemini-4-argon-high (gemini-4-argon); not a CLI invoice."
     },
     "Gemini 4 Argon (Low)": {
       "input": 0.004,
       "output": 0.02,
-      "notes": "API-equivalent list-rate estimate for the agy display name (gemini-4-argon); introductory 0.002/0.01 per 1K through 2026-11-30 not applied. Not a CLI invoice."
+      "notes": "API-equivalent estimate for Gemini 4 Argon (Low) (gemini-4-argon); not a CLI invoice."
+    },
+    "Gemini 4 Argon (Medium)": {
+      "input": 0.004,
+      "output": 0.02,
+      "notes": "API-equivalent estimate for Gemini 4 Argon (Medium) (gemini-4-argon); not a CLI invoice."
+    },
+    "Gemini 4 Argon (High)": {
+      "input": 0.004,
+      "output": 0.02,
+      "notes": "API-equivalent estimate for Gemini 4 Argon (High) (gemini-4-argon); not a CLI invoice."
     },
     "gemini-3.8-flash": {
       "input": 0.00075,
       "output": 0.00375,
       "provider": "Google",
-      "notes": "Promotional rate through 2026-12-31 ($0.75/$3.75 per 1M); standard from 2027-01-01: $1.50/$7.50. Cache/service adjustments excluded. Verified 2026-10-24."
+      "notes": "Promotional rate ($0.75/$3.75 per 1M). Standard rate from 2027-01-01; promotional 0.75/3.75 through 2026-12-31. Verified 2026-10-25 (https://ai.google.dev/gemini-api/docs/pricing)."
     },
-    "Gemini 3.8 Flash (High)": {
+    "gemini-3.8-flash-low": {
       "input": 0.00075,
       "output": 0.00375,
-      "notes": "Promotional API-equivalent estimate through 2026-12-31; standard from 2027-01-01: 0.0015/0.0075 per 1K. Cache/service adjustments excluded; not a CLI invoice."
+      "notes": "API-equivalent estimate for gemini-3.8-flash-low (gemini-3.8-flash); not a CLI invoice."
     },
-    "Gemini 3.8 Flash (Medium)": {
+    "gemini-3.8-flash-medium": {
       "input": 0.00075,
       "output": 0.00375,
-      "notes": "Promotional API-equivalent estimate through 2026-12-31; standard from 2027-01-01: 0.0015/0.0075 per 1K. Cache/service adjustments excluded; not a CLI invoice."
+      "notes": "API-equivalent estimate for gemini-3.8-flash-medium (gemini-3.8-flash); not a CLI invoice."
+    },
+    "gemini-3.8-flash-high": {
+      "input": 0.00075,
+      "output": 0.00375,
+      "notes": "API-equivalent estimate for gemini-3.8-flash-high (gemini-3.8-flash); not a CLI invoice."
     },
     "Gemini 3.8 Flash (Low)": {
       "input": 0.00075,
       "output": 0.00375,
-      "notes": "Promotional API-equivalent estimate through 2026-12-31; standard from 2027-01-01: 0.0015/0.0075 per 1K. Cache/service adjustments excluded; not a CLI invoice."
+      "notes": "API-equivalent estimate for Gemini 3.8 Flash (Low) (gemini-3.8-flash); not a CLI invoice."
+    },
+    "Gemini 3.8 Flash (Medium)": {
+      "input": 0.00075,
+      "output": 0.00375,
+      "notes": "API-equivalent estimate for Gemini 3.8 Flash (Medium) (gemini-3.8-flash); not a CLI invoice."
+    },
+    "Gemini 3.8 Flash (High)": {
+      "input": 0.00075,
+      "output": 0.00375,
+      "notes": "API-equivalent estimate for Gemini 3.8 Flash (High) (gemini-3.8-flash); not a CLI invoice."
     },
     "gpt-6-astra": {
       "input": 0.01,
       "output": 0.05,
       "provider": "OpenAI",
-      "notes": "Standard rate ($10/$50 per 1M). >272K input: long-context rates for the full request (2x input, 1.5x output). Cache/service adjustments excluded. Verified 2026-10-24."
+      "notes": "Standard API list rate ($10/$50 per 1M). Above 272K input tokens the long-context rates apply. Verified 2026-10-25 (https://developers.openai.com/api/docs/pricing)."
     },
     "gpt-6.1-sol": {
       "input": 0.002,
       "output": 0.01,
       "provider": "OpenAI",
-      "notes": "Standard rate ($2/$10 per 1M). >272K input: long-context rates for the full request (2x input, 1.5x output). Cache/service adjustments excluded. Verified 2026-10-24."
+      "notes": "Standard API list rate ($2/$10 per 1M). Above 272K input tokens the long-context rates apply. Verified 2026-10-25 (https://developers.openai.com/api/docs/pricing)."
     },
     "gpt-6-luna": {
       "input": 0.0001,
       "output": 0.0005,
       "provider": "OpenAI",
-      "notes": "Standard rate ($0.10/$0.50 per 1M). >272K input: long-context rates for the full request (2x input, 1.5x output). Cache/service adjustments excluded. Verified 2026-10-24."
+      "notes": "Standard API list rate ($0.10/$0.50 per 1M). Verified 2026-10-25 (https://developers.openai.com/api/docs/pricing)."
     },
     "mistral-large-4": {
       "input": 0.00136,
       "output": 0.00418,
       "provider": "Mistral",
-      "notes": "Public preview; list rate ($1.36/$4.18 per 1M). Alias of mistral-large-4-0. Verified 2026-10-24."
+      "notes": "Standard API list rate ($1.36/$4.18 per 1M). Verified 2026-10-25 (https://docs.mistral.ai/models/mistral-large-4-0)."
     },
     "mistral-large-4-0": {
       "input": 0.00136,
@@ -97,7 +134,7 @@
       "input": 0.0015,
       "output": 0.0075,
       "provider": "Mistral",
-      "notes": "Medium 3.5 ($1.50/$7.50 per 1M); Vibe CLI name. Verified 2026-10-24."
+      "notes": "Standard API list rate ($1.50/$7.50 per 1M). Verified 2026-10-25 (https://docs.mistral.ai/models/mistral-medium-3-5-26-04)."
     },
     "mistral-medium-3-5": {
       "input": 0.0015,
@@ -107,33 +144,50 @@
       "input": 0.00015,
       "output": 0.0006,
       "provider": "Mistral",
-      "notes": "Mistral Small 4 ($0.15/$0.60 per 1M); API opt-in. Verified 2026-10-24."
+      "notes": "Standard API list rate ($0.15/$0.60 per 1M). Verified 2026-10-25 (https://docs.mistral.ai/models/mistral-small-4-0-26-03)."
     },
     "deepseek-flash": {
       "input": 0.0003,
       "output": 0.0012,
       "provider": "DeepSeek",
-      "notes": "DeepSeek-V4.1-Flash. Peak cache-miss rate ($0.30/$1.20 per 1M); off-peak (50%) and cache-hit discounts excluded. Verified 2026-10-24."
+      "notes": "Standard API list rate ($0.30/$1.20 per 1M). Peak cache-miss rate; off-peak 0.15/0.60. Verified 2026-10-25 (https://api-docs.deepseek.com/quick_start/pricing)."
     },
     "deepseek-v4-pro": {
       "input": 0.00132,
       "output": 0.00396,
       "provider": "DeepSeek",
-      "notes": "Peak cache-miss rate ($1.32/$3.96 per 1M); off-peak (50%) and cache-hit discounts excluded. Opt-in. Verified 2026-10-24."
+      "notes": "Standard API list rate ($1.32/$3.96 per 1M). Peak rate. Verified 2026-10-25 (https://api-docs.deepseek.com/quick_start/pricing)."
     },
     "grok-4.7": {
       "input": 0.002,
       "output": 0.006,
       "provider": "xAI",
-      "notes": "Standard rate ($2/$6 per 1M); at 200K input or more both rates double for the request. Cache, regional, priority and Fast rates excluded. Verified 2026-10-24."
+      "notes": "Standard API list rate ($2/$6 per 1M). At or above 200K input tokens: 4/12. Above 200K input tokens: $4/$12. Verified 2026-10-25 (https://docs.x.ai/docs/models)."
     },
     "minimax-m3.1-flash": {
       "input": 0.00015,
       "output": 0.0006,
       "provider": "MiniMax",
-      "notes": "Pay-as-you-go rate ($0.15/$0.60 per 1M); cache reads excluded. Verified 2026-10-24."
+      "notes": "Standard API list rate ($0.15/$0.60 per 1M). Verified 2026-10-25 (https://platform.minimax.io/docs/guides/pricing)."
     },
-    "_comment_unpriced": "Subscription-billed transports: these consultants run on a plan that bills by quota (Kimi Code, Qwen Token Plan, GLM coding-plan endpoint), not per token. Rated 0 and listed in unpriced_models, so the session report discloses the exclusion instead of implying the model was free. For reference, the pay-as-you-go API prices per 1M are: kimi-k3.1-pro $2/$10, qwen3.8-max $2/$6, qwen3.8-flash $0.15/$0.47, GLM-5.3 $1.40/$4.40, GLM-5.3-Flash $0.15/$0.50 (Verified 2026-10-24.)",
+    "muse-wonder-1.0": {
+      "input": 0.004,
+      "output": 0.02,
+      "provider": "Meta",
+      "notes": "Standard API list rate ($4/$20 per 1M). Cached input 0.20. Verified 2026-10-25 (https://dev.meta.ai/docs/pricing-rate-limits)."
+    },
+    "muse-spark-1.3": {
+      "input": 0.00125,
+      "output": 0.00425,
+      "provider": "Meta",
+      "notes": "Standard API list rate ($1.25/$4.25 per 1M). Cached input 0.15. Verified 2026-10-25 (https://dev.meta.ai/docs/pricing-rate-limits)."
+    },
+    "muse-spark-1.3-contributor": {
+      "input": 0.0001,
+      "output": 0.0002,
+      "provider": "Meta",
+      "notes": "Standard API list rate ($0.10/$0.20 per 1M). Content is used for training (Contributor mode). Verified 2026-10-25 (https://dev.meta.ai/docs/pricing-rate-limits)."
+    },
     "kimi-code/k3.1-pro": {
       "input": 0,
       "output": 0
@@ -153,24 +207,6 @@
     "glm-5.3-flash": {
       "input": 0,
       "output": 0
-    },
-    "muse-wonder-1.0": {
-      "input": 0.004,
-      "output": 0.02,
-      "provider": "Meta",
-      "notes": "Standard mode rate ($4.00/$20.00 per 1M; cached input $0.20 excluded). No long-context premium. Preview; no Contributor mode on the API. Verified 2026-10-24."
-    },
-    "muse-spark-1.3": {
-      "input": 0.00125,
-      "output": 0.00425,
-      "provider": "Meta",
-      "notes": "Standard mode rate ($1.25/$4.25 per 1M; cached input $0.15 excluded). No long-context premium. Verified 2026-10-24."
-    },
-    "muse-spark-1.3-contributor": {
-      "input": 0.0001,
-      "output": 0.0002,
-      "provider": "Meta",
-      "notes": "Contributor mode rate ($0.10/$0.20 per 1M): Meta may train on prompts, context and responses. Opt-in by pinning only. Verified 2026-10-24."
     }
   },
   "unpriced_models": [
@@ -189,22 +225,22 @@
     "opus-4.6": "claude-opus-5-5",
     "claude-opus-4-5-20251124": "claude-opus-5-5",
     "claude-3-opus": "claude-opus-5-5",
-    "claude-sonnet-5": "claude-opus-5-5",
-    "claude-sonnet-4-6": "claude-opus-5-5",
-    "sonnet-4.6": "claude-opus-5-5",
-    "claude-sonnet-4-5-20251124": "claude-opus-5-5",
-    "claude-3-sonnet": "claude-opus-5-5",
+    "claude-sonnet-5": "claude-sonnet-5-5",
+    "claude-sonnet-4-6": "claude-sonnet-5-5",
+    "sonnet-4.6": "claude-sonnet-5-5",
+    "claude-sonnet-4-5-20251124": "claude-sonnet-5-5",
+    "claude-3-sonnet": "claude-sonnet-5-5",
     "claude-haiku-4-5": "claude-haiku-5-5",
     "haiku-4.5": "claude-haiku-5-5",
     "claude-3-5-haiku-20241022": "claude-haiku-5-5",
     "claude-3-haiku": "claude-haiku-5-5",
-    "Gemini 3.1 Pro (High)": "Gemini 4 Argon (High)",
-    "Gemini 3.7 Flash (High)": "Gemini 3.8 Flash (High)",
-    "Gemini 3.6 Flash (High)": "Gemini 3.8 Flash (High)",
-    "Gemini 3.5 Flash (High)": "Gemini 3.8 Flash (High)",
-    "Gemini 3.7 Flash (Low)": "Gemini 3.8 Flash (Low)",
-    "Gemini 3.6 Flash (Low)": "Gemini 3.8 Flash (Low)",
-    "Gemini 3.5 Flash (Low)": "Gemini 3.8 Flash (Low)",
+    "Gemini 3.1 Pro (High)": "gemini-4-argon-high",
+    "Gemini 3.7 Flash (High)": "gemini-3.8-flash-high",
+    "Gemini 3.6 Flash (High)": "gemini-3.8-flash-high",
+    "Gemini 3.5 Flash (High)": "gemini-3.8-flash-high",
+    "Gemini 3.7 Flash (Low)": "gemini-3.8-flash-low",
+    "Gemini 3.6 Flash (Low)": "gemini-3.8-flash-low",
+    "Gemini 3.5 Flash (Low)": "gemini-3.8-flash-low",
     "gemini-3.1-pro-preview": "gemini-4-argon",
     "gemini-3.7-flash": "gemini-3.8-flash",
     "gemini-3-flash": "gemini-3.8-flash",
@@ -275,13 +311,14 @@
     "composer-2.5": null,
     "composer-1.5": null,
     "cursor": null,
-    "nvidia/nemotron-3-super-120b-a12b:free": null
+    "nvidia/nemotron-3-super-120b-a12b:free": null,
+    "kimi-k3": "kimi-k3.1-pro"
   },
   "model_tiers": {
     "_comment": "Model tiers for apply_model_tier() (mirrors get_model_for_tier in scripts/config.sh)",
     "maximum": {
       "claude": "claude-fable-5-1",
-      "gemini": "Gemini 4 Argon (High)",
+      "gemini": "gemini-4-argon-high",
       "codex": "gpt-6-astra",
       "mistral": "mistral-medium-3.5",
       "deepseek": "deepseek-flash",
@@ -294,7 +331,7 @@
     },
     "premium": {
       "claude": "claude-fable-5-1",
-      "gemini": "Gemini 4 Argon (High)",
+      "gemini": "gemini-4-argon-high",
       "codex": "gpt-6.1-sol",
       "mistral": "mistral-medium-3.5",
       "deepseek": "deepseek-flash",
@@ -307,7 +344,7 @@
     },
     "standard": {
       "claude": "claude-opus-5-5",
-      "gemini": "Gemini 3.8 Flash (High)",
+      "gemini": "gemini-3.8-flash-high",
       "codex": "gpt-6.1-sol",
       "mistral": "mistral-medium-3.5",
       "deepseek": "deepseek-flash",
@@ -320,7 +357,7 @@
     },
     "economy": {
       "claude": "claude-haiku-5-5",
-      "gemini": "Gemini 3.8 Flash (Low)",
+      "gemini": "gemini-3.8-flash-low",
       "codex": "gpt-6-luna",
       "mistral": "mistral-medium-3.5",
       "deepseek": "deepseek-flash",
@@ -336,19 +373,19 @@
     "_comment": "Transport-specific namespaces used by Gemini and Mistral; the legacy model_tiers table reflects their CLI values.",
     "gemini": {
       "maximum": {
-        "cli": "Gemini 4 Argon (High)",
+        "cli": "gemini-4-argon-high",
         "api": "gemini-4-argon"
       },
       "premium": {
-        "cli": "Gemini 4 Argon (High)",
+        "cli": "gemini-4-argon-high",
         "api": "gemini-4-argon"
       },
       "standard": {
-        "cli": "Gemini 3.8 Flash (High)",
+        "cli": "gemini-3.8-flash-high",
         "api": "gemini-3.8-flash"
       },
       "economy": {
-        "cli": "Gemini 3.8 Flash (Low)",
+        "cli": "gemini-3.8-flash-low",
         "api": "gemini-3.8-flash"
       }
     },
@@ -374,7 +411,7 @@
   "consultant_fallbacks": {
     "_comment": "Premium defaults - 5.5.0",
     "claude": "claude-fable-5-1",
-    "gemini": "Gemini 4 Argon (High)",
+    "gemini": "gemini-4-argon-high",
     "codex": "gpt-6.1-sol",
     "mistral": "mistral-medium-3.5",
     "deepseek": "deepseek-flash",
@@ -382,14 +419,14 @@
     "grok": "grok-4.7",
     "qwen3": "qwen3.8-max",
     "kimi": "kimi-code/k3.1-pro",
-    "minimax": "minimax-m3.1-flash",
+    "minimax": "MiniMax-M3.1-Flash",
     "meta": "muse-wonder-1.0"
   },
   "opt_in_targets": {
     "gemini_cli": [
-      "Gemini 4 Argon (Medium)",
-      "Gemini 4 Argon (Low)",
-      "Gemini 3.8 Flash (Medium)"
+      "gemini-4-argon-medium",
+      "gemini-4-argon-low",
+      "gemini-3.8-flash-medium"
     ],
     "mistral_api": [
       "mistral-medium-3-5",

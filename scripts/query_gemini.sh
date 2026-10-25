@@ -2,13 +2,13 @@
 # query_gemini.sh - Query Gemini via the Antigravity CLI (`agy`) or Google AI API
 #
 # CLI mode uses `agy` (Antigravity CLI), the successor to the deprecated Gemini
-# CLI (transitioned 2026-06-18). Models are addressed by display name and the
+# CLI (transitioned 2026-06-18). Models are addressed by agy model ID and the
 # CLI prints the model's response as plain text (no JSON envelope wrapper).
 #
 # Usage: ./query_gemini.sh "question" [context_file] [output_file]
 #
 # Environment variables:
-#   GEMINI_MODEL - agy model display name (default: "Gemini 4 Argon (High)")
+#   GEMINI_MODEL - agy model ID (default: gemini-4-argon-high; `agy models` lists them)
 #   GEMINI_TIMEOUT - Timeout in seconds (default: 180)
 #   GEMINI_USE_API - Use Google AI API mode instead of the agy CLI (default: false)
 #   GEMINI_API_MODEL - API model ID for API mode (default: gemini-4-argon)
@@ -93,7 +93,7 @@ if is_api_mode "gemini"; then
     source "$SCRIPT_DIR/lib/api_query.sh"
 
     # API mode addresses the Google AI endpoint, which needs an API model ID
-    # (not an agy display name like "Gemini 4 Argon (High)").
+    # (not an agy model ID like gemini-4-argon-high).
     # Keep the failure inside an explicit conditional: a bare call whose
     # function returns non-zero aborts the script under `set -e` before
     # exit_code is read, so no error-response envelope is ever written and

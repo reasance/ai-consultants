@@ -23,12 +23,12 @@ models programmatically.
 
 | Model | Tier | Cost/1K | Consultant |
 |-------|------|---------|------------|
-| Gemini 4 Argon (High) | Maximum/Premium | $0.004 | Gemini (CLI smoke passed; API-equivalent list-rate estimate) |
-| Gemini 4 Argon (Medium/Low) | CLI opt-in | $0.004 | Gemini (agy CLI; API-equivalent list-rate estimate) |
+| gemini-4-argon-high | Maximum/Premium | $0.004 | Gemini (CLI smoke passed; API-equivalent list-rate estimate) |
+| gemini-4-argon-medium, gemini-4-argon-low | CLI opt-in | $0.004 | Gemini (agy CLI; API-equivalent list-rate estimate) |
 | gemini-4-argon | API Maximum/Premium | $0.004 | Gemini API (list rate; offline-tested) |
-| Gemini 3.8 Flash (High) | Standard | $0.00075 | Gemini (CLI smoke passed; API-equivalent estimate; promotional through 2026-12-31) |
-| Gemini 3.8 Flash (Low) | Economy | $0.00075 | Gemini (CLI smoke passed; API-equivalent estimate; promotional through 2026-12-31) |
-| Gemini 3.8 Flash (Medium) | CLI opt-in | $0.00075 | Gemini (agy CLI; promotional through 2026-12-31) |
+| gemini-3.8-flash-high | Standard | $0.00075 | Gemini (CLI smoke passed; API-equivalent estimate; promotional through 2026-12-31) |
+| gemini-3.8-flash-low | Economy | $0.00075 | Gemini (CLI smoke passed; API-equivalent estimate; promotional through 2026-12-31) |
+| gemini-3.8-flash-medium | CLI opt-in | $0.00075 | Gemini (agy CLI; promotional through 2026-12-31) |
 | gemini-3.8-flash | API Standard/Economy | $0.00075 | Gemini API (promotional through 2026-12-31; offline-tested) |
 | gpt-6-astra | Maximum | $0.010 | Codex |
 | gpt-6.1-sol | Default/Premium/Standard | $0.002 | Codex |
@@ -57,12 +57,12 @@ models programmatically.
 
 | Model | Tier | Cost/1K | Consultant |
 |-------|------|---------|------------|
-| Gemini 4 Argon (High) | Maximum/Premium | $0.020 | Gemini (CLI smoke passed; API-equivalent list-rate estimate) |
-| Gemini 4 Argon (Medium/Low) | CLI opt-in | $0.020 | Gemini (agy CLI; API-equivalent list-rate estimate) |
+| gemini-4-argon-high | Maximum/Premium | $0.020 | Gemini (CLI smoke passed; API-equivalent list-rate estimate) |
+| gemini-4-argon-medium, gemini-4-argon-low | CLI opt-in | $0.020 | Gemini (agy CLI; API-equivalent list-rate estimate) |
 | gemini-4-argon | API Maximum/Premium | $0.020 | Gemini API (list rate; offline-tested) |
-| Gemini 3.8 Flash (High) | Standard | $0.00375 | Gemini (CLI smoke passed; API-equivalent estimate; promotional through 2026-12-31) |
-| Gemini 3.8 Flash (Low) | Economy | $0.00375 | Gemini (CLI smoke passed; API-equivalent estimate; promotional through 2026-12-31) |
-| Gemini 3.8 Flash (Medium) | CLI opt-in | $0.00375 | Gemini (agy CLI; promotional through 2026-12-31) |
+| gemini-3.8-flash-high | Standard | $0.00375 | Gemini (CLI smoke passed; API-equivalent estimate; promotional through 2026-12-31) |
+| gemini-3.8-flash-low | Economy | $0.00375 | Gemini (CLI smoke passed; API-equivalent estimate; promotional through 2026-12-31) |
+| gemini-3.8-flash-medium | CLI opt-in | $0.00375 | Gemini (agy CLI; promotional through 2026-12-31) |
 | gemini-3.8-flash | API Standard/Economy | $0.00375 | Gemini API (promotional through 2026-12-31; offline-tested) |
 | gpt-6-astra | Maximum | $0.050 | Codex |
 | gpt-6.1-sol | Default/Premium/Standard | $0.010 | Codex |
@@ -247,7 +247,7 @@ and [Opus 5.5](https://platform.claude.com/docs/en/models/opus-5-5/overview).
 
 ## Gemini 4 Argon
 
-`Gemini 4 Argon (High)` on `agy` and `gemini-4-argon` on the API serve the
+`gemini-4-argon-high` on `agy` and `gemini-4-argon` on the API serve the
 default (premium) and maximum tiers. Google lists Argon at $4/M input and $20/M
 output, with an introductory $2/M and $10/M through 2026-11-30. The estimator
 uses the list rate so budgets fail safe; thinking tokens bill as output, and

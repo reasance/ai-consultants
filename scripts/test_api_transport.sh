@@ -530,6 +530,19 @@ test_anthropic_thinking_blocks_and_budget() {
         "Anthropic request accepts the larger shared thinking/output budget"
     assert_eq "16384" "$(build_anthropic_request "hello" "claude-fable-5-1" | jq -r '.max_tokens')" \
         "Anthropic request helper defaults to the Opus 5 budget"
+    assert_eq "false" "$(build_anthropic_request "hello" "claude-opus-5-5" 16384 | jq 'has("output_config")')" \
+        "Anthropic request without an effort leaves the model default"
+    assert_eq "xhigh" "$(build_anthropic_request "hello" "claude-opus-5-5" 16384 xhigh | jq -r '.output_config.effort')" \
+        "Anthropic request carries the effort in output_config.effort"
+}
+
+test_qwen_dashscope_output_cap() {
+    assert_eq "16384" "$(build_qwen_request "hello" "qwen3.8-max" | jq -r '.parameters.max_tokens')" \
+        "DashScope request caps output by default"
+    assert_eq "8000" "$(build_qwen_request "hello" "qwen3.8-max" 8000 | jq -r '.parameters.max_tokens')" \
+        "DashScope request takes the configured output cap"
+    assert_eq "message" "$(build_qwen_request "hello" "qwen3.8-max" 8000 | jq -r '.parameters.result_format')" \
+        "DashScope request keeps the message result format"
 }
 
 test_anthropic_max_tokens_is_failure() {
@@ -698,6 +711,7 @@ run_test "Gemini 4 Argon API request and multi-part answers" test_gemini_argon_a
 run_test "API provider model identity and GLM failure modes" test_api_provider_model_identity_and_glm_failures
 run_test "OpenAI-compatible reasoning content chunks" test_openai_reasoning_content_chunks
 run_test "Anthropic thinking blocks and request budget" test_anthropic_thinking_blocks_and_budget
+run_test "DashScope request output cap" test_qwen_dashscope_output_cap
 run_test "Anthropic truncation fails closed" test_anthropic_max_tokens_is_failure
 run_test "API consultants get the persona contract over a private transport" test_api_consultant_contract_and_private_transport
 run_test "Request builders accept prompts beyond argv limits" test_request_builders_accept_prompts_beyond_argv_limits

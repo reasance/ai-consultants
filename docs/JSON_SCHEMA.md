@@ -35,7 +35,7 @@ Every consultant file has the same outer shape, whatever happened:
 ```json
 {
   "consultant": "Gemini",
-  "model": "Gemini 4 Argon (High)",
+  "model": "gemini-4-argon-high",
   "persona": "The Architect",
   "response": {
     "summary": "TL;DR in 2-3 sentences",
@@ -56,8 +56,8 @@ Every consultant file has the same outer shape, whatever happened:
     "tokens_input": 1200,
     "tokens_output": 300,
     "latency_ms": 2345,
-    "model_version": "Gemini 4 Argon (High)",
-    "requested_model": "Gemini 4 Argon (High)",
+    "model_version": "gemini-4-argon-high",
+    "requested_model": "gemini-4-argon-high",
     "model_identity_source": "capability-probed",
     "response_quality": "structured",
     "timestamp": "2026-09-29T12:34:56+02:00"
