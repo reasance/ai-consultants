@@ -768,6 +768,8 @@ check_rate_limit() {
 # (none/minimal unsupported); an unsupported explicit value fails before the
 # request is billed. As panel consultants Astra and Sol get high unless an
 # effort is configured; economy Luna keeps the provider default.
+# Terra 6.1 keeps its transport default, supports API none, and rejects minimal.
+# Codex CLI does not offer none for Terra.
 _codex_frontier_model() {
     case "$1" in
         gpt-6-astra|gpt-6.1-sol) return 0 ;;
@@ -781,12 +783,17 @@ _codex_gpt6_model() {
     esac
 }
 resolve_codex_effort() {
-    local model="$1" effort="${2:-}"
+    local model="$1" effort="${2:-}" transport="${3:-api}"
     if [[ -z "$effort" ]] && _codex_frontier_model "$model"; then
         effort=high
     fi
     [[ -n "$effort" ]] || return 0
     effort=$(validate_reasoning_effort "$effort" Codex) || return 1
+    if [[ "$model" == gpt-6.1-terra ]] &&
+        { [[ "$effort" == minimal ]] || [[ "$transport" == cli && "$effort" == none ]]; }; then
+        log_error "[Codex] $model does not support reasoning effort $effort on $transport"
+        return 1
+    fi
     if _codex_gpt6_model "$model" && [[ "$effort" == none || "$effort" == minimal ]]; then
         log_error "[Codex] $model requires low|medium|high|xhigh|max reasoning effort"
         return 1

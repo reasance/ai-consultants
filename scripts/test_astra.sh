@@ -47,6 +47,16 @@ build_openai_request hello grok-4.7 4096 high | jq -e '.max_tokens == 4096 and (
 [[ $(estimate_query_cost gpt-6.1-sol 273000 1000) == 1.107000 ]] || { printf "Astra assertion failed at line %s\n" "$LINENO" >&2; exit 1; }
 [[ $(estimate_query_cost gpt-6-luna 272000 1000) == 0.027700 ]] || { printf "Astra assertion failed at line %s\n" "$LINENO" >&2; exit 1; }
 [[ $(estimate_query_cost gpt-6-luna 273000 1000) == 0.055350 ]] || { printf "Astra assertion failed at line %s\n" "$LINENO" >&2; exit 1; }
+# Terra is opt-in: its transport default stays unset and API none is valid.
+[[ -z $(resolve_codex_effort gpt-6.1-terra '') ]] || exit 1
+build_codex_request hello gpt-6.1-terra 4096 none | jq -e '.model == "gpt-6.1-terra" and .reasoning_effort == "none" and .max_completion_tokens == 4096 and (has("max_tokens")|not)' >/dev/null
+build_codex_request hello gpt-6.1-terra 4096 '' | jq -e 'has("reasoning_effort")|not' >/dev/null
+if resolve_codex_effort gpt-6.1-terra minimal >/dev/null 2>&1; then exit 1; fi
+if resolve_codex_effort gpt-6.1-terra none cli >/dev/null 2>&1; then exit 1; fi
+[[ $(estimate_query_cost gpt-6.1-terra 272000 1000) == 0.277000 ]] || exit 1
+[[ $(estimate_query_cost gpt-6.1-terra 273000 1000) == 0.553500 ]] || exit 1
+COST_RATES_FILE="$TMP/missing" \
+    bash -c 'source "$1/lib/costs.sh"; [[ $(estimate_query_cost gpt-6.1-terra 273000 1000) == 0.553500 ]]' _ "$SCRIPT_DIR"
 COST_RATES_FILE="$TMP/missing" \
     bash -c 'source "$1/lib/costs.sh"; [[ $(get_input_cost_per_1k gpt-6-astra) == 0.01 && $(get_output_cost_per_1k gpt-6-astra) == 0.05 ]]' _ "$SCRIPT_DIR"
 COST_RATES_FILE="$TMP/missing" \
@@ -60,7 +70,8 @@ mkdir -p "$TMP/bin"
 printf '#!/bin/bash\n: > "$DISPATCH_FILE"\nexit 99\n' > "$TMP/bin/curl"
 chmod +x "$TMP/bin/curl"
 for effort in none minimal; do
-  for gpt6 in gpt-6-astra gpt-6.1-sol; do
+  for gpt6 in gpt-6-astra gpt-6.1-sol gpt-6.1-terra; do
+    [[ "$gpt6" == gpt-6.1-terra && "$effort" == none ]] && continue
     rc=0
     rm -f "$TMP/dispatched"
     PATH="$TMP/bin:$PATH" CODEX_USE_API=true OPENAI_API_KEY=test CODEX_MODEL="$gpt6" \
@@ -70,4 +81,4 @@ for effort in none minimal; do
     jq -e '.metadata.response_quality == "error"' "$TMP/error.json" >/dev/null
   done
 done
-printf '%s\n' 'GPT-6 Astra/6.1 Sol/Luna effort, tier isolation, payload and pricing checks passed'
+printf '%s\n' 'GPT-6 Astra/6.1 Sol/6.1 Terra/Luna effort, tier isolation, payload and pricing checks passed'

@@ -32,6 +32,7 @@ models programmatically.
 | gemini-3.8-flash | API Standard/Economy | $0.00075 | Gemini API (promotional through 2026-12-31; offline-tested) |
 | gpt-6-astra | Maximum | $0.010 | Codex |
 | gpt-6.1-sol | Default/Premium/Standard | $0.002 | Codex |
+| gpt-6.1-terra | Opt-in | $0.001 | Codex |
 | gpt-6-luna | Economy | $0.0001 | Codex |
 | claude-fable-5-1 | Maximum/Premium | $0.010 | Claude |
 | claude-opus-5-5 | Standard | $0.004 | Claude |
@@ -66,6 +67,7 @@ models programmatically.
 | gemini-3.8-flash | API Standard/Economy | $0.00375 | Gemini API (promotional through 2026-12-31; offline-tested) |
 | gpt-6-astra | Maximum | $0.050 | Codex |
 | gpt-6.1-sol | Default/Premium/Standard | $0.010 | Codex |
+| gpt-6.1-terra | Opt-in | $0.005 | Codex |
 | gpt-6-luna | Economy | $0.0005 | Codex |
 | claude-fable-5-1 | Maximum/Premium | $0.050 | Claude |
 | claude-opus-5-5 | Standard | $0.020 | Claude |
@@ -121,6 +123,17 @@ $0.435/$0.87 to its current $1.32/$3.96 per 1M. The subscription-billed models
 have published API prices for reference: Kimi K3.1 Pro $2/$10, Qwen3.8-Max
 $2/$6, Qwen3.8-Flash $0.15/$0.47, GLM-5.3 $1.40/$4.40 and GLM-5.3-Flash
 $0.15/$0.50 per 1M; their CLI or plan transports are billed by quota instead.
+
+GPT-6.1 Terra is opt-in through `CODEX_MODEL=gpt-6.1-terra`; no tier selects
+it automatically. API `CODEX_REASONING_EFFORT` accepts `none`, `low`,
+`medium`, `high`, `xhigh` and `max`; the CLI accepts `low` through `max`
+in this consultant wrapper. Leaving it unset keeps the transport default
+(API `medium`, Codex CLI `low`). `minimal` is rejected. Standard rates above
+272K input tokens are $2/M input and $7.50/M output for the full request.
+Tool calling on Terra requires the Responses API; this consultant uses
+Chat Completions for text-only API requests. Facts verified 2026-10-27 from
+[the model page](https://developers.openai.com/api/docs/models/gpt-6.1-terra)
+and [pricing](https://developers.openai.com/api/docs/pricing).
 
 Meta bills Muse Wonder and Muse Spark per token with no long-context premium;
 cached input ($0.20 and $0.15 per 1M) is excluded from the estimate, and

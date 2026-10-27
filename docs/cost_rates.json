@@ -1,6 +1,6 @@
 {
   "version": "5.6.0",
-  "updated": "2026-10-25",
+  "updated": "2026-10-27",
   "models": {
     "_comment_units": "All rates are USD per 1,000 tokens (per-1K). lib/costs.sh computes cost as (token_count / 1000) * rate, so every value here MUST be a per-1K rate = (provider $/1M price) / 1000. Do NOT paste $/MTok figures directly.",
     "_comment_scope": "Current models only (5.5.0). Superseded models are listed in retired_models with their replacement; configure migrates them and the runtime warns. A model absent from this table is reported as unpriced, never priced at a guessed rate. Rates are official list prices, Verified 2026-10-24.",
@@ -113,6 +113,12 @@
       "output": 0.01,
       "provider": "OpenAI",
       "notes": "Standard API list rate ($2/$10 per 1M). Above 272K input tokens the long-context rates apply. Verified 2026-10-25 (https://developers.openai.com/api/docs/pricing)."
+    },
+    "gpt-6.1-terra": {
+      "input": 0.001,
+      "output": 0.005,
+      "provider": "OpenAI",
+      "notes": "Standard API list rate ($1/$5 per 1M). Standard USD per 1M tokens. Cached input $0.05. Above 272K input tokens, the long-context rates apply to the full request. Above 272K input tokens: $2/$7.50. Verified 2026-10-27 (https://developers.openai.com/api/docs/pricing)."
     },
     "gpt-6-luna": {
       "input": 0.0001,
@@ -247,7 +253,7 @@
     "gemini-3-flash-preview": "gemini-3.8-flash",
     "gemini-2.0-flash": "gemini-3.8-flash",
     "gpt-5.6-sol": "gpt-6.1-sol",
-    "gpt-5.6-terra": "gpt-6.1-sol",
+    "gpt-5.6-terra": "gpt-6.1-terra",
     "gpt-5.5": "gpt-6.1-sol",
     "gpt-5.4": "gpt-6.1-sol",
     "gpt-5.3": "gpt-6.1-sol",
@@ -423,6 +429,9 @@
     "meta": "muse-wonder-1.0"
   },
   "opt_in_targets": {
+    "codex": [
+      "gpt-6.1-terra"
+    ],
     "gemini_cli": [
       "gemini-4-argon-medium",
       "gemini-4-argon-low",
