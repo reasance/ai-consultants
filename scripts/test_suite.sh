@@ -793,8 +793,12 @@ test_response_tokens() {
     rm -f "$rd"/*.json
     printf '{"consultant":"Codex","model":"gpt-6.1-sol","response":{"approach":"x"},"confidence":{"score":8},"metadata":{"tokens_used":20500,"tokens_source":"measured","tokens_input":20000,"tokens_output":500}}\n' > "$rd/c.json"
     assert_equals "0.045000" "$(calculate_session_cost "$rd")" "measured split priced as measured, not re-split 60/40"
-    assert_equals " [GPT-6 Astra/6.1 Sol/Luna cost estimated at Standard rates (incl. long-context pricing); cache/service adjustments excluded, not an invoice]" \
+    assert_equals " [GPT-6 Astra/6.1 Sol/6.1 Terra/Luna cost estimated at Standard rates (incl. long-context pricing); cache/service adjustments excluded, not an invoice]" \
         "$(format_cost_caveats "$rd")" "a fully measured, priced run discloses only its rate basis"
+
+    printf '{"consultant":"Codex","model":"gpt-6.1-terra","response":{"approach":"x"},"metadata":{"tokens_source":"measured","tokens_input":273000,"tokens_output":1000,"tokens_used":274000}}\n' > "$rd/c.json"
+    assert_equals "0.553500" "$(calculate_session_cost "$rd")" "Terra session cost uses the full-request long-context rates"
+    assert_contains "6.1 Terra" "$(format_cost_caveats "$rd")" "Terra rate estimate is disclosed"
 
     # Keep the provider's versioned effective identity without mispricing it:
     # requested_model supplies the catalog key when that revision has no row.

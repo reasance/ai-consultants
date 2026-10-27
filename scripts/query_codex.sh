@@ -111,7 +111,7 @@ else
 
     source "$SCRIPT_DIR/lib/api.sh"
     effort_ok=true
-    if ! cli_effort=$(resolve_codex_effort "$CODEX_MODEL" "${CODEX_REASONING_EFFORT:-}"); then
+    if ! cli_effort=$(resolve_codex_effort "$CODEX_MODEL" "${CODEX_REASONING_EFFORT:-}" cli); then
         effort_ok=false
         exit_code=1
     fi

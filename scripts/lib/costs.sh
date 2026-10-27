@@ -106,10 +106,10 @@ get_default_rate() {
 # COST RATES (USD per 1K tokens)
 # =============================================================================
 # docs/cost_rates.json is the source of truth. The built-in table below covers
-# only the current tier models, so an install without the catalog still prices
+# the current tier and opt-in models, so an install without the catalog prices
 # them; it is not a second catalog and carries no retired models.
 
-# Built-in rate for a current tier model.
+# Built-in rate for a current priced model.
 # Usage: _builtin_rate <lowercased model> <type: input|output>
 # Returns 1 for any other model.
 # BEGIN controller-models: builtin-rates
@@ -117,20 +117,25 @@ _builtin_rate() {
     local pair
     case "$1" in
         claude-fable-5-1) pair="0.01 0.05" ;;
+        claude-opus-5-5) pair="0.004 0.02" ;;
+        claude-sonnet-5-5) pair="0.002 0.01" ;;
+        claude-haiku-5-5) pair="0.0001 0.0005" ;;
         gemini-4-argon|gemini-4-argon-low|gemini-4-argon-medium|gemini-4-argon-high|"gemini 4 argon (low)"|"gemini 4 argon (medium)"|"gemini 4 argon (high)") pair="0.004 0.02" ;;
+        gemini-3.8-flash|gemini-3.8-flash-low|gemini-3.8-flash-medium|gemini-3.8-flash-high|"gemini 3.8 flash (low)"|"gemini 3.8 flash (medium)"|"gemini 3.8 flash (high)") pair="0.00075 0.00375" ;;
         gpt-6-astra) pair="0.01 0.05" ;;
+        gpt-6.1-sol) pair="0.002 0.01" ;;
+        gpt-6.1-terra) pair="0.001 0.005" ;;
+        gpt-6-luna) pair="0.0001 0.0005" ;;
         mistral-large-4|mistral-large-4-0) pair="0.00136 0.00418" ;;
         mistral-medium-3.5|mistral-medium-3-5) pair="0.0015 0.0075" ;;
+        mistral-small-2603) pair="0.00015 0.0006" ;;
         deepseek-flash) pair="0.0003 0.0012" ;;
+        deepseek-v4-pro) pair="0.00132 0.00396" ;;
         grok-4.7) pair="0.002 0.006" ;;
         minimax-m3.1-flash) pair="0.00015 0.0006" ;;
         muse-wonder-1.0) pair="0.004 0.02" ;;
-        gpt-6.1-sol) pair="0.002 0.01" ;;
-        claude-opus-5-5) pair="0.004 0.02" ;;
-        gemini-3.8-flash|gemini-3.8-flash-low|gemini-3.8-flash-medium|gemini-3.8-flash-high|"gemini 3.8 flash (low)"|"gemini 3.8 flash (medium)"|"gemini 3.8 flash (high)") pair="0.00075 0.00375" ;;
         muse-spark-1.3) pair="0.00125 0.00425" ;;
-        claude-haiku-5-5) pair="0.0001 0.0005" ;;
-        gpt-6-luna) pair="0.0001 0.0005" ;;
+        muse-spark-1.3-contributor) pair="0.0001 0.0002" ;;
         *) return 1 ;;
     esac
     if [[ "$2" == "input" ]]; then echo "${pair% *}"; else echo "${pair#* }"; fi
@@ -233,7 +238,7 @@ estimate_query_cost() {
     output_rate=$(get_output_cost_per_1k "$model")
 
     # Long-context multiplier applies to the entire request, not only excess.
-    if [[ ( "$model" == gpt-6-astra || "$model" == gpt-6.1-sol || "$model" == gpt-6-luna ) && "$input_tokens" -gt 272000 ]]; then
+    if [[ ( "$model" == gpt-6-astra || "$model" == gpt-6.1-sol || "$model" == gpt-6.1-terra || "$model" == gpt-6-luna ) && "$input_tokens" -gt 272000 ]]; then
         input_rate=$(echo "scale=6; $input_rate * 2" | bc)
         output_rate=$(echo "scale=6; $output_rate * 1.5" | bc)
     fi
@@ -451,7 +456,7 @@ format_cost_caveats() {
 
         local model seen item
         model=$(_billing_model_for_response "$f")
-        if [[ "$model" == gpt-6-astra || "$model" == gpt-6.1-sol || "$model" == gpt-6-luna ]] && ! jq -e '.metadata.provider_cost_usd | numbers' "$f" >/dev/null 2>&1; then
+        if [[ "$model" == gpt-6-astra || "$model" == gpt-6.1-sol || "$model" == gpt-6.1-terra || "$model" == gpt-6-luna ]] && ! jq -e '.metadata.provider_cost_usd | numbers' "$f" >/dev/null 2>&1; then
             astra_estimate=1
         fi
         case "$model" in
@@ -501,7 +506,7 @@ format_cost_caveats() {
         parts="${parts:+$parts; }$unknown contributed no token data"
     fi
     if [[ $astra_estimate -eq 1 ]]; then
-        parts="${parts:+$parts; }GPT-6 Astra/6.1 Sol/Luna cost estimated at Standard rates (incl. long-context pricing); cache/service adjustments excluded, not an invoice"
+        parts="${parts:+$parts; }GPT-6 Astra/6.1 Sol/6.1 Terra/Luna cost estimated at Standard rates (incl. long-context pricing); cache/service adjustments excluded, not an invoice"
     fi
     if [[ $deepseek_flash_estimate -eq 1 ]]; then
         parts="${parts:+$parts; }DeepSeek Flash cost estimated at peak cache-miss rates; off-peak/cache discounts excluded, not an invoice"

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For longer-form release notes (rationale, upgrade guides, performance numbers), see `docs/releases/v<VERSION>.md`.
 
+## [Unreleased]
+
+- Add GPT-6.1 Terra as an opt-in Codex model with verified rates and migration from GPT-5.6 Terra. Default tier models stay unchanged.
+- Validate Terra effort per transport: API accepts `none`; CLI rejects `none`; both reject `minimal`. Apply long-context rates above 272K input tokens and retain opt-in model prices when the JSON catalog is unavailable.
+
 ## [5.6.0] - 2026-10-25
 
 ### Changed

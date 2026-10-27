@@ -432,6 +432,32 @@ test_stream_failure_and_cached_subset() {
         esac
     done
 }
+test_terra_cli_efforts() {
+    local fake="$TMP_ROOT/terra-codex" args="$TMP_ROOT/terra-args" output="$TMP_ROOT/terra.json" effort rc
+    make_codex_stub "$fake"
+    for effort in '' low max; do
+        CODEX_CMD="$fake" CODEX_USE_API=false CODEX_MODEL=gpt-6.1-terra CODEX_REASONING_EFFORT="$effort" \
+            CODEX_ARGS_FILE="$args" MAX_RETRIES=1 \
+            "$SCRIPT_DIR/query_codex.sh" test '' "$output" >/dev/null 2>&1
+        assert_eq 0 "$?" "Terra CLI completes with effort ${effort:-default}"
+        assert_match gpt-6.1-terra "$(cat "$args")" "Terra model reaches CLI"
+        if [[ -n "$effort" ]]; then
+            assert_match "model_reasoning_effort=$effort" "$(cat "$args")" "Terra effort reaches CLI"
+        else
+            assert_eq 0 "$(grep -c model_reasoning_effort "$args" || true)" "Terra keeps the CLI default"
+        fi
+    done
+    for effort in none minimal; do
+        rm -f "$args"
+        rc=0
+        CODEX_CMD="$fake" CODEX_USE_API=false CODEX_MODEL=gpt-6.1-terra CODEX_REASONING_EFFORT="$effort" \
+            CODEX_ARGS_FILE="$args" MAX_RETRIES=1 \
+            "$SCRIPT_DIR/query_codex.sh" test '' "$output" >/dev/null 2>&1 || rc=$?
+        assert_eq 1 "$rc" "Terra CLI rejects $effort"
+        assert_eq false "$([[ -e "$args" ]] && echo true || echo false)" "invalid Terra effort never starts CLI"
+    done
+}
+run_test "Terra CLI model and transport-specific efforts" test_terra_cli_efforts
 run_test "Codex terminal failures and cache subset integrity" test_stream_failure_and_cached_subset
 
 run_test "Test 1: CLI isolation contract and payload preference" test_cli_isolation_contract
