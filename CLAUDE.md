@@ -6,7 +6,7 @@ AI Consultants is a multi-model coverage system that queries up to 11 AI consult
 
 **Self-Exclusion**: The invoking agent is automatically excluded from both the panel and synthesis. Claude Code won't query or synthesize with Claude, Codex CLI won't query or synthesize with Codex, etc.
 
-**Version**: 5.6.0
+**Version**: 5.7.0
 
 ## Distribution
 
@@ -787,6 +787,12 @@ curl -fsSL https://raw.githubusercontent.com/reasance/ai-consultants/main/script
 - **No internal jargon**: Avoid referencing issue tracker IDs or internal codenames without context.
 
 ## Changelog
+
+### v5.7.0 (2026-10-27)
+
+- **Terra 6.1 is opt-in.** `docs/cost_rates.json` carries `gpt-6.1-terra` and the same-line `gpt-5.6-terra` migration. Existing tier defaults remain on Astra, Sol and Luna. Data and built-in rates are rendered by controller-models; its generator now includes priced optional targets in the fallback table.
+- **Transport-specific effort checks.** `scripts/lib/api.sh::resolve_codex_effort` accepts an optional transport; `scripts/query_codex.sh` identifies CLI mode. Terra keeps its transport default, accepts API `none`, rejects CLI `none`, and rejects `minimal` in both paths. `scripts/test_api_transport.sh`, `scripts/test_astra.sh` and `scripts/test_query_codex.sh` exercise the wire, forwarding and pre-dispatch refusals with fakes.
+- **Long-context cost estimates.** `scripts/lib/costs.sh` includes Terra in the full-request multiplier above 272K input tokens and in estimate disclosures. `scripts/test_suite.sh` checks a measured 273K-input/1K-output session at $0.553500; the Astra suite covers the threshold and missing-catalog fallback. No Terra API consultation was run for this release; the transport verification is offline.
 
 ### v5.6.0 (2026-10-25)
 
