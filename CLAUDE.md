@@ -792,6 +792,8 @@ curl -fsSL https://raw.githubusercontent.com/reasance/ai-consultants/main/script
 
 **Tier policy.** `scripts/config.sh` now contains generated model and effort lookups. Opus/max, Opus/xhigh and Opus/medium serve maximum, premium and standard; Astra/max, Sol/max and Sol/high serve their OpenAI counterparts. `resolve_tier_effort` checks the active model before applying a default and leaves explicit effort untouched. `api_query.sh`, `query_claude.sh` and `query_codex.sh` resolve it per request, without mutating user effort variables.
 
+**Cache isolation.** `scripts/lib/cache.sh` includes the active tier in key version 3. The same Opus model now serves three different efforts; model ID plus an unset effort variable was no longer enough to distinguish cached answers. The focused v5 regression checks maximum versus standard.
+
 **Migration.** `configure.sh` changes the marked managed Fable default to Opus. A live current-model pin or unmarked Fable choice remains a choice; retired-model migration keeps its separate same-family contract. Tier-switch regression coverage includes maximum -> standard -> economy and an explicit lower effort.
 
 **Evidence.** The controller owns the versioned v5 comparison and task-cost provenance. Token prices, provider coverage and Terra's optional status are unchanged. The generic index does not establish security-review quality, and task costs are not local workload forecasts.

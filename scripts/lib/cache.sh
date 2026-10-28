@@ -58,7 +58,7 @@ _file_checksum() {
 
 # Cache key schema. Bump when the fingerprint inputs change so entries written
 # under an older, less specific key can never be served.
-CACHE_KEY_VERSION="2"
+CACHE_KEY_VERSION="3"
 
 # Everything that changes WHAT a consultant is asked or WHICH model answers.
 # Without it a `--preset max_quality` run could be served an answer that a
@@ -67,7 +67,9 @@ CACHE_KEY_VERSION="2"
 cache_identity() {
     local upper var lower
     upper=$(printf '%s' "${1:-all}" | tr '[:lower:]' '[:upper:]' | tr -d ' -')
-    local out="v${CACHE_KEY_VERSION}|persona=${ENABLE_PERSONA:-true}"
+    # A tier can now select another effort on the same model without setting
+    # a persistent REASONING_EFFORT variable. Do not reuse its older answer.
+    local out="v${CACHE_KEY_VERSION}|persona=${ENABLE_PERSONA:-true}|tier=${_AI_CONSULTANTS_MODEL_TIER:-premium}"
     for var in MODEL API_MODEL CLI_MODEL USE_API REASONING_EFFORT FORMAT API_URL \
         MAX_TURNS MAX_TOKENS API_MAX_TOKENS PERSONA_ID PERSONA PERSONA_NAME; do
         var="${upper}_${var}"

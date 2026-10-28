@@ -15,4 +15,19 @@ grep -Eq '^CLAUDE_MODEL=claude-opus-5-5[[:space:]]+# ai-consultants:default' "$A
 bash "$SCRIPT_DIR/configure.sh" --force --set CLAUDE_MODEL=claude-fable-5-1 >/dev/null 2>&1
 bash "$SCRIPT_DIR/configure.sh" --force >/dev/null 2>&1
 grep -Eq '^CLAUDE_MODEL=claude-fable-5-1[[:space:]]+# ai-consultants:pin' "$AI_CONSULTANTS_CONFIG_DIR/.env"
+AI_CONSULTANTS_CONFIG_DIR="$TMP/cache-config" CACHE_DIR="$TMP/cache" bash -c '
+    set -euo pipefail
+    source "$1/config.sh"
+    source "$1/lib/cache.sh"
+    export ENABLE_SEMANTIC_CACHE=true
+    apply_model_tier maximum
+    store_cache "same question" GENERAL claude "{\"response\":{\"summary\":\"maximum answer\"}}"
+    check_cache "same question" GENERAL claude >/dev/null
+    apply_model_tier standard
+    [[ "$CLAUDE_MODEL" == claude-opus-5-5 ]]
+    if check_cache "same question" GENERAL claude >/dev/null; then
+        echo "standard tier reused a maximum-effort answer" >&2
+        exit 1
+    fi
+' _ "$SCRIPT_DIR"
 printf '%s\n' 'AA v5 managed Claude default migrates; an explicit Fable pin survives'
