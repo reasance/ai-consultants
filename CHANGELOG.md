@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For longer-form release notes (rationale, upgrade guides, performance numbers), see `docs/releases/v<VERSION>.md`.
 
+## [5.8.0] - 2026-10-28
+
+### Changed
+
+- Refresh Claude panel choices following the Artificial Analysis Intelligence Index v5 review: Opus 5.5 uses max for maximum, xhigh for premium, and medium for standard. Fable 5.1 remains opt-in.
+- Make OpenAI tier effort explicit: Astra/max for maximum, Sol/max for premium, and Sol/high for standard. Economy models and Terra's opt-in status remain unchanged.
+
+### Fixed
+
+- Cache keys include the selected tier, so Opus answers at maximum effort cannot be reused as standard-tier answers or vice versa. Existing cache entries expire from use through a key-version bump.
+- Explicit effort settings win over tier defaults on both CLI and API transports, including the final synthesis CLI. Switching tiers cannot leak an injected maximum effort into an economy run.
+- Configure migrates only the managed Fable default to Opus. Current unmarked and pinned Fable choices remain user-owned.
+
+These are advisory preset choices, not a qualification of review quality or a prediction of repository task cost.
+
 ## [5.7.0] - 2026-10-27
 
 ### Added

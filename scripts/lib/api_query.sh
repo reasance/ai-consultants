@@ -82,6 +82,8 @@ run_api_mode_query() {
         fi
     fi
 
+    effort=$(resolve_tier_effort "$(to_lower "$consultant_name")" "$model" "$effort")
+
     # Build request body based on format
     local request_body
     local final_api_url="$api_url"

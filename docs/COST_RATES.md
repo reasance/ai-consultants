@@ -1,4 +1,4 @@
-# Cost Rates - AI Consultants v5.7.0
+# Cost Rates - AI Consultants v5.8.0
 
 This page documents the per-token rates used by the cost tracking system.
 
@@ -34,8 +34,8 @@ models programmatically.
 | gpt-6.1-sol | Default/Premium/Standard | $0.002 | Codex |
 | gpt-6.1-terra | Opt-in | $0.001 | Codex |
 | gpt-6-luna | Economy | $0.0001 | Codex |
-| claude-fable-5-1 | Maximum/Premium | $0.010 | Claude |
-| claude-opus-5-5 | Standard | $0.004 | Claude |
+| claude-fable-5-1 | Opt-in | $0.010 | Claude |
+| claude-opus-5-5 | Maximum/Premium/Standard | $0.004 | Claude |
 | claude-haiku-5-5 | Economy | $0.0001 | Claude (prompts over 100K: 5x for the whole request) |
 | mistral-large-4 / mistral-large-4-0 | API all tiers (preview, list rate) | $0.00136 | Mistral |
 | mistral-medium-3.5 / mistral-medium-3-5 | CLI all tiers / API opt-in | $0.0015 | Mistral |
@@ -69,8 +69,8 @@ models programmatically.
 | gpt-6.1-sol | Default/Premium/Standard | $0.010 | Codex |
 | gpt-6.1-terra | Opt-in | $0.005 | Codex |
 | gpt-6-luna | Economy | $0.0005 | Codex |
-| claude-fable-5-1 | Maximum/Premium | $0.050 | Claude |
-| claude-opus-5-5 | Standard | $0.020 | Claude |
+| claude-fable-5-1 | Opt-in | $0.050 | Claude |
+| claude-opus-5-5 | Maximum/Premium/Standard | $0.020 | Claude |
 | claude-haiku-5-5 | Economy | $0.0005 | Claude (prompts over 100K: 5x for the whole request) |
 | mistral-large-4 / mistral-large-4-0 | API all tiers (preview, list rate) | $0.00418 | Mistral |
 | mistral-medium-3.5 / mistral-medium-3-5 | CLI all tiers / API opt-in | $0.0075 | Mistral |
@@ -142,7 +142,7 @@ so a CLI run on a subscription is estimated at the API list rate.
 
 ## Cost Estimation per Session
 
-### Typical Consultation
+### Historical consultation examples (2026-10-19)
 
 Session cost reports from two live runs on 2026-10-19 with the default models,
 a short question and about 130 lines of automatic context (estimates, not
@@ -153,7 +153,8 @@ invoices):
 | `balanced` | Gemini 4 Argon (High), GPT-6.1 Sol, Mistral Large 4 | ≈ $0.14 | ≈ $0.22 |
 | Every consultant enabled | 9 answering consultants | ≈ $0.30 | ≈ $0.59 |
 
-Reasoning models add thinking tokens, synthesis on Fable 5.1 is often the
+These examples used the older Fable default; current tiers use Opus.
+Reasoning models add thinking tokens. In those runs, Fable synthesis was the
 largest single item, and Token Plan, coding-plan and subscription models are
 excluded rather than counted as free. The pre-run estimate is a rough lower
 bound.

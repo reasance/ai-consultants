@@ -964,18 +964,17 @@ pinned, and `--set` refuses them. Unrelated IDs survive.
 The existing capability/model inventory probes, strict sandbox and OAuth
 isolation still apply; the Grok 4.7 Fast variant is not implicitly selected.
 
-Claude standard/medium selects `claude-opus-5-5`; default/premium/maximum
-remain Fable 5.1 and economy uses Haiku 5.5 (since 5.5.0). Select Opus directly with
-`configure --set CLAUDE_MODEL=claude-opus-5-5`. The historical unpinned Claude
-default migration to Fable is unchanged; pinned retired Opus, Sonnet and Fable
-models move to their family's current model and stay pinned.
+Claude uses `claude-opus-5-5`: maximum/max, premium/xhigh and standard/medium.
+Economy keeps Haiku 5.5. Fable 5.1 remains an explicit opt-in. Configure migrates
+the marked managed Fable default to Opus; unmarked and pinned current Fable
+choices remain. Pinned retired models still move to their same-family successor.
 
 Opus 5.5 has always-on adaptive thinking, including empty thinking display
 blocks. Our tool-free single-turn API request omits thinking overrides, sampling
 parameters and forced tool choice; parsing selects visible text by block type.
-The API therefore uses the provider's default effort (medium), with the existing
-16384 total-output budget. The CLI retains explicit `CLAUDE_REASONING_EFFORT`
-control. Content identity and terminal success remain separate checks.
+Both CLI and API use the matching tier's effort unless `CLAUDE_REASONING_EFFORT`
+is explicit. Opt-in models without a matching tier retain provider defaults.
+The total-output budget remains 16384. Content identity and terminal success remain separate checks.
 
 These additions have offline regression coverage. Grok 4.7 and Opus 5.5 CLI
 smokes passed on 2026-09-28. New API transports remain separately unverified. Frozen
