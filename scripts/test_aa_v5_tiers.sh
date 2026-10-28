@@ -17,13 +17,23 @@ bash "$SCRIPT_DIR/configure.sh" --force >/dev/null 2>&1
 grep -Eq '^CLAUDE_MODEL=claude-fable-5-1[[:space:]]+# ai-consultants:pin' "$AI_CONSULTANTS_CONFIG_DIR/.env"
 AI_CONSULTANTS_CONFIG_DIR="$TMP/cache-config" CACHE_DIR="$TMP/cache" bash -c '
     set -euo pipefail
-    source "$1/config.sh"
+    source "$1/lib/common.sh"
     source "$1/lib/cache.sh"
     export ENABLE_SEMANTIC_CACHE=true
     apply_model_tier maximum
+    build_synthesis_args claude
+    [[ "${SYNTHESIS_ARGS[*]}" == *"--effort max"* ]]
+    build_synthesis_args codex "" "$CACHE_DIR/payload"
+    [[ "${SYNTHESIS_ARGS[*]}" == *"model_reasoning_effort=max"* ]]
     store_cache "same question" GENERAL claude "{\"response\":{\"summary\":\"maximum answer\"}}"
     check_cache "same question" GENERAL claude >/dev/null
     apply_model_tier standard
+    build_synthesis_args claude
+    [[ "${SYNTHESIS_ARGS[*]}" == *"--effort medium"* ]]
+    CLAUDE_REASONING_EFFORT=low
+    build_synthesis_args claude
+    [[ "${SYNTHESIS_ARGS[*]}" == *"--effort low"* ]]
+    unset CLAUDE_REASONING_EFFORT
     [[ "$CLAUDE_MODEL" == claude-opus-5-5 ]]
     if check_cache "same question" GENERAL claude >/dev/null; then
         echo "standard tier reused a maximum-effort answer" >&2

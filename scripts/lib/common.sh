@@ -1798,6 +1798,10 @@ build_synthesis_args() {
     local cli_type="$1"
     local prompt="${2:-}"   # agy takes the prompt inline (-p arg); others read stdin
     local codex_payload_file="${3:-}"
+    local synthesis_effort=""
+    if [[ "$cli_type" == claude || "$cli_type" == codex ]]; then
+        source "$SCRIPT_DIR_COMMON/api.sh"
+    fi
 
     case "$cli_type" in
         claude)
@@ -1808,6 +1812,11 @@ build_synthesis_args() {
             local model
             model=$(synthesis_model_for_cli claude)
             [[ -n "$model" ]] && SYNTHESIS_ARGS+=("--model" "$model")
+            synthesis_effort=$(resolve_tier_effort claude "$model" "${CLAUDE_REASONING_EFFORT:-}")
+            if [[ -n "$synthesis_effort" ]]; then
+                synthesis_effort=$(validate_reasoning_effort "$synthesis_effort" Claude) || return 1
+                SYNTHESIS_ARGS+=(--effort "$synthesis_effort")
+            fi
             ;;
         gemini)
             # agy's -p takes the prompt as its ARGUMENT value; it does NOT read
@@ -1831,6 +1840,9 @@ build_synthesis_args() {
             local model
             model=$(synthesis_model_for_cli codex)
             [[ -n "$model" ]] && SYNTHESIS_ARGS+=(-m "$model")
+            synthesis_effort=$(resolve_tier_effort codex "$model" "${CODEX_REASONING_EFFORT:-}")
+            synthesis_effort=$(resolve_codex_effort "$model" "$synthesis_effort" cli) || return 1
+            [[ -n "$synthesis_effort" ]] && SYNTHESIS_ARGS+=(-c "model_reasoning_effort=$synthesis_effort")
             SYNTHESIS_ARGS+=(-)
             ;;
         *)

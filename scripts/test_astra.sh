@@ -83,6 +83,7 @@ for effort in none minimal; do
 done
 # Tier effort follows the current run and never mutates explicit overrides.
 bash -c '
+    set -euo pipefail
     source "$1/config.sh"
     unset CLAUDE_REASONING_EFFORT CODEX_REASONING_EFFORT
     apply_model_tier maximum
