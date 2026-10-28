@@ -309,11 +309,19 @@ done < <(list_parameters)
 case "$(read_value "$WORK_FILE" CLAUDE_MODEL 2>/dev/null || true)" in
     claude-opus-4-8|claude-opus-5)
         if ! has_value_marker "$WORK_FILE" CLAUDE_MODEL "$PIN_MARKER"; then
-            set_value CLAUDE_MODEL "claude-fable-5-1 $DEFAULT_MARKER"
-            echo "Migrated managed Claude default to claude-fable-5-1" >&2
+            set_value CLAUDE_MODEL "claude-opus-5-5 $DEFAULT_MARKER"
+            echo "Migrated managed Claude default to claude-opus-5-5" >&2
         fi
         ;;
 esac
+
+# Only the explicitly managed Fable default follows the new premium choice.
+# An unmarked or pinned Fable remains an intentional current-model selection.
+if [[ "$(read_value "$WORK_FILE" CLAUDE_MODEL 2>/dev/null || true)" == claude-fable-5-1 ]] \
+    && has_value_marker "$WORK_FILE" CLAUDE_MODEL "$DEFAULT_MARKER" \
+    && ! has_value_marker "$WORK_FILE" CLAUDE_MODEL "$PIN_MARKER"; then
+    set_value CLAUDE_MODEL "claude-opus-5-5 $DEFAULT_MARKER"
+fi
 
 # Migrate exact unpinned persisted defaults; environment and --set remain pins.
 # gpt-6-astra was the generated default from 5.1.0 to 5.1.2; it remains the

@@ -57,7 +57,7 @@ inspection.
 Model defaults carry an `# ai-consultants:default` marker. On rewrite,
 `configure` upgrades the exact historical defaults it generated, marked or
 unmarked, unless they are pinned: `CLAUDE_MODEL=claude-opus-4-8`/`claude-opus-5`
-to Fable 5.1, plus the previous Gemini (CLI and API), Codex, Mistral API, Qwen,
+to Opus 5.5, plus the previous Gemini (CLI and API), Codex, Mistral API, Qwen,
 GLM, Grok and DeepSeek defaults, and the fixed timeouts described under
 [Timeouts, Waiting and Retries](#timeouts-waiting-and-retries). An explicit
 model override supplied with `--set` is stored with `# ai-consultants:pin`, so
@@ -267,8 +267,9 @@ GEMINI_API_MODEL=gemini-4-argon       # API only; needs a paid-tier key
 GEMINI_API_MAX_TOKENS=32768           # API only: Argon thinking + visible output
 CODEX_MODEL=gpt-6.1-sol    # max_quality uses gpt-6-astra
 CODEX_API_MAX_TOKENS=16384
-CLAUDE_MODEL=claude-fable-5-1
-# Lower-cost standard override: CLAUDE_MODEL=claude-opus-5-5
+CLAUDE_MODEL=claude-opus-5-5
+# Matching tier defaults: maximum/max, premium/xhigh, standard/medium.
+# CLAUDE_REASONING_EFFORT overrides the tier effort; Fable remains opt-in.
 CLAUDE_API_MAX_TOKENS=16384  # API only: adaptive thinking + visible output
 MISTRAL_MODEL=mistral-large-4
 MISTRAL_CLI_MODEL=mistral-medium-3.5

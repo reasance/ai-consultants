@@ -1451,7 +1451,7 @@ test_escalation() {
 test_model_for_tier() {
     suite "config.sh: get_model_for_tier"
 
-    assert_equals "claude-fable-5-1"      "$(get_model_for_tier "claude" "premium")"  "claude premium is Fable 5.1"
+    assert_equals "claude-opus-5-5"      "$(get_model_for_tier "claude" "premium")"  "claude premium is Opus 5.5"
     assert_equals "claude-opus-5-5"       "$(get_model_for_tier "claude" "standard")" "claude standard is Opus 5.5"
     assert_equals "claude-haiku-5-5"      "$(get_model_for_tier "claude" "economy")"  "claude economy is claude-haiku-5-5"
     assert_equals gemini-4-argon-high "$(get_model_for_tier "gemini" "premium" cli)" "gemini CLI premium is gemini-4-argon-high"
@@ -1494,7 +1494,7 @@ test_model_for_tier() {
     assert_equals "glm-5.3-flash"         "$(get_model_for_tier "glm" "standard")"      "glm standard is glm-5.3-flash"
     assert_equals "grok-4.7"              "$(get_model_for_tier "grok" "economy")"      "grok economy is grok-4.7"
     assert_equals "glm-5.3-flash"         "$(get_model_for_tier "glm" "economy")"       "glm economy is glm-5.3-flash"
-    assert_equals "claude-fable-5-1"      "$(get_model_for_tier "claude" "maximum")"    "Claude maximum is Fable 5.1"
+    assert_equals "claude-opus-5-5"      "$(get_model_for_tier "claude" "maximum")"    "Claude maximum is Opus 5.5"
     assert_equals "kimi-code/k3.1-pro"    "$(get_model_for_tier "kimi" "maximum")"      "maximum tier uses Kimi K3.1 Pro"
     assert_equals "qwen3.8-max"           "$(get_model_for_tier "qwen3" "maximum")"     "maximum catalog includes Qwen3.8-Max"
     assert_equals "MiniMax-M3.1-Flash"    "$(get_model_for_tier "minimax" "maximum")"   "maximum tier uses MiniMax-M3.1-Flash"

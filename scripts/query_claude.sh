@@ -4,7 +4,7 @@
 # Usage: ./query_claude.sh "question" [context_file] [output_file]
 #
 # Environment variables:
-#   CLAUDE_MODEL - Model to use (default: claude-fable-5-1)
+#   CLAUDE_MODEL - Model to use (default: claude-opus-5-5)
 #   CLAUDE_TIMEOUT - Timeout in seconds (default: 240)
 #   CLAUDE_USE_API - Use API mode instead of CLI (default: false)
 #   CLAUDE_API_MAX_TOKENS - API thinking + visible-output budget (default: 16384)
@@ -27,7 +27,7 @@ OUTPUT_FILE="${3:-/tmp/claude_response.json}"
 ENABLE_PERSONA="${ENABLE_PERSONA:-true}"
 CONSULTANT_NAME="Claude"
 CLAUDE_CMD="${CLAUDE_CMD:-claude}"
-MODEL_USED="${CLAUDE_MODEL:-claude-fable-5-1}"
+MODEL_USED="${CLAUDE_MODEL:-claude-opus-5-5}"
 
 # --- Build query ---
 FULL_QUERY=$(build_full_query "$QUERY" "$CONTEXT_FILE")
@@ -116,15 +116,15 @@ else
         effort_ok=true
     fi
 
-    # Optional CLI effort control. Unset leaves the CLI's own default alone;
-    # when set, pass --effort through after the shared validation gate. Do not
-    # invent a local allowlist — the provider rejects what it does not accept.
+    # Resolve explicit effort or a matching tier's default per request, then
+    # validate before dispatch. Opt-in models without a tier keep CLI defaults.
     CLAUDE_ARGS=("$CLAUDE_CMD" --print --model "$MODEL_USED" --output-format stream-json --verbose \
         --no-session-persistence --setting-sources "" --tools "" \
         --strict-mcp-config --mcp-config '{"mcpServers":{}}' --permission-mode plan)
-    if [[ -n "${CLAUDE_REASONING_EFFORT:-}" ]]; then
+    resolved_effort=$(resolve_tier_effort claude "$MODEL_USED" "${CLAUDE_REASONING_EFFORT:-}")
+    if [[ -n "$resolved_effort" ]]; then
         source "$SCRIPT_DIR/lib/api.sh"
-        if ! cli_effort=$(validate_reasoning_effort "$CLAUDE_REASONING_EFFORT" "$CONSULTANT_NAME"); then
+        if ! cli_effort=$(validate_reasoning_effort "$resolved_effort" "$CONSULTANT_NAME"); then
             effort_ok=false
             exit_code=1
         else

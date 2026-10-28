@@ -6,7 +6,7 @@ AI Consultants is a multi-model coverage system that queries up to 11 AI consult
 
 **Self-Exclusion**: The invoking agent is automatically excluded from both the panel and synthesis. Claude Code won't query or synthesize with Claude, Codex CLI won't query or synthesize with Codex, etc.
 
-**Version**: 5.7.0
+**Version**: 5.8.0
 
 ## Distribution
 
@@ -787,6 +787,15 @@ curl -fsSL https://raw.githubusercontent.com/reasance/ai-consultants/main/script
 - **No internal jargon**: Avoid referencing issue tracker IDs or internal codenames without context.
 
 ## Changelog
+
+### v5.8.0 — AA Intelligence Index v5 panel choices
+
+**Tier policy.** `scripts/config.sh` now contains generated model and effort lookups. Opus/max, Opus/xhigh and Opus/medium serve maximum, premium and standard; Astra/max, Sol/max and Sol/high serve their OpenAI counterparts. `resolve_tier_effort` checks the active model before applying a default and leaves explicit effort untouched. `api_query.sh`, `query_claude.sh` and `query_codex.sh` resolve it per request, without mutating user effort variables.
+
+**Migration.** `configure.sh` changes the marked managed Fable default to Opus. A live current-model pin or unmarked Fable choice remains a choice; retired-model migration keeps its separate same-family contract. Tier-switch regression coverage includes maximum -> standard -> economy and an explicit lower effort.
+
+**Evidence.** The controller owns the versioned v5 comparison and task-cost provenance. Token prices, provider coverage and Terra's optional status are unchanged. The generic index does not establish security-review quality, and task costs are not local workload forecasts.
+
 
 ### v5.7.0 (2026-10-27)
 

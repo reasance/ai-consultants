@@ -5,10 +5,10 @@ license: MIT
 compatibility: Requires bash, jq, and at least 2 AI CLI tools (agy, codex, vibe, etc.). macOS and Linux.
 metadata:
   author: matteoscurati
-  version: 5.7.0
+  version: 5.8.0
 ---
 
-# AI Consultants v5.7.0 - AI Expert Panel
+# AI Consultants v5.8.0 - AI Expert Panel
 
 **Coverage, not a single guess.** Convene a panel of AI "consultants" from different vendors for coding questions: they fan out in parallel and you get the *union* of what they collectively see — the risks, edge cases, and approaches a single model misses. Each consultant has a **configurable persona** that decorrelates its analysis.
 
@@ -127,7 +127,7 @@ standard/economy). `gemini-4-argon-high` is the `agy` target for the default
 and maximum tiers (`gemini-4-argon` on the API); one authorized `agy` smoke passed on
 2026-10-16 with capability-probed identity, and the API transport is offline-tested only.
 Gemini 3.8 Flash serves the standard/economy tiers (High/Low on the CLI, `gemini-3.8-flash`
-on the API). Claude Fable 5.1 is the default/premium/maximum target. Tiers use current models
+on the API). Claude Opus 5.5 is the default: maximum/max, premium/xhigh and standard/medium. Explicit effort settings win; Fable remains opt-in. Tiers use current models
 only: since 5.5.0 superseded models are retired, `configure` migrates them, and a retired
 model selected at run time runs with a warning and is reported as unpriced. Mistral
 API mode uses Mistral Large 4 in every tier; the other new Mistral API IDs remain explicit opt-ins.

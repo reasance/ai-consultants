@@ -81,4 +81,21 @@ for effort in none minimal; do
     jq -e '.metadata.response_quality == "error"' "$TMP/error.json" >/dev/null
   done
 done
+# Tier effort follows the current run and never mutates explicit overrides.
+bash -c '
+    source "$1/config.sh"
+    unset CLAUDE_REASONING_EFFORT CODEX_REASONING_EFFORT
+    apply_model_tier maximum
+    [[ $(resolve_tier_effort claude "$CLAUDE_MODEL" "") == max ]]
+    [[ $(resolve_tier_effort codex "$CODEX_MODEL" "") == max ]]
+    apply_model_tier standard
+    [[ $(resolve_tier_effort claude "$CLAUDE_MODEL" "") == medium ]]
+    [[ $(resolve_tier_effort codex "$CODEX_MODEL" "") == high ]]
+    [[ $(resolve_tier_effort claude "$CLAUDE_MODEL" low) == low ]]
+    [[ -z $(resolve_tier_effort claude claude-fable-5-1 "") ]]
+    apply_model_tier economy
+    [[ -z $(resolve_tier_effort claude "$CLAUDE_MODEL" "") ]]
+    [[ -z $(resolve_tier_effort codex "$CODEX_MODEL" "") ]]
+    [[ -z ${CLAUDE_REASONING_EFFORT:-}${CODEX_REASONING_EFFORT:-} ]]
+' _ "$SCRIPT_DIR"
 printf '%s\n' 'GPT-6 Astra/6.1 Sol/6.1 Terra/Luna effort, tier isolation, payload and pricing checks passed'

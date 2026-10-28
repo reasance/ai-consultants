@@ -1,8 +1,8 @@
-# AI Consultants v5.7.0
+# AI Consultants v5.8.0
 
 > **Coverage, not a single guess.** A panel of up to 11 frontier models from different vendors fans out on your question in parallel and hands you the *union* of what they collectively see — the risks, edge cases, and approaches a single model misses.
 
-[![Version](https://img.shields.io/badge/version-5.7.0-blue.svg)](https://github.com/reasance/ai-consultants)
+[![Version](https://img.shields.io/badge/version-5.8.0-blue.svg)](https://github.com/reasance/ai-consultants)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code Skill](https://img.shields.io/badge/Claude%20Code-Skill-orange.svg)](https://docs.anthropic.com/en/docs/claude-code/skills)
 [![GitHub stars](https://img.shields.io/github/stars/reasance/ai-consultants?style=social)](https://github.com/reasance/ai-consultants)
@@ -521,7 +521,7 @@ and cannot support a comprehensive coverage claim.
 
 | Consultant | `max_quality` | Premium | Standard | Economy |
 |------------|---------------|---------|----------|---------|
-| Claude | claude-fable-5-1 | claude-fable-5-1 | claude-opus-5-5 | claude-haiku-5-5 |
+| Claude | claude-opus-5-5 | claude-opus-5-5 | claude-opus-5-5 | claude-haiku-5-5 |
 | Gemini CLI | gemini-4-argon-high | gemini-4-argon-high | gemini-3.8-flash-high | gemini-3.8-flash-low |
 | Gemini API | gemini-4-argon | gemini-4-argon | gemini-3.8-flash | gemini-3.8-flash |
 | Codex | gpt-6-astra | gpt-6.1-sol | gpt-6.1-sol | gpt-6-luna |
@@ -579,8 +579,10 @@ structured answer with provider-reported identity on 2026-10-15; the preview is 
 `mistral-medium-3.5`. The other Mistral
 API IDs (`mistral-medium-3-5`, `mistral-small-2603`) remain catalogued
 opt-ins. Claude
-Fable 5.1 is the default/premium/maximum target; use
-`CLAUDE_MODEL=claude-opus-5-5` for the lower-cost standard override. Selecting a preset later intentionally reapplies that
+Opus 5.5 is the default Claude target: maximum uses `max`, premium `xhigh`,
+and standard `medium`. Astra uses `max` in maximum; Sol uses `max` in premium
+and `high` in standard. Explicit reasoning-effort settings win. Fable 5.1
+remains an opt-in. Selecting a preset later intentionally reapplies that
 preset's tier and can replace an explicit model override for the run.
 Qwen3.8-Max serves the default, premium and maximum tiers on every Qwen
 transport (the `qwen` CLI, the Token Plan and DashScope); `max_quality` adds
@@ -690,7 +692,7 @@ later run to adapt when a CLI or credential changes. Environment variables,
 historical generated Claude default and the retired models described below.
 Managed model defaults use `# ai-consultants:default`; `configure` upgrades
 the exact historical defaults it generated when they are not pinned (for
-example `CLAUDE_MODEL=claude-opus-4-8`/`claude-opus-5` to Fable 5.1, and the
+example `CLAUDE_MODEL=claude-opus-4-8`/`claude-opus-5` to Opus 5.5, and the
 previous Gemini, Codex, Mistral API, Qwen, GLM, Grok and DeepSeek defaults),
 and turns the fixed timeouts it generated through 5.1.2 into 0 (no limit).
 To keep a model, run for example

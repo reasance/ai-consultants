@@ -365,8 +365,8 @@ test_claude_default_migration_and_pin() {
     printf '%s\n' 'CLAUDE_MODEL=claude-opus-5' > "$cfg/.env"
 
     run_clean_configure "$cfg" --force >/dev/null 2>&1
-    assert_eq "claude-fable-5-1" "$(read_env "$cfg/.env" CLAUDE_MODEL)" \
-        "unpinned Opus 5 default migrates to Fable 5.1"
+    assert_eq "claude-opus-5-5" "$(read_env "$cfg/.env" CLAUDE_MODEL)" \
+        "unpinned Opus 5 default migrates to Opus 5.5"
     assert_contains "$(grep '^CLAUDE_MODEL=' "$cfg/.env")" "# ai-consultants:default" \
         "migrated Claude default records managed provenance"
 
@@ -388,15 +388,15 @@ test_claude_default_migration_and_pin() {
         "the refusal names the replacement"
     assert_eq "claude-opus-5-5" "$(read_env "$cfg/.env" CLAUDE_MODEL)" \
         "a refused --set leaves the config unchanged"
-    assert_contains "$(cat "$cfg/.env")" "# claude-opus-5-5 (or apply_model_tier standard for a single run)." \
+    assert_contains "$(cat "$cfg/.env")" "# For the lower-effort standard tier, use apply_model_tier standard." \
         "lower-cost Claude guidance survives configure rewrites"
 
     cfg="$TMP/claude-old-default-migration"
     mkdir -p "$cfg"
     printf '%s\n' 'CLAUDE_MODEL=claude-opus-4-8' > "$cfg/.env"
     run_clean_configure "$cfg" --force >/dev/null 2>&1
-    assert_eq "claude-fable-5-1" "$(read_env "$cfg/.env" CLAUDE_MODEL)" \
-        "older unpinned Claude default migrates directly to Fable 5.1"
+    assert_eq "claude-opus-5-5" "$(read_env "$cfg/.env" CLAUDE_MODEL)" \
+        "older unpinned Claude default migrates directly to Opus 5.5"
 
     cfg="$TMP/claude-non-opus-choice"
     mkdir -p "$cfg"

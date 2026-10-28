@@ -9,10 +9,10 @@ unset GROK_MODEL CLAUDE_MODEL CLAUDE_REASONING_EFFORT GROK_REASONING_EFFORT
 source "$SCRIPT_DIR/lib/common.sh"
 source "$SCRIPT_DIR/lib/api.sh"
 source "$SCRIPT_DIR/lib/costs.sh"
-[[ "$GROK_MODEL" == grok-4.7 && "$CLAUDE_MODEL" == claude-fable-5-1 ]] || exit 1
+[[ "$GROK_MODEL" == grok-4.7 && "$CLAUDE_MODEL" == claude-opus-5-5 ]] || exit 1
 for tier in maximum premium; do
     [[ $(get_model_for_tier grok "$tier") == grok-4.7 ]] || exit 1
-    [[ $(get_model_for_tier claude "$tier") == claude-fable-5-1 ]] || exit 1
+    [[ $(get_model_for_tier claude "$tier") == claude-opus-5-5 ]] || exit 1
 done
 [[ $(get_model_for_tier claude standard) == claude-opus-5-5 ]] || exit 1
 [[ $(get_model_for_tier claude economy) == claude-haiku-5-5 ]] || exit 1

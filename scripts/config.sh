@@ -365,7 +365,7 @@ KIMI_CMD="${KIMI_CMD:-kimi}"
 # CLAUDE CONFIGURATION - The Synthesizer (v2.2)
 # =============================================================================
 
-CLAUDE_MODEL="${CLAUDE_MODEL:-claude-fable-5-1}"
+CLAUDE_MODEL="${CLAUDE_MODEL:-claude-opus-5-5}"
 CLAUDE_API_MAX_TOKENS="${CLAUDE_API_MAX_TOKENS:-16384}"
 CLAUDE_TIMEOUT_SECONDS="${CLAUDE_TIMEOUT:-0}"
 CLAUDE_CMD="${CLAUDE_CMD:-claude}"
@@ -683,7 +683,7 @@ get_model_for_tier() {
     case "$tier" in
         maximum|max_quality|max-quality)
             case "$consultant" in
-                claude)   echo "claude-fable-5-1" ;;
+                claude)   echo "claude-opus-5-5" ;;
                 gemini)   [[ "$transport" == "api" ]] && echo "gemini-4-argon" || echo "gemini-4-argon-high" ;;
                 codex)    echo "gpt-6-astra" ;;
                 mistral)  [[ "$transport" == "api" ]] && echo "mistral-large-4" || echo "mistral-medium-3.5" ;;
@@ -699,7 +699,7 @@ get_model_for_tier() {
             ;;
         premium|max|best)
             case "$consultant" in
-                claude)   echo "claude-fable-5-1" ;;
+                claude)   echo "claude-opus-5-5" ;;
                 gemini)   [[ "$transport" == "api" ]] && echo "gemini-4-argon" || echo "gemini-4-argon-high" ;;
                 codex)    echo "gpt-6.1-sol" ;;
                 mistral)  [[ "$transport" == "api" ]] && echo "mistral-large-4" || echo "mistral-medium-3.5" ;;
@@ -749,6 +749,44 @@ get_model_for_tier() {
             echo "" ;;
     esac
 }
+
+get_effort_for_tier() {
+    case "${2:-premium}" in
+        maximum|max_quality|max-quality)
+            case "$1" in
+                claude) echo "max" ;;
+                codex) echo "max" ;;
+                *) echo "" ;;
+            esac ;;
+        premium|max|best)
+            case "$1" in
+                claude) echo "xhigh" ;;
+                codex) echo "max" ;;
+                *) echo "" ;;
+            esac ;;
+        standard|medium|balanced)
+            case "$1" in
+                claude) echo "medium" ;;
+                codex) echo "high" ;;
+                *) echo "" ;;
+            esac ;;
+        economy|fast|quick)
+            case "$1" in
+                *) echo "" ;;
+            esac ;;
+        *) echo "" ;;
+    esac
+}
+
+resolve_tier_effort() {
+    local provider="$1" model="$2" requested="${3:-}"
+    provider=$(printf '%s' "$provider" | tr '[:upper:]' '[:lower:]')
+    local tier="${_AI_CONSULTANTS_MODEL_TIER:-premium}" expected
+    if [[ -n "$requested" ]]; then printf '%s\n' "$requested"; return; fi
+    expected=$(get_model_for_tier "$provider" "$tier")
+    [[ "$model" == "$expected" ]] || return 0
+    get_effort_for_tier "$provider" "$tier"
+}
 # END controller-models: model-tiers
 
 # Name of the variable that selects the model on a consultant's ACTIVE
@@ -787,6 +825,9 @@ apply_model_tier() {
             return 1
             ;;
     esac
+
+    # Child adapters resolve tier defaults per request; explicit effort wins.
+    export _AI_CONSULTANTS_MODEL_TIER="$tier"
 
     local consultants="claude codex deepseek glm grok minimax kimi meta"
     for c in $consultants; do
@@ -1110,4 +1151,4 @@ list_presets() {
 # VERSION
 # =============================================================================
 
-AI_CONSULTANTS_VERSION="5.7.0"
+AI_CONSULTANTS_VERSION="5.8.0"
