@@ -6,7 +6,7 @@ AI Consultants is a multi-model coverage system that queries up to 11 AI consult
 
 **Self-Exclusion**: The invoking agent is automatically excluded from both the panel and synthesis. Claude Code won't query or synthesize with Claude, Codex CLI won't query or synthesize with Codex, etc.
 
-**Version**: 5.8.0
+**Version**: 5.9.0
 
 ## Distribution
 
@@ -354,10 +354,10 @@ Three normal tiers plus a `maximum` tier are configurable via `apply_model_tier(
 
 | Tier | Description | Example Models |
 |------|-------------|----------------|
-| **premium** | Latest flagship models | claude-fable-5-1, gemini-4-argon-high, gpt-6.1-sol |
-| **maximum** | All 11 consultants; maximum targets and highest provider effort | claude-fable-5-1, gemini-4-argon-high, Kimi K3.1 Pro, Qwen3.8-Max, MiniMax-M3.1-Flash, muse-wonder-1.0; Grok xhigh, GLM/DeepSeek/Kimi/Meta max |
-| **standard** | Good quality at reasonable cost | claude-opus-5-5, gemini-3.8-flash-high, gpt-6.1-sol |
-| **economy** | Optimized for speed and low cost | claude-haiku-5-5, gemini-3.8-flash-low, gpt-6-luna, grok-4.7, glm-5.3-flash |
+| **premium** | Demanding work | Fable 5.2/high, Hydrogen/xhigh, Sol/max |
+| **maximum** | Maximum targets; up to 11 consultants | Fable 5.2/max, Hydrogen/xhigh (optional Carbon/high via CLI), Astra/max; highest supported efforts for other providers |
+| **standard** | Good quality at reasonable cost | claude-opus-5-5, gemini-4-hydrogen-high, gpt-6.1-sol |
+| **economy** | Optimized for speed and low cost | claude-haiku-5-5, gemini-4-hydrogen-medium, gpt-6-luna, grok-4.7, glm-5.3-flash |
 
 **Default models are now premium tier** for maximum quality. Tiers use current
 models only; superseded models are listed in `retired_models` in
@@ -372,7 +372,7 @@ apply_model_tier "standard"  # Set all consultants to standard models
 apply_model_tier "economy"   # Set all consultants to economy models
 
 # Get model for a specific consultant and tier (v2.8.1)
-get_model_for_tier "gemini" "premium"   # → gemini-4-argon-high on agy
+get_model_for_tier "gemini" "premium"   # → gemini-4-hydrogen-xhigh on agy
 get_model_for_tier "claude" "economy"   # → claude-haiku-5-5
 ```
 
@@ -390,13 +390,13 @@ Three new presets leverage the model tiers:
 ./scripts/consult_all.sh --preset fast "quick syntax question"
 ```
 
-### Premium Model Defaults (September 2026)
+### Premium Model Defaults (November 2026)
 All consultants now use premium models by default:
 
 | Consultant | Default Model |
 |------------|---------------|
-| Claude | claude-fable-5-1 |
-| Gemini | gemini-4-argon-high (via agy CLI); API: gemini-4-argon |
+| Claude | claude-fable-5-2 |
+| Gemini | gemini-4-hydrogen-xhigh (via agy CLI); API: gemini-4-hydrogen |
 | Codex | gpt-6.1-sol (max_quality: gpt-6-astra) |
 | Mistral | CLI: mistral-medium-3.5; API: mistral-large-4 (preview) |
 | DeepSeek | deepseek-flash (DeepSeek-V4.1-Flash) |
@@ -603,11 +603,12 @@ for f in scripts/*.sh scripts/lib/*.sh; do bash -n "$f" && echo "OK: $f"; done
 | `ENABLE_SMART_ROUTING` | false | Intelligent routing by category |
 | `ENABLE_COST_TRACKING` | true | Track costs |
 | `MAX_SESSION_COST` | 1.00 | Max budget ($) |
-| `CLAUDE_MODEL` | claude-fable-5-1 | Claude model (use claude-opus-5-5 for lower-cost standard) |
+| `CLAUDE_MODEL` | claude-fable-5-2 | Claude model (use claude-opus-5-5 for lower-cost standard) |
 | `CLAUDE_API_MAX_TOKENS` | 16384 | Claude API thinking + visible-output budget |
-| `GEMINI_MODEL` | gemini-4-argon-high | Gemini agy CLI model |
-| `GEMINI_API_MODEL` | gemini-4-argon | Gemini API-mode model ID (v2.15) |
+| `GEMINI_MODEL` | gemini-4-hydrogen-xhigh | Gemini agy CLI model |
+| `GEMINI_API_MODEL` | gemini-4-hydrogen | Gemini API-mode model ID (v2.15) |
 | `GEMINI_API_MAX_TOKENS` | 32768 | Gemini API thinking + visible-output budget |
+| `GEMINI_FRONTIER_CLI_MODEL` | empty | Optional Carbon/high maximum; requires CLI mode and exact account inventory |
 | `CODEX_MODEL` | gpt-6.1-sol | Codex model (max_quality: gpt-6-astra) |
 | `MISTRAL_MODEL` | mistral-large-4 | Mistral API model (Vibe uses `MISTRAL_CLI_MODEL`) |
 | `MISTRAL_CLI_MODEL` | mistral-medium-3.5 | Vibe CLI model alias |
@@ -716,7 +717,19 @@ Consequence worth knowing: the skill's `finalize.sh` re-verifies the same versio
 
 1. **Preflight**: `~/.claude/skills/ai-consultants-release/scripts/preflight.sh <VERSION>` — read-only gate on both repos (branch, cleanliness, origin sync, forward semver, free tag, tooling)
 2. **Bump the version**: `scripts/release.sh <VERSION>` — rewrites 9 anchored surfaces across 7 files (`package.json`, `scripts/config.sh`, `SKILL.md` ×2, `README.md` ×2, `CLAUDE.md`, `docs/cost_rates.json`, `docs/COST_RATES.md`), validates them, and runs `npm test` + `npm run lint`. Never commits, tags, or publishes.
-3. **Write the three changelogs** (hand-written — see "Why three changelog surfaces?" below): `CHANGELOG.md` entry at the top, `## Changelog` entry in this file, and `docs/releases/v<VERSION>.md`
+3. **Write the three changelogs** (hand-written — see "Why three changelog surfaces?" below): `CHANGELOG.md` entry at the top, `## Changelog
+
+### v5.9.0 — Fable, Hydrogen and explicit Carbon CLI
+
+**Preset and migration boundary.** `scripts/config.sh` and controller-generated tier data choose Fable 5.2/high for premium and max for maximum; Google tiers use Hydrogen medium/high/xhigh. `scripts/configure.sh` migrates only marked managed current defaults. Unmarked current selections and model/effort pins remain user-owned. Fable 5.1, Argon and Flash remain explicit choices.
+
+**Same-ID effort bug.** Google API tiers share `gemini-4-hydrogen`. The model-only economy override previously retained the premium effort; `scripts/lib/routing.sh` now returns the economy effort, `scripts/consult_all.sh` scopes it to the child request and compares effort during escalation, and `scripts/lib/cache.sh` includes it in cache identity. The recorded pre-fix boundary probe failed with xhigh instead of medium then xhigh; the repaired probe and full offline gate exercise serialization, escalation, explicit pins and cache separation.
+
+**Carbon remains explicit.** `scripts/lib/model_contracts.sh` owns family detection. The inventory check in `scripts/lib/common.sh` matches the exact requested CLI ID. Query and synthesis paths reject unavailable Carbon and API substitution; cost-aware routing and escalation keep an explicit Carbon model pinned. Account entitlement is separate from Google's public API release. The November 15 agy 1.5.9 inventory lists Hydrogen but not Carbon.
+
+**Evidence and pricing.** Controller-generated references use the complete 741-row AA v5.0.1 snapshot, with measured-effort scores, current task-cost figures and explicit serving contracts. Official prices remain provider-sourced. The integration does not enable provider long decode or rewrite personal router choices, and no live new-model quality qualification is claimed.
+
+` entry in this file, and `docs/releases/v<VERSION>.md`
 4. **Update workspace sync surfaces**: `../CLAUDE.md` workspace guide ("Latest at time of last sync" + Recent release line)
 5. **Finalize**: `~/.claude/skills/ai-consultants-release/scripts/finalize.sh <VERSION> --message-file … --tag-message-file …` — re-verifies all 9 version surfaces *and* the 3 doc surfaces, re-runs the gate, then commits, creates the annotated tag, and pushes both
 6. **Publishing is automatic**: pushing the `v*` tag triggers `.github/workflows/publish.yml`, which re-runs the gate, verifies the tag matches `package.json`, publishes to npm via **Trusted Publishing (OIDC — no `NPM_TOKEN`)** with provenance, and creates the GitHub release from the release note. Both terminal steps are idempotent, so a failed run can be re-run after a fix — **never move or delete a pushed tag**, and never `npm publish` from a workstation.

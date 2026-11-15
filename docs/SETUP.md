@@ -1006,16 +1006,16 @@ Sources and benchmark figures: [model reference](MODEL_BENCHMARKS.md).
 
 ### Gemini 3.8 Flash
 
-The installed `agy models` inventory on 2026-09-27 lists Gemini 3.8 Flash
-(High), (Medium) and (Low). CLI standard selects High and economy selects Low.
-Medium remains an explicit `GEMINI_MODEL` choice. Inventory
-evidence is capability-probed, not provider attestation of a generated answer.
+The installed `agy models` inventory on 2026-09-27 listed Gemini 3.8 Flash
+(High), (Medium) and (Low). All remain explicit model choices. Current Google
+tiers use Hydrogen medium/high/xhigh instead. Inventory evidence is
+capability-probed, not provider attestation of a generated answer.
 
-Configure migrates Flash 3.7 (and 3.6/3.5) values to the same-level 3.8
-Flash, pinned or not; unrelated models are preserved. Since 5.5.0 the API
-standard and economy tiers use `gemini-3.8-flash` (offline-tested); its
-native thinking levels are low/medium/high. Other explicit efforts fail before
-dispatch. With no effort setting, the provider's API default is medium.
+Configure migrates retired Flash 3.7 (and 3.6/3.5) values to the same-level
+3.8 Flash, pinned or not; unrelated active models are preserved. For an
+explicit Flash API selection, use `gemini-3.8-flash`; its thinking levels are
+low/medium/high. Other explicit efforts fail before dispatch. With no effort
+setting, the provider's API default is medium.
 
 Inventory discovery performed no inference. Separately authorized High/Low CLI
 smokes passed on 2026-09-28, using the named variant without --effort. This is

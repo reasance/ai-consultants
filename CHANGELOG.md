@@ -7,14 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For longer-form release notes (rationale, upgrade guides, performance numbers), see `docs/releases/v<VERSION>.md`.
 
-## [Unreleased]
+## [5.9.0] - 2026-11-15
 
-- Support effort-aware economy/escalation on Hydrogen's single API model ID, keep automatic overrides scoped to each request, and include the effective economy effort in cache identity. Explicit Carbon selections remain pinned across routing and escalation.
-- Use Hydrogen/medium, high and xhigh for Google economy, standard and premium/default maximum. Add an explicit Carbon/high CLI maximum option with exact account-inventory checks and no API substitution. Preserve current unmarked choices and pins.
+### Added
 
-- Use Fable 5.2/high for Claude premium and max for maximum. Keep explicit current-model pins and standard Opus/medium. Update official Fable token rates to $8/$40 per million.
-- Refresh model references to AA v5.0.1. Carbon CLI IDs are verified from official agy documentation; access is checked per account.
+- Opt into Carbon/high for maximum quality through Antigravity with `GEMINI_FRONTIER_CLI_MODEL=gemini-4-carbon-high` and `GEMINI_USE_API=false`. The exact model ID must be visible to the account before dispatch.
+- Publish effort-specific AA v5.0.1 benchmark and serving-contract references, including Fable 5.2, Hydrogen and optional Carbon.
 
+### Changed
+
+- Claude premium uses Fable 5.2/high and maximum uses Fable/max; standard stays Opus 5.5/medium. Fable requires Claude Code 2.1.321 or later and uses verified standard API rates of $8/$40 per million tokens.
+- Google tiers use Hydrogen/medium for economy, high for standard, and xhigh for premium and the default maximum. Only marked managed defaults migrate; active unmarked choices, model pins and explicit efforts remain user-owned.
+
+### Fixed
+
+- Hydrogen API economy requests use the intended effort even though economy and premium share one API model ID. Confidence escalation can raise effort on that same ID, while explicit effort pins still win.
+- Cache identity includes the effective economy effort, preventing an answer obtained at another effort from satisfying the request.
+- Explicit Carbon selections stay pinned across automatic routing, escalation and synthesis. Unavailable or non-exact account inventory fails before dispatch without substituting another model or the API.
 
 ## [5.8.0] - 2026-10-28
 

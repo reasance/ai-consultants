@@ -1,4 +1,4 @@
-# Cost Rates - AI Consultants v5.8.0
+# Cost Rates - AI Consultants v5.9.0
 
 This page documents the per-token rates used by the cost tracking system.
 
@@ -159,7 +159,8 @@ invoices):
 | `balanced` | Gemini 4 Argon (High), GPT-6.1 Sol, Mistral Large 4 | ≈ $0.14 | ≈ $0.22 |
 | Every consultant enabled | 9 answering consultants | ≈ $0.30 | ≈ $0.59 |
 
-These examples used the older Fable default; current tiers use Opus.
+These examples used Fable 5.1. Current Claude premium/maximum use Fable 5.2,
+and standard uses Opus 5.5/medium; these historical costs are not current quotes.
 Reasoning models add thinking tokens. In those runs, Fable synthesis was the
 largest single item, and Token Plan, coding-plan and subscription models are
 excluded rather than counted as free. The pre-run estimate is a rough lower
@@ -267,8 +268,9 @@ and [Opus 5.5](https://platform.claude.com/docs/en/models/opus-5-5/overview).
 
 ## Gemini 4 Argon
 
-`gemini-4-argon-high` on `agy` and `gemini-4-argon` on the API serve the
-default (premium) and maximum tiers. Google lists Argon at $4/M input and $20/M
+`gemini-4-argon-high` on `agy` and `gemini-4-argon` on the API remain
+explicit opt-in choices. Current Google tiers use Hydrogen; optional Carbon
+maximum is CLI-only. Google lists Argon at $4/M input and $20/M
 output, with an introductory $2/M and $10/M through 2026-11-30. The estimator
 uses the list rate so budgets fail safe; thinking tokens bill as output, and
 implicit-cache discounts are excluded. The `agy` Medium/Low variants share the
@@ -284,9 +286,9 @@ CLI High/Medium/Low and API ID `gemini-3.8-flash` are priced at the promotional
 API-equivalent rate: $0.75/M input, $3.75/M output through 2026-12-31. Standard
 rates from 2027-01-01 are $1.50/M input and $7.50/M output; the static catalog
 must be refreshed at expiry. Cache, service-tier and subscription adjustments
-are excluded: a CLI estimate is not a subscription invoice. Since 5.5.0
-`gemini-3.8-flash` also serves the API standard/economy tiers (offline-tested),
-and `gemini-4-argon` the default and maximum tiers.
+are excluded: a CLI estimate is not a subscription invoice. Flash and Argon remain
+explicit choices. Current Google standard/economy tiers use Hydrogen with
+high/medium thinking; premium and default maximum use Hydrogen/xhigh.
 Source: [Google latest-model guide](https://ai.google.dev/gemini-api/docs/latest-model),
 checked 2026-09-27.
 

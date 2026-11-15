@@ -34,7 +34,7 @@ Google made `gemini-4-carbon` publicly available on November 10. Only the separa
 
 Hydrogen uses gemini-4-hydrogen on the API and exact level IDs gemini-4-hydrogen-low/medium/high/xhigh on agy. It defaults to high, supports all four thinking levels, and costs $1.50/$7.50 per million input/output tokens at standard API rates. These rates estimate CLI equivalents, not subscription invoices. Argon and Flash stay selectable.
 
-Carbon has a unified 1,048,576-token input/output window. Foreground generation supports up to 65,536 output tokens when streaming and 32,768 when non-streaming in the Cloud contract. Consumers use a 32,768-token non-streaming cap; long decode needs a continuation or background implementation and is not silently enabled. Do not send thinking_budget or MINIMAL; sampling overrides are ignored. Explicit context caching is unsupported.
+Carbon has a unified 1,048,576-token input/output window. Foreground generation supports up to 65,536 output tokens when streaming and 32,768 when non-streaming in the Cloud contract. These provider API limits are not agy CLI output limits. ai-consultants keeps a configured 32,768-token API budget; Carbon remains CLI-only here. Long decode needs continuation or background support and is not enabled by these integrations. Do not send thinking_budget or MINIMAL; sampling overrides are ignored. Explicit context caching is unsupported.
 
 Carbon standard API input/output prices are $2/$10 per million tokens through November 30, 2026, then $4/$20 from December 1. Thinking tokens count as output. ai-consultants uses list rates for conservative estimates; delegation-kit's catalog uses the current promotional rate. Neither estimate is a subscription invoice.
 
