@@ -1,6 +1,6 @@
 # Model reference: Artificial Analysis Intelligence Index v5.0.1
 
-Generated from controller-models; snapshot 2026-11-13. Each score belongs to its measured effort and benchmark revision.
+Generated from controller-models; snapshot 2026-11-15. Each score belongs to its measured effort and benchmark revision.
 
 | Model | Measured effort | Index v5.0.1 | AA USD/task | Serving evidence |
 |---|---|---:|---:|---|
@@ -17,6 +17,7 @@ Generated from controller-models; snapshot 2026-11-13. Each score belongs to its
 | Gemini 4 Hydrogen | medium | 41.2 | $0.80 | agy IDs locally observed / API |
 | Gemini 4 Hydrogen | low | 26.9 | $0.29 | agy IDs locally observed / API |
 | Gemini 4 Argon | high | 50.4 | $4.97 | registered transports |
+| Gemini 4 Argon | medium | 47.6 | $4.31 | registered transports |
 | Gemini 3.8 Flash | high | 30.8 | $7.77 | registered transports |
 | Gemini 3.8 Flash | medium | 30.1 | $6.26 | registered transports |
 | Gemini 3.8 Flash | low | 22.5 | unknown | registered transports |
@@ -29,7 +30,7 @@ Google economy uses Hydrogen/medium, standard high, premium and the default maxi
 
 Fable 5.2 uses `claude-fable-5-2`, adaptive thinking always on, and low/medium/high/xhigh/max effort (API default high). Claude Code requires version 2.1.321 or later and an eligible plan or usage credits. Standard API token rates are $8 input / $40 output per million; fast mode costs $16/$80 and is not enabled by this integration. Fable 5.1 remains a supported explicit choice. AA labels its Fable measurements Default Fallback; this does not authorize local silent fallbacks or additional model calls.
 
-Google made `gemini-4-carbon` publicly available on November 10. Only the separate cyber-permissive variant remains allowlisted. The standard model supports low/medium/high thinking, default medium. A high benchmark score therefore requires explicitly requesting high. Google documents agy IDs gemini-4-carbon-low/medium/high. Carbon requires an enabled Ultra/Enterprise account and is absent from the checked local agy 1.5.6 inventory. The integrations check the exact requested ID and fail without a substitute.
+Google made `gemini-4-carbon` publicly available on November 10. Only the separate cyber-permissive variant remains allowlisted. The standard model supports low/medium/high thinking, default medium. A high benchmark score therefore requires explicitly requesting high. Google documents agy IDs gemini-4-carbon-low/medium/high. Carbon requires an enabled Ultra/Enterprise account and is absent from the checked local agy 1.5.9 inventory (November 15, 2026). The integrations check the exact requested ID and fail without a substitute.
 
 Hydrogen uses gemini-4-hydrogen on the API and exact level IDs gemini-4-hydrogen-low/medium/high/xhigh on agy. It defaults to high, supports all four thinking levels, and costs $1.50/$7.50 per million input/output tokens at standard API rates. These rates estimate CLI equivalents, not subscription invoices. Argon and Flash stay selectable.
 
