@@ -120,8 +120,11 @@ _builtin_rate() {
         claude-opus-5-5) pair="0.004 0.02" ;;
         claude-sonnet-5-5) pair="0.002 0.01" ;;
         claude-haiku-5-5) pair="0.0001 0.0005" ;;
+        claude-fable-5-2) pair="0.008 0.04" ;;
         gemini-4-argon|gemini-4-argon-low|gemini-4-argon-medium|gemini-4-argon-high|"gemini 4 argon (low)"|"gemini 4 argon (medium)"|"gemini 4 argon (high)") pair="0.004 0.02" ;;
         gemini-3.8-flash|gemini-3.8-flash-low|gemini-3.8-flash-medium|gemini-3.8-flash-high|"gemini 3.8 flash (low)"|"gemini 3.8 flash (medium)"|"gemini 3.8 flash (high)") pair="0.00075 0.00375" ;;
+        gemini-4-carbon|gemini-4-carbon-low|gemini-4-carbon-medium|gemini-4-carbon-high|"gemini 4 carbon (low)"|"gemini 4 carbon (medium)"|"gemini 4 carbon (high)") pair="0.004 0.02" ;;
+        gemini-4-hydrogen|gemini-4-hydrogen-low|gemini-4-hydrogen-medium|gemini-4-hydrogen-high|gemini-4-hydrogen-xhigh|"gemini 4 hydrogen (low)"|"gemini 4 hydrogen (medium)"|"gemini 4 hydrogen (high)"|"gemini 4 hydrogen (xhigh)") pair="0.0015 0.0075" ;;
         gpt-6-astra) pair="0.01 0.05" ;;
         gpt-6.1-sol) pair="0.002 0.01" ;;
         gpt-6.1-terra) pair="0.001 0.005" ;;

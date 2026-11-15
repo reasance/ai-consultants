@@ -1,6 +1,6 @@
 {
   "version": "5.8.0",
-  "updated": "2026-10-28",
+  "updated": "2026-11-15",
   "models": {
     "_comment_units": "All rates are USD per 1,000 tokens (per-1K). lib/costs.sh computes cost as (token_count / 1000) * rate, so every value here MUST be a per-1K rate = (provider $/1M price) / 1000. Do NOT paste $/MTok figures directly.",
     "_comment_scope": "Current models only (5.5.0). Superseded models are listed in retired_models with their replacement; configure migrates them and the runtime warns. A model absent from this table is reported as unpriced, never priced at a guessed rate. Rates are official list prices, Verified 2026-10-24.",
@@ -29,6 +29,12 @@
       "output": 0.0005,
       "provider": "Anthropic",
       "notes": "Standard API list rate ($0.10/$0.50 per 1M). Cache and batch adjustments excluded. Above 100K input tokens: $0.50/$2.50 (the whole request bills at this rate). Verified 2026-10-25 (https://platform.claude.com/docs/en/about-claude/pricing)."
+    },
+    "claude-fable-5-2": {
+      "input": 0.008,
+      "output": 0.04,
+      "provider": "Anthropic",
+      "notes": "Standard API list rate ($8/$40 per 1M). Standard API prices. Fast mode 16/80, cache and batch adjustments excluded. Verified 2026-11-10 (https://platform.claude.com/docs/en/models/fable-5-2/overview)."
     },
     "gemini-4-argon": {
       "input": 0.004,
@@ -101,6 +107,88 @@
       "input": 0.00075,
       "output": 0.00375,
       "notes": "API-equivalent estimate for Gemini 3.8 Flash (High) (gemini-3.8-flash); not a CLI invoice."
+    },
+    "gemini-4-carbon": {
+      "input": 0.004,
+      "output": 0.02,
+      "provider": "Google",
+      "notes": "Standard API list rate ($4/$20 per 1M). Standard rates from 2026-12-01; 2/10 introductory rates through 2026-11-30. Thinking billed as output. Implicit cache only; cache/batch/flex/priority adjustments excluded. Verified 2026-11-10 (https://aistudio.google.com/docs/pricing#gemini-4-carbon)."
+    },
+    "gemini-4-carbon-low": {
+      "input": 0.004,
+      "output": 0.02,
+      "notes": "API-equivalent estimate for gemini-4-carbon-low (gemini-4-carbon); not a CLI invoice."
+    },
+    "gemini-4-carbon-medium": {
+      "input": 0.004,
+      "output": 0.02,
+      "notes": "API-equivalent estimate for gemini-4-carbon-medium (gemini-4-carbon); not a CLI invoice."
+    },
+    "gemini-4-carbon-high": {
+      "input": 0.004,
+      "output": 0.02,
+      "notes": "API-equivalent estimate for gemini-4-carbon-high (gemini-4-carbon); not a CLI invoice."
+    },
+    "Gemini 4 Carbon (Low)": {
+      "input": 0.004,
+      "output": 0.02,
+      "notes": "API-equivalent estimate for Gemini 4 Carbon (Low) (gemini-4-carbon); not a CLI invoice."
+    },
+    "Gemini 4 Carbon (Medium)": {
+      "input": 0.004,
+      "output": 0.02,
+      "notes": "API-equivalent estimate for Gemini 4 Carbon (Medium) (gemini-4-carbon); not a CLI invoice."
+    },
+    "Gemini 4 Carbon (High)": {
+      "input": 0.004,
+      "output": 0.02,
+      "notes": "API-equivalent estimate for Gemini 4 Carbon (High) (gemini-4-carbon); not a CLI invoice."
+    },
+    "gemini-4-hydrogen": {
+      "input": 0.0015,
+      "output": 0.0075,
+      "provider": "Google",
+      "notes": "Standard API list rate ($1.50/$7.50 per 1M). Standard flat rates across context; thinking billed as output. Cache/batch/flex/priority adjustments excluded. Verified 2026-11-13 (https://aistudio.google.com/docs/pricing#gemini-4-hydrogen)."
+    },
+    "gemini-4-hydrogen-low": {
+      "input": 0.0015,
+      "output": 0.0075,
+      "notes": "API-equivalent estimate for gemini-4-hydrogen-low (gemini-4-hydrogen); not a CLI invoice."
+    },
+    "gemini-4-hydrogen-medium": {
+      "input": 0.0015,
+      "output": 0.0075,
+      "notes": "API-equivalent estimate for gemini-4-hydrogen-medium (gemini-4-hydrogen); not a CLI invoice."
+    },
+    "gemini-4-hydrogen-high": {
+      "input": 0.0015,
+      "output": 0.0075,
+      "notes": "API-equivalent estimate for gemini-4-hydrogen-high (gemini-4-hydrogen); not a CLI invoice."
+    },
+    "gemini-4-hydrogen-xhigh": {
+      "input": 0.0015,
+      "output": 0.0075,
+      "notes": "API-equivalent estimate for gemini-4-hydrogen-xhigh (gemini-4-hydrogen); not a CLI invoice."
+    },
+    "Gemini 4 Hydrogen (Low)": {
+      "input": 0.0015,
+      "output": 0.0075,
+      "notes": "API-equivalent estimate for Gemini 4 Hydrogen (Low) (gemini-4-hydrogen); not a CLI invoice."
+    },
+    "Gemini 4 Hydrogen (Medium)": {
+      "input": 0.0015,
+      "output": 0.0075,
+      "notes": "API-equivalent estimate for Gemini 4 Hydrogen (Medium) (gemini-4-hydrogen); not a CLI invoice."
+    },
+    "Gemini 4 Hydrogen (High)": {
+      "input": 0.0015,
+      "output": 0.0075,
+      "notes": "API-equivalent estimate for Gemini 4 Hydrogen (High) (gemini-4-hydrogen); not a CLI invoice."
+    },
+    "Gemini 4 Hydrogen (XHigh)": {
+      "input": 0.0015,
+      "output": 0.0075,
+      "notes": "API-equivalent estimate for Gemini 4 Hydrogen (XHigh) (gemini-4-hydrogen); not a CLI invoice."
     },
     "gpt-6-astra": {
       "input": 0.01,
@@ -323,8 +411,8 @@
   "model_tiers": {
     "_comment": "Model tiers for apply_model_tier() (mirrors get_model_for_tier in scripts/config.sh)",
     "maximum": {
-      "claude": "claude-opus-5-5",
-      "gemini": "gemini-4-argon-high",
+      "claude": "claude-fable-5-2",
+      "gemini": "gemini-4-hydrogen-xhigh",
       "codex": "gpt-6-astra",
       "mistral": "mistral-medium-3.5",
       "deepseek": "deepseek-flash",
@@ -336,8 +424,8 @@
       "meta": "muse-wonder-1.0"
     },
     "premium": {
-      "claude": "claude-opus-5-5",
-      "gemini": "gemini-4-argon-high",
+      "claude": "claude-fable-5-2",
+      "gemini": "gemini-4-hydrogen-xhigh",
       "codex": "gpt-6.1-sol",
       "mistral": "mistral-medium-3.5",
       "deepseek": "deepseek-flash",
@@ -350,7 +438,7 @@
     },
     "standard": {
       "claude": "claude-opus-5-5",
-      "gemini": "gemini-3.8-flash-high",
+      "gemini": "gemini-4-hydrogen-high",
       "codex": "gpt-6.1-sol",
       "mistral": "mistral-medium-3.5",
       "deepseek": "deepseek-flash",
@@ -363,7 +451,7 @@
     },
     "economy": {
       "claude": "claude-haiku-5-5",
-      "gemini": "gemini-3.8-flash-low",
+      "gemini": "gemini-4-hydrogen-medium",
       "codex": "gpt-6-luna",
       "mistral": "mistral-medium-3.5",
       "deepseek": "deepseek-flash",
@@ -379,20 +467,20 @@
     "_comment": "Transport-specific namespaces used by Gemini and Mistral; the legacy model_tiers table reflects their CLI values.",
     "gemini": {
       "maximum": {
-        "cli": "gemini-4-argon-high",
-        "api": "gemini-4-argon"
+        "cli": "gemini-4-hydrogen-xhigh",
+        "api": "gemini-4-hydrogen"
       },
       "premium": {
-        "cli": "gemini-4-argon-high",
-        "api": "gemini-4-argon"
+        "cli": "gemini-4-hydrogen-xhigh",
+        "api": "gemini-4-hydrogen"
       },
       "standard": {
-        "cli": "gemini-3.8-flash-high",
-        "api": "gemini-3.8-flash"
+        "cli": "gemini-4-hydrogen-high",
+        "api": "gemini-4-hydrogen"
       },
       "economy": {
-        "cli": "gemini-3.8-flash-low",
-        "api": "gemini-3.8-flash"
+        "cli": "gemini-4-hydrogen-medium",
+        "api": "gemini-4-hydrogen"
       }
     },
     "mistral": {
@@ -416,8 +504,8 @@
   },
   "consultant_fallbacks": {
     "_comment": "Premium defaults - 5.5.0",
-    "claude": "claude-opus-5-5",
-    "gemini": "gemini-4-argon-high",
+    "claude": "claude-fable-5-2",
+    "gemini": "gemini-4-hydrogen-xhigh",
     "codex": "gpt-6.1-sol",
     "mistral": "mistral-medium-3.5",
     "deepseek": "deepseek-flash",
@@ -433,9 +521,14 @@
       "gpt-6.1-terra"
     ],
     "gemini_cli": [
+      "gemini-4-hydrogen-low",
+      "gemini-4-carbon-high",
+      "gemini-4-argon-high",
       "gemini-4-argon-medium",
       "gemini-4-argon-low",
-      "gemini-3.8-flash-medium"
+      "gemini-3.8-flash-high",
+      "gemini-3.8-flash-medium",
+      "gemini-3.8-flash-low"
     ],
     "mistral_api": [
       "mistral-medium-3-5",
@@ -445,7 +538,8 @@
       "deepseek-v4-pro"
     ],
     "claude": [
-      "claude-fable-5-1"
+      "claude-fable-5-1",
+      "claude-opus-5-5"
     ],
     "meta": [
       "muse-spark-1.3-contributor"

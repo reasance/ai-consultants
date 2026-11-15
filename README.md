@@ -565,24 +565,29 @@ Code 1.4.12, Muse Wonder, 2026-10-24) returned a structured persona answer in
 12 s with requested-only identity and estimated tokens; the API transport is
 offline-tested.
 
-Promotion is transport-specific. Gemini 4 Argon (GA 2026-10-13) is the Gemini
-default and maximum target: `gemini-4-argon-high` on `agy` and `gemini-4-argon`
-on the API. An authorized `agy` consultation smoke returned a structured answer
-with capability-probed identity on 2026-10-16; the API transport is covered by
-offline tests only. Google excludes Argon from the Free tier and the AI Pro
-plan, so the `agy` listing alone is not an access check. Gemini 3.8 Flash serves
-the standard (High) and economy (Low) tiers on the CLI and, as `gemini-3.8-flash`,
-on the API; that API transport is offline-tested. Mistral Large 4 (`mistral-large-4`, public preview) is the
+Google tiers now use Hydrogen: medium for economy, high for standard, and
+xhigh for premium and the default maximum. The CLI uses the exact level ID
+from `agy models`; the API uses `gemini-4-hydrogen` with an explicit tier
+thinking level. Flash and Argon remain selectable, and current personal pins
+are preserved. For an eligible Ultra/Enterprise account, explicitly opt into
+Carbon/high for maximum with `GEMINI_FRONTIER_CLI_MODEL=gemini-4-carbon-high`
+and `GEMINI_USE_API=false`. Missing exact CLI access fails before a Carbon
+request; no model or API is substituted. A standalone Carbon selection uses
+`GEMINI_MODEL=gemini-4-carbon-high` without a preset. These are benchmark-informed
+choices, not a live qualification of repository work.
+
+Mistral Large 4 (`mistral-large-4`, public preview) is the
 Mistral API target for every tier. An authorized consultation smoke returned a
 structured answer with provider-reported identity on 2026-10-15; the preview is absent from
 `GET /v1/models`, so that listing is not an access check. Vibe keeps
 `mistral-medium-3.5`. The other Mistral
 API IDs (`mistral-medium-3-5`, `mistral-small-2603`) remain catalogued
 opt-ins. Claude
-Opus 5.5 is the default Claude target: maximum uses `max`, premium `xhigh`,
-and standard `medium`. Astra uses `max` in maximum; Sol uses `max` in premium
+Fable 5.2 is the premium Claude target at `high`; maximum uses Fable/max.
+Standard uses Opus 5.5/medium and economy uses Haiku 5.5. Claude Code must
+be version 2.1.321 or later. Astra uses `max` in maximum; Sol uses `max` in premium
 and `high` in standard. Explicit reasoning-effort settings win. Fable 5.1
-remains an opt-in. Selecting a preset later intentionally reapplies that
+remains an opt-in, with current pins preserved. Selecting a preset later intentionally reapplies that
 preset's tier and can replace an explicit model override for the run.
 Qwen3.8-Max serves the default, premium and maximum tiers on every Qwen
 transport (the `qwen` CLI, the Token Plan and DashScope); `max_quality` adds
@@ -890,3 +895,9 @@ MIT License - see [LICENSE](LICENSE) for details.
 ## Contributing
 
 Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+<!-- BEGIN controller-models: benchmark-reference -->
+## Model benchmarks and availability
+
+[Current v5.0.1 reference](docs/MODEL_BENCHMARKS.md): Fable 5.2 and Carbon scores, provider contracts and integration choices. Carbon is optional via agy; agy selections use exact inventory checks; Carbon needs Ultra/Enterprise.
+<!-- END controller-models: benchmark-reference -->

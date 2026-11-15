@@ -123,11 +123,13 @@ the observed version is recorded only as response provenance.
 The `max_quality` preset enables all 11 consultants. It uses the separately
 Kimi K3.1 Pro at max thinking effort (every Kimi tier), MiniMax-M3.1-Flash (every MiniMax tier), GLM-5.3 (the flagship; Flash serves
 premium/standard/economy) and Qwen3.8-Max (also the Qwen default; Flash serves
-standard/economy). `gemini-4-argon-high` is the `agy` target for the default
-and maximum tiers (`gemini-4-argon` on the API); one authorized `agy` smoke passed on
-2026-10-16 with capability-probed identity, and the API transport is offline-tested only.
-Gemini 3.8 Flash serves the standard/economy tiers (High/Low on the CLI, `gemini-3.8-flash`
-on the API). Claude Opus 5.5 is the default: maximum/max, premium/xhigh and standard/medium. Explicit effort settings win; Fable remains opt-in. Tiers use current models
+standard/economy). Hydrogen uses xhigh for Google premium and default maximum, high for standard,
+and medium for economy. Carbon/high is an explicit CLI-only maximum option
+with `GEMINI_FRONTIER_CLI_MODEL=gemini-4-carbon-high` and `GEMINI_USE_API=false`;
+the exact ID must appear in the account's `agy models` inventory. Missing
+access never triggers an API or alternate-model fallback. Flash and Argon
+remain selectable. Claude uses Fable 5.2/high for premium and max for maximum;
+Opus/medium remains standard, with Fable 5.1 pins preserved. Tiers use current models
 only: since 5.5.0 superseded models are retired, `configure` migrates them, and a retired
 model selected at run time runs with a warning and is reported as unpriced. Mistral
 API mode uses Mistral Large 4 in every tier; the other new Mistral API IDs remain explicit opt-ins.

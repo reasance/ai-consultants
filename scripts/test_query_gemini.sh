@@ -53,6 +53,14 @@ if [[ "${1:-}" == "models" ]]; then
             'Failed to start: listen tcp 127.0.0.1:0: bind: operation not permitted' >&2
         exit 1
     fi
+    if [[ "${AGY_FAKE_MODE:-compatible}" == "carbon_exact" ]]; then
+        printf '%s\t%s\n' gemini-4-carbon-high 'Gemini 4 Carbon (High)'
+        exit 0
+    fi
+    if [[ "${AGY_FAKE_MODE:-compatible}" == "carbon_prefix" ]]; then
+        printf '%s\n' gemini-4-carbon-high-extra
+        exit 0
+    fi
     if [[ "${AGY_FAKE_MODE:-compatible}" == "missing_model" ]]; then
         printf '%s\n' 'Gemini 3.7 Flash (High)'
     else
@@ -77,6 +85,31 @@ if [[ "${AGY_FAKE_MODE:-}" == *hang* ]]; then
 fi
 EOF
     chmod +x "$path"
+}
+
+test_new_google_ids_and_carbon_inventory_guard() {
+    local fake="$TMP_ROOT/agy-new" output="$TMP_ROOT/new-model.json" sentinel="$TMP_ROOT/model-call" rc
+    make_agy_stub "$fake"
+    # A prefix is not proof of access. Neither this case nor API mode may dispatch.
+    for mode in carbon_prefix missing_model; do
+        rm -f "$sentinel"
+        rc=0
+        GEMINI_CMD="$fake" GEMINI_USE_API=false GEMINI_MODEL=gemini-4-carbon-high \
+          AGY_FAKE_MODE="$mode" AGY_REQUEST_FILE="$sentinel" \
+          "$SCRIPT_DIR/query_gemini.sh" test "" "$output" >/dev/null 2>&1 || rc=$?
+        assert_eq 1 "$rc" "Carbon refuses an unavailable or non-exact inventory entry"
+        assert_eq absent "$([[ -e "$sentinel" ]] && echo called || echo absent)" "Carbon never dispatches without an exact inventory match"
+    done
+    rc=0
+    GEMINI_CMD="$fake" GEMINI_USE_API=true GEMINI_MODEL=gemini-4-carbon-high \
+      GEMINI_API_MODEL=gemini-4-hydrogen AGY_REQUEST_FILE="$sentinel" \
+      "$SCRIPT_DIR/query_gemini.sh" test "" "$output" >/dev/null 2>&1 || rc=$?
+    assert_eq 1 "$rc" "Carbon cannot silently use the API transport"
+    rc=0
+    GEMINI_CMD="$fake" GEMINI_USE_API=false GEMINI_MODEL=gemini-4-carbon-high \
+      AGY_FAKE_MODE=carbon_exact AGY_REQUEST_FILE="$sentinel" MAX_RETRIES=1 \
+      "$SCRIPT_DIR/query_gemini.sh" test "" "$output" >/dev/null 2>&1 || rc=$?
+    assert_eq 0 "$rc" "documented Carbon CLI ID works when exposed by the account"
 }
 
 test_agy_env_strips_ssh_markers() {
@@ -243,4 +276,5 @@ run_test "Test 4: a complete answer survives an agy that never exits" test_compl
 run_test "Test 5: a partial answer keeps waiting for agy" test_partial_answer_keeps_waiting_for_agy
 run_test "Test 6: the exit guard passes status and stdin through" test_exit_guard_passes_status_and_stdin_through
 run_test "Test 7: a model inventory failure names its cause" test_inventory_failure_names_its_cause
+run_test "Test 8: exact Carbon CLI access and no API substitution" test_new_google_ids_and_carbon_inventory_guard
 test_summary "query_gemini"

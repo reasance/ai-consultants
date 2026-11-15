@@ -7,6 +7,8 @@ source "$SCRIPT_DIR/lib/test_helpers.sh"
 source "$SCRIPT_DIR/lib/common.sh" >/dev/null 2>&1
 source "$SCRIPT_DIR/lib/costs.sh" >/dev/null 2>&1
 
+unset CLAUDE_REASONING_EFFORT _AI_CONSULTANTS_MODEL_TIER
+
 TMP=$(mktemp -d -t ai_consultants_query_claude_test.XXXXXX)
 trap 'rm -rf "$TMP"' EXIT
 
@@ -26,13 +28,13 @@ fi
 printf '%s\n' "$@" > "$CLAUDE_ARGS_FILE"
 prompt=$(cat)
 [[ -z "${CLAUDE_PROMPT_FILE:-}" ]] || printf '%s' "$prompt" > "$CLAUDE_PROMPT_FILE"
-printf '%s\n' '{"type":"assistant","message":{"id":"msg1","model":"claude-fable-5-1","content":[{"type":"text","text":"hello"}]}}'
-printf '%s\n' '{"type":"result","subtype":"success","model":"claude-fable-5-1","result":"hello","stop_reason":"end_turn","usage":{"input_tokens":10,"cache_creation_input_tokens":20,"cache_read_input_tokens":30,"output_tokens":40},"modelUsage":{"claude-fable-5-1":{"inputTokens":10,"outputTokens":40,"cacheReadInputTokens":30,"cacheCreationInputTokens":20,"costUSD":0.42}}}'
+printf '%s\n' '{"type":"assistant","message":{"id":"msg1","model":"claude-fable-5-2","content":[{"type":"text","text":"hello"}]}}'
+printf '%s\n' '{"type":"result","subtype":"success","model":"claude-fable-5-2","result":"hello","stop_reason":"end_turn","usage":{"input_tokens":10,"cache_creation_input_tokens":20,"cache_read_input_tokens":30,"output_tokens":40},"modelUsage":{"claude-fable-5-2":{"inputTokens":10,"outputTokens":40,"cacheReadInputTokens":30,"cacheCreationInputTokens":20,"costUSD":0.42}}}'
 EOF
     chmod +x "$fake"
 
     AI_CONSULTANTS_CONFIG_DIR="$TMP/config" CLAUDE_CMD="$fake" \
-        CLAUDE_MODEL=claude-fable-5-1 CLAUDE_USE_API=false \
+        CLAUDE_MODEL=claude-fable-5-2 CLAUDE_USE_API=false \
         CLAUDE_PROMPT_FILE="$TMP/prompt" CLAUDE_ARGS_FILE="$TMP/args" ENABLE_PERSONA=true \
         "$SCRIPT_DIR/query_claude.sh" test "" "$output" >/dev/null 2>&1 || rc=$?
 
@@ -45,9 +47,9 @@ EOF
         "CLI provider usage is marked measured"
     assert_eq 0.42 "$(jq -r '.metadata.provider_cost_usd' "$output")" \
         "CLI provider cost is persisted"
-    assert_eq claude-fable-5-1 "$(jq -r '.metadata.requested_model' "$output")" \
+    assert_eq claude-fable-5-2 "$(jq -r '.metadata.requested_model' "$output")" \
         "Claude records the requested content model separately"
-    assert_eq claude-fable-5-1 "$(jq -r '.model' "$output")" \
+    assert_eq claude-fable-5-2 "$(jq -r '.model' "$output")" \
         "CLI provider attestation supplies the effective content model"
     assert_eq provider-reported "$(jq -r '.metadata.model_identity_source' "$output")" \
         "assistant content model is distinguished from billing participants"
@@ -61,8 +63,10 @@ EOF
         "Claude consultation excludes ambient setting sources"
     assert_match '--tools' "$(tr '\n' ' ' < "$TMP/args")" \
         "Claude consultation disables tools"
-    assert_match '--model claude-fable-5-1' "$(tr '\n' ' ' < "$TMP/args")" \
-        "Claude CLI request selects Fable 5.1"
+    assert_match '--model claude-fable-5-2' "$(tr '\n' ' ' < "$TMP/args")" \
+        "Claude CLI request selects Fable 5.2"
+    assert_match '--effort high' "$(tr '\n' ' ' < "$TMP/args")" \
+        "Fable premium effort reaches the native CLI"
 }
 
 test_cli_safety_route_uses_provider_identity() {
@@ -79,19 +83,19 @@ if [[ "${1:-}" == "auth" && "${2:-}" == "status" ]]; then
 fi
 cat >/dev/null
 printf '%s\n' '{"type":"assistant","message":{"id":"msg1","model":"claude-opus-5","content":[{"type":"text","text":"hello"}]}}'
-printf '%s\n' '{"type":"result","subtype":"success","model":"claude-fable-5-1","result":"hello","usage":{"input_tokens":1,"output_tokens":1},"modelUsage":{"claude-opus-5":{"inputTokens":1,"outputTokens":1,"costUSD":0.01}}}'
+printf '%s\n' '{"type":"result","subtype":"success","model":"claude-fable-5-2","result":"hello","usage":{"input_tokens":1,"output_tokens":1},"modelUsage":{"claude-opus-5":{"inputTokens":1,"outputTokens":1,"costUSD":0.01}}}'
 EOF
     chmod +x "$fake"
 
     AI_CONSULTANTS_CONFIG_DIR="$TMP/config" CLAUDE_CMD="$fake" \
-        CLAUDE_MODEL=claude-fable-5-1 CLAUDE_USE_API=false ENABLE_PERSONA=false \
+        CLAUDE_MODEL=claude-fable-5-2 CLAUDE_USE_API=false ENABLE_PERSONA=false \
         "$SCRIPT_DIR/query_claude.sh" test "" "$output" >/dev/null 2>&1 || rc=$?
 
     assert_eq 0 "$rc" "safety-routed Claude response completes"
-    assert_eq claude-fable-5-1 "$(jq -r '.metadata.requested_model' "$output")" \
-        "safety route preserves requested Fable 5.1"
+    assert_eq claude-fable-5-2 "$(jq -r '.metadata.requested_model' "$output")" \
+        "safety route preserves requested Fable 5.2"
     assert_eq claude-opus-5 "$(jq -r '.model' "$output")" \
-        "safety route is never labeled as Fable 5.1"
+        "safety route is never labeled as Fable 5.2"
     assert_eq provider-reported "$(jq -r '.metadata.model_identity_source' "$output")" \
         "safety route records provider-reported identity"
     assert_eq 0.01 "$(jq -r '.metadata.provider_cost_usd' "$output")" \
@@ -120,17 +124,19 @@ EOF
 
     PATH="$TMP:$PATH" AI_CONSULTANTS_CONFIG_DIR="$TMP/config" \
         ANTHROPIC_API_KEY=test-key CLAUDE_API_REQUEST_FILE="$request" \
-        CLAUDE_MODEL=claude-fable-5-1 CLAUDE_USE_API=true ENABLE_PERSONA=false \
+        CLAUDE_MODEL=claude-fable-5-2 CLAUDE_USE_API=true ENABLE_PERSONA=false \
         MAX_RETRIES=1 RATE_LIMIT_DIR="$TMP/rate-api-safety" \
         "$SCRIPT_DIR/query_claude.sh" test "" "$output" >/dev/null 2>&1 || rc=$?
 
     assert_eq 0 "$rc" "safety-routed Claude API response completes"
-    assert_eq claude-fable-5-1 "$(jq -r '.model' "$request")" \
-        "Claude API request selects Fable 5.1"
-    assert_eq claude-fable-5-1 "$(jq -r '.metadata.requested_model' "$output")" \
-        "API safety route preserves requested Fable 5.1"
+    assert_eq claude-fable-5-2 "$(jq -r '.model' "$request")" \
+        "Claude API request selects Fable 5.2"
+    assert_eq high "$(jq -r '.output_config.effort' "$request")" \
+        "Fable premium effort reaches the Anthropic API"
+    assert_eq claude-fable-5-2 "$(jq -r '.metadata.requested_model' "$output")" \
+        "API safety route preserves requested Fable 5.2"
     assert_eq claude-opus-5 "$(jq -r '.model' "$output")" \
-        "API safety route is never labeled as Fable 5.1"
+        "API safety route is never labeled as Fable 5.2"
     assert_eq provider-reported "$(jq -r '.metadata.model_identity_source' "$output")" \
         "API safety route records provider-reported identity"
 }

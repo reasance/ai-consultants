@@ -365,8 +365,8 @@ test_claude_default_migration_and_pin() {
     printf '%s\n' 'CLAUDE_MODEL=claude-opus-5' > "$cfg/.env"
 
     run_clean_configure "$cfg" --force >/dev/null 2>&1
-    assert_eq "claude-opus-5-5" "$(read_env "$cfg/.env" CLAUDE_MODEL)" \
-        "unpinned Opus 5 default migrates to Opus 5.5"
+    assert_eq "claude-fable-5-2" "$(read_env "$cfg/.env" CLAUDE_MODEL)" \
+        "managed legacy Claude default follows the current premium model"
     assert_contains "$(grep '^CLAUDE_MODEL=' "$cfg/.env")" "# ai-consultants:default" \
         "migrated Claude default records managed provenance"
 
@@ -395,8 +395,8 @@ test_claude_default_migration_and_pin() {
     mkdir -p "$cfg"
     printf '%s\n' 'CLAUDE_MODEL=claude-opus-4-8' > "$cfg/.env"
     run_clean_configure "$cfg" --force >/dev/null 2>&1
-    assert_eq "claude-opus-5-5" "$(read_env "$cfg/.env" CLAUDE_MODEL)" \
-        "older unpinned Claude default migrates directly to Opus 5.5"
+    assert_eq "claude-fable-5-2" "$(read_env "$cfg/.env" CLAUDE_MODEL)" \
+        "older managed Claude default follows the current premium model"
 
     cfg="$TMP/claude-non-opus-choice"
     mkdir -p "$cfg"
@@ -561,7 +561,7 @@ test_catalog_default_migrations_and_pins() {
         'GROK_MODEL=grok-4.5' > "$cfg/.env"
     run_clean_configure "$cfg" --force >/dev/null 2>&1
     assert_eq qwen3.8-max "$(read_env "$cfg/.env" QWEN3_MODEL)" "managed Qwen default migrates to 3.8-max"
-    assert_eq gemini-4-argon-high "$(read_env "$cfg/.env" GEMINI_MODEL)" "managed Gemini CLI default migrates"
+    assert_eq gemini-4-hydrogen-xhigh "$(read_env "$cfg/.env" GEMINI_MODEL)" "managed Gemini CLI default migrates"
     assert_eq mistral-large-4 "$(read_env "$cfg/.env" MISTRAL_MODEL)" "managed Mistral API default migrates to Large 4"
     assert_eq mistral-medium-3.5 "$(read_env "$cfg/.env" MISTRAL_CLI_MODEL)" "new Mistral CLI field is populated"
     assert_eq "0" "$(grep -c '^CURSOR_CMD=' "$cfg/.env" || true)" "removed Cursor command is dropped"
@@ -716,7 +716,7 @@ test_gemini38_migration() {
             printf 'GEMINI_MODEL="Gemini 3.7 Flash (%s)"%s\n' "$level" "$marker" > "$cfg/.env"
             run_clean_configure "$cfg" --force >/dev/null 2>&1
             expected=gemini-3.8-flash-low
-            [[ "$level" == Low ]] || expected=gemini-4-argon-high
+            [[ "$level" == Low ]] || expected=gemini-4-hydrogen-xhigh
             [[ "$marker" != *pin* ]] || expected="gemini-3.8-flash-$(printf '%s' "$level" | tr '[:upper:]' '[:lower:]')"
             assert_eq "$expected" "$(read_env "$cfg/.env" GEMINI_MODEL)" "Gemini $level migration respects pin state"
             run_clean_configure "$cfg" --force >/dev/null 2>&1
@@ -731,7 +731,7 @@ test_gemini38_migration() {
     run_clean_configure "$cfg" --force --set 'GEMINI_MODEL=Gemini 3.8 Flash (Medium)' >/dev/null 2>&1
     run_clean_configure "$cfg" --force >/dev/null 2>&1
     assert_eq 'Gemini 3.8 Flash (Medium)' "$(read_env "$cfg/.env" GEMINI_MODEL)" "Gemini Medium remains an explicit choice"
-    assert_eq gemini-4-argon "$(read_env "$cfg/.env" GEMINI_API_MODEL)" "Gemini API default is Argon"
+    assert_eq gemini-4-hydrogen "$(read_env "$cfg/.env" GEMINI_API_MODEL)" "new Gemini API default is Hydrogen"
 
     # The 5.1.2 defaults move to Argon unless pinned; Flash Low stays economy.
     for marker in '' ' # ai-consultants:default' ' # ai-consultants:pin'; do
@@ -742,8 +742,12 @@ test_gemini38_migration() {
             assert_eq "Gemini 3.8 Flash (High)" "$(read_env "$cfg/.env" GEMINI_MODEL)" "pinned Gemini 3.8 Flash (High) survives"
             assert_eq gemini-4-argon "$(read_env "$cfg/.env" GEMINI_API_MODEL)" "a pinned retired Gemini API ID moves to Argon"
         else
-            assert_eq gemini-4-argon-high "$(read_env "$cfg/.env" GEMINI_MODEL)" "unpinned Gemini CLI default migrates to Argon"
-            assert_eq gemini-4-argon "$(read_env "$cfg/.env" GEMINI_API_MODEL)" "unpinned Gemini API default migrates to Argon"
+            if [[ "$marker" == *default* ]]; then
+                assert_eq gemini-4-hydrogen-xhigh "$(read_env "$cfg/.env" GEMINI_MODEL)" "marked Gemini default follows Hydrogen"
+            else
+                assert_eq "Gemini 3.8 Flash (High)" "$(read_env "$cfg/.env" GEMINI_MODEL)" "unmarked current Gemini choice is preserved"
+            fi
+            assert_eq gemini-4-hydrogen "$(read_env "$cfg/.env" GEMINI_API_MODEL)" "legacy managed API default follows Hydrogen"
             assert_contains "$(grep '^GEMINI_API_MODEL=' "$cfg/.env")" "# ai-consultants:default" "Gemini API migration records managed provenance"
         fi
     done
@@ -762,8 +766,8 @@ test_gemini38_migration() {
     cfg="$TMP/gemini-argon-economy"; mkdir -p "$cfg"
     printf 'GEMINI_MODEL="Gemini 3.8 Flash (Low)"\n' > "$cfg/.env"
     run_clean_configure "$cfg" --force >/dev/null 2>&1
-    # The managed economy display name moves to its agy ID, not to Argon.
-    assert_eq gemini-3.8-flash-low "$(read_env "$cfg/.env" GEMINI_MODEL)" "Gemini 3.8 Flash (Low) is not promoted"
+    # An unmarked active economy choice remains user-owned, including its spelling.
+    assert_eq "Gemini 3.8 Flash (Low)" "$(read_env "$cfg/.env" GEMINI_MODEL)" "Gemini 3.8 Flash (Low) is not promoted"
 }
 
 run_test "Test 1: public configure route and help" test_public_route_and_help

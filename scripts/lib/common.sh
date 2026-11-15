@@ -12,6 +12,8 @@ _COMMON_SH_SOURCED=1
 # Load configuration
 SCRIPT_DIR_COMMON="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR_COMMON/../config.sh"
+# shellcheck source=model_contracts.sh
+source "$SCRIPT_DIR_COMMON/model_contracts.sh"
 
 # =============================================================================
 # LOGGING FUNCTIONS
@@ -1792,6 +1794,44 @@ synthesis_model_for_cli() {
 }
 
 # Build synthesis command arguments for a resolved CLI type.
+gemini_cli_exposes_requested_model() {
+    local requested_model="${1:-${GEMINI_MODEL:-}}"
+    local inventory requested_norm rc=0 detail
+    inventory=$(run_with_timeout 10 "${AGY_ENV_PREFIX[@]}" "$GEMINI_CMD" models 2>&1 </dev/null) || rc=$?
+    if (( rc != 0 )); then
+        # Name the cause agy printed (a sandbox that forbids its local
+        # server, a login prompt, ...) instead of guessing between them.
+        if (( rc == 124 )); then
+            detail="timed out after 10s"
+        else
+            detail=$(printf '%s\n' "$inventory" | pick_error_line)
+        fi
+        GEMINI_PROBE_REASON="Antigravity model inventory failed: ${detail:-exit $rc without a message (is agy signed in?)}"
+        printf '%s\n' "$inventory" >&2
+        return 1
+    fi
+    # IDs match the first inventory field exactly. Legacy display-name output
+    # is accepted only as an exact normalized field, never a substring.
+    requested_norm=$(printf '%s' "$requested_model" | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:]')
+    if ! printf '%s\n' "$inventory" | awk -F '\t' -v requested="$requested_model" -v normalized="$requested_norm" '
+        {
+            if ($1 == requested) found = 1
+            if (requested !~ /^gemini-/) {
+                field = tolower(NF > 1 ? $2 : $1)
+                gsub(/[^[:alnum:]]/, "", field)
+                if (field == normalized) found = 1
+            }
+        }
+        END { exit(found ? 0 : 1) }
+    '; then
+        GEMINI_PROBE_REASON="Antigravity model inventory does not include $requested_model"
+        if [[ "$requested_model" == gemini-4-carbon* ]]; then
+            GEMINI_PROBE_REASON+="; Carbon requires an enabled Ultra/Enterprise account"
+        fi
+        return 1
+    fi
+}
+
 # Sets the global SYNTHESIS_ARGS array directly (no eval needed).
 # Usage: build_synthesis_args <cli_type> [prompt] [codex_payload_file]
 build_synthesis_args() {

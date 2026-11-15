@@ -100,6 +100,17 @@ COMPLEXITY_THRESHOLD_MEDIUM=6    # Score 4-6 = use standard models
 
 See [COST_RATES.md](COST_RATES.md) for model pricing by tier.
 
+For Hydrogen on the native API, economy and premium share the model ID
+`gemini-4-hydrogen` and differ by thinking effort: medium versus xhigh.
+Cost-aware requests carry the economy effort only in the request subshell;
+a valid low-confidence structured answer can escalate to the premium effort.
+Explicit `GEMINI_REASONING_EFFORT` pins win, and cache identity records the
+effective economy effort so it cannot be confused with a premium request.
+
+An explicitly selected Carbon CLI model stays pinned. Automatic cost-aware
+routing and confidence escalation do not replace it with Hydrogen or another
+model. Its exact account inventory check still applies before dispatch.
+
 ## Supported Categories
 
 Pattern classification (`scripts/classify_question.sh`) checks the categories

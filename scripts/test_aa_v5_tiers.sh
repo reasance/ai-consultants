@@ -11,7 +11,7 @@ mkdir -p "$AI_CONSULTANTS_CONFIG_DIR"
 printf '%s\n' 'CLAUDE_MODEL=claude-fable-5-1 # ai-consultants:default' > "$AI_CONSULTANTS_CONFIG_DIR/.env"
 chmod 600 "$AI_CONSULTANTS_CONFIG_DIR/.env"
 bash "$SCRIPT_DIR/configure.sh" --force >/dev/null 2>&1
-grep -Eq '^CLAUDE_MODEL=claude-opus-5-5[[:space:]]+# ai-consultants:default' "$AI_CONSULTANTS_CONFIG_DIR/.env"
+grep -Eq '^CLAUDE_MODEL=claude-fable-5-2[[:space:]]+# ai-consultants:default' "$AI_CONSULTANTS_CONFIG_DIR/.env"
 bash "$SCRIPT_DIR/configure.sh" --force --set CLAUDE_MODEL=claude-fable-5-1 >/dev/null 2>&1
 bash "$SCRIPT_DIR/configure.sh" --force >/dev/null 2>&1
 grep -Eq '^CLAUDE_MODEL=claude-fable-5-1[[:space:]]+# ai-consultants:pin' "$AI_CONSULTANTS_CONFIG_DIR/.env"
@@ -40,4 +40,4 @@ AI_CONSULTANTS_CONFIG_DIR="$TMP/cache-config" CACHE_DIR="$TMP/cache" bash -c '
         exit 1
     fi
 ' _ "$SCRIPT_DIR"
-printf '%s\n' 'AA v5 managed Claude default migrates; an explicit Fable pin survives'
+printf '%s\n' 'AA v5.0.1 managed Claude default migrates; an explicit Fable pin survives'

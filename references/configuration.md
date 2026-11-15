@@ -262,14 +262,15 @@ ENABLE_META=false
 ### Model Overrides
 
 ```bash
-GEMINI_MODEL="gemini-4-argon-high" # CLI smoke passed; capability-probed identity; API uses GEMINI_API_MODEL
-GEMINI_API_MODEL=gemini-4-argon       # API only; needs a paid-tier key
-GEMINI_API_MAX_TOKENS=32768           # API only: Argon thinking + visible output
+GEMINI_MODEL=gemini-4-hydrogen-xhigh # premium; exact agy ID
+GEMINI_API_MODEL=gemini-4-hydrogen   # API only; explicit tier thinking level
+GEMINI_API_MAX_TOKENS=32768           # API thinking + visible output
+GEMINI_FRONTIER_CLI_MODEL=             # optional Carbon maximum; CLI-only
 CODEX_MODEL=gpt-6.1-sol    # max_quality uses gpt-6-astra
 CODEX_API_MAX_TOKENS=16384
-CLAUDE_MODEL=claude-opus-5-5
-# Matching tier defaults: maximum/max, premium/xhigh, standard/medium.
-# CLAUDE_REASONING_EFFORT overrides the tier effort; Fable remains opt-in.
+CLAUDE_MODEL=claude-fable-5-2
+# Matching Claude tier defaults: Fable 5.2/max, Fable 5.2/high, Opus 5.5/medium.
+# CLAUDE_REASONING_EFFORT overrides the tier effort; Fable 5.1 remains opt-in.
 CLAUDE_API_MAX_TOKENS=16384  # API only: adaptive thinking + visible output
 MISTRAL_MODEL=mistral-large-4
 MISTRAL_CLI_MODEL=mistral-medium-3.5
@@ -393,18 +394,12 @@ listing is not an access check. Mistral Large 3 is retired. The official API
 IDs `mistral-medium-3-5` and `mistral-small-2603` remain catalogued opt-ins
 until an authenticated API smoke passes in this project.
 
-Gemini 4 Argon (GA 2026-10-13) is the Gemini default and maximum target:
-`GEMINI_MODEL="gemini-4-argon-high"` on `agy` and `GEMINI_API_MODEL=gemini-4-argon`
-on the API. An authorized `agy` consultation smoke returned a structured answer
-on 2026-10-16 (capability-probed identity, about 49 s for a short question). The
-API transport has offline tests only. On the API, Argon defaults to the `high`
-thinking level of its CLI target (`GEMINI_REASONING_EFFORT` accepts
-low|medium|high), sends no sampling parameters, and spends thinking tokens from
-`GEMINI_API_MAX_TOKENS` (default 32768). Google excludes Argon from the Free tier
-and the AI Pro plan, so an `agy models` listing is not an access check. Pin
-`GEMINI_MODEL="gemini-3.8-flash-high" # ai-consultants:pin` or
-`GEMINI_API_MODEL=gemini-3.8-flash # ai-consultants:pin` to use Gemini 3.8
-Flash, the standard and economy target on both transports, by default.
+Hydrogen is the Google default: xhigh for premium and default maximum,
+high for standard and medium for economy. CLI and API keep separate IDs.
+Carbon is an explicit CLI-only maximum option on eligible accounts, controlled
+by `GEMINI_FRONTIER_CLI_MODEL=gemini-4-carbon-high` with `GEMINI_USE_API=false`.
+Missing exact account inventory fails before dispatch; no substitute is chosen.
+Existing active pins are preserved. See [model contracts and benchmarks](../docs/MODEL_BENCHMARKS.md).
 
 The current Vibe CLI exposes only `--prompt TEXT`, not stdin or a prompt-file
 surface, and the same holds for `agy` and `kimi`. Their adapters keep an

@@ -5,17 +5,17 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 export AI_CONSULTANTS_CONFIG_DIR="$TMP/config"
-unset GEMINI_MODEL GEMINI_API_MODEL GEMINI_REASONING_EFFORT
+unset GEMINI_MODEL GEMINI_API_MODEL GEMINI_REASONING_EFFORT GEMINI_FRONTIER_CLI_MODEL
 source "$SCRIPT_DIR/lib/common.sh"
 source "$SCRIPT_DIR/lib/costs.sh"
 source "$SCRIPT_DIR/lib/api.sh"
-[[ "$GEMINI_MODEL" == gemini-4-argon-high && "$GEMINI_API_MODEL" == gemini-4-argon \
+[[ "$GEMINI_MODEL" == gemini-4-hydrogen-xhigh && "$GEMINI_API_MODEL" == gemini-4-hydrogen \
     && "$GEMINI_API_MAX_TOKENS" == 32768 ]] || exit 1
 for tier in maximum premium standard economy; do
     case "$tier" in
-        maximum|premium) expected=gemini-4-argon-high; expected_api=gemini-4-argon ;;
-        standard) expected=gemini-3.8-flash-high; expected_api=gemini-3.8-flash ;;
-        economy) expected=gemini-3.8-flash-low; expected_api=gemini-3.8-flash ;;
+        maximum|premium) expected=gemini-4-hydrogen-xhigh; expected_api=gemini-4-hydrogen ;;
+        standard) expected=gemini-4-hydrogen-high; expected_api=gemini-4-hydrogen ;;
+        economy) expected=gemini-4-hydrogen-medium; expected_api=gemini-4-hydrogen ;;
     esac
     [[ $(get_model_for_tier gemini "$tier" api) == "$expected_api" ]] || exit 1
     [[ $(get_model_for_tier gemini "$tier" cli) == "$expected" ]] || exit 1
@@ -44,4 +44,17 @@ for model in gemini-4-argon-high gemini-4-argon-medium gemini-4-argon-low \
 done
 printf '%s\n' '{"consultant":"Gemini","model":"gemini-4-argon-high","response":{"summary":"ok"},"metadata":{"tokens_source":"estimated"}}' > "$TMP/responses/gemini.json"
 [[ $(format_cost_caveats "$TMP/responses") == *'Gemini 4 Argon list-rate'* ]] || exit 1
-printf '%s\n' 'Gemini Argon/3.8 CLI tiers, API tiers and list/promotional estimates passed'
+printf '%s\n' 'Hydrogen tiers, Carbon CLI maximum and preserved legacy prices passed'
+
+# CLI-only maximum opt-in is explicit and does not leak into other tiers.
+GEMINI_USE_API=false GEMINI_FRONTIER_CLI_MODEL=gemini-4-carbon-high bash -c '
+    source "$1/lib/common.sh"
+    apply_model_tier maximum
+    [[ "$GEMINI_MODEL" == gemini-4-carbon-high ]]
+    [[ $(get_effort_for_tier gemini maximum) == high ]]
+    apply_model_tier standard
+    [[ "$GEMINI_MODEL" == gemini-4-hydrogen-high ]]
+' _ "$SCRIPT_DIR"
+if GEMINI_USE_API=true GEMINI_FRONTIER_CLI_MODEL=gemini-4-carbon-high bash -c '
+    source "$1/lib/common.sh"; apply_model_tier maximum
+' _ "$SCRIPT_DIR" 2>/dev/null; then exit 1; fi

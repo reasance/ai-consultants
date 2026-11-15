@@ -659,11 +659,16 @@ for consultant in "${SELECTED_CONSULTANTS[@]}"; do
                     log_warn "Invalid model variable name: $model_var, skipping cost-aware override"
                     continue
                 fi
+                local_effort=$(get_cost_aware_effort "$consultant_lower" "${QUERY_COMPLEXITY:-5}" 2>/dev/null || true)
                 log_debug "Cost-aware: $consultant using model $local_model"
                 (
                     trap '' INT
                     apply_launch_stagger
                     export "$model_var=$local_model"
+                    if [[ -n "$local_effort" ]]; then
+                        effort_var="$(to_upper "$consultant_lower")_REASONING_EFFORT"
+                        export "$effort_var=$local_effort"
+                    fi
                     "$query_script" "" "$CONTEXT_FILE" "$local_output_file"
                 ) > /dev/null 2>"$local_err_file" &
                 PIDS+=($!)
@@ -1093,10 +1098,20 @@ if is_escalation_enabled && [[ $SUCCESS_COUNT -gt 0 ]]; then
             # the configured variable still names the premium model here.
             current_model=$(jq -r '.metadata.requested_model // .model // empty' "$response_file" 2>/dev/null || true)
             [[ -n "$current_model" ]] || current_model="${!model_var:-}"
-            # Never re-ask the same model, and never "escalate" away from a
-            # maximum-tier target (premium can be a smaller model).
-            if [[ -n "$premium_model" && "$premium_model" != "$current_model" \
-                && "$current_model" != "$(get_model_for_tier "$consultant_lower" maximum)" ]]; then
+            if [[ "$consultant_lower" == gemini ]] && is_carbon_model "$current_model"; then
+                log_debug "Carbon remains pinned; no automatic model substitution"
+                continue
+            fi
+            economic_effort=$(get_cost_aware_effort "$consultant_lower" "${QUERY_COMPLEXITY:-5}" 2>/dev/null || true)
+            premium_effort=""
+            effort_upgrade=false
+            if [[ -n "$economic_effort" ]]; then
+                premium_effort=$(get_effort_for_tier "$consultant_lower" premium)
+                [[ -z "$premium_effort" || "$premium_effort" == "$economic_effort" ]] || effort_upgrade=true
+            fi
+            # A same-ID effort upgrade is distinct from re-asking the same setting.
+            if [[ -n "$premium_model" ]] && { [[ "$effort_upgrade" == true ]] || \
+                { [[ "$premium_model" != "$current_model" ]] && [[ "$current_model" != "$(get_model_for_tier "$consultant_lower" maximum)" ]]; }; }; then
                 original_confidence=$(jq -r '.confidence.score // 5' "$response_file" 2>/dev/null)
                 [[ "$original_confidence" =~ ^[0-9]+$ ]] || original_confidence=5
                 log_info "Escalating $consultant (confidence: $original_confidence) → premium model: $premium_model"
@@ -1119,6 +1134,10 @@ if is_escalation_enabled && [[ $SUCCESS_COUNT -gt 0 ]]; then
                     (
                         trap '' INT
                         export "$model_var=$premium_model"
+                        if [[ "$effort_upgrade" == true ]]; then
+                            effort_var="$(to_upper "$consultant_lower")_REASONING_EFFORT"
+                            export "$effort_var=$premium_effort"
+                        fi
                         "$query_script" "" "$CONTEXT_FILE" "$escalation_file"
                     ) > /dev/null 2>&1 &
                     escalation_rc=0

@@ -405,6 +405,19 @@ if ! [[ "$SYNTHESIS_TIMEOUT" =~ ^[0-9]+$ && "$SYNTHESIS_TOTAL_TIMEOUT" =~ ^[0-9]
     log_error "SYNTHESIS_TIMEOUT and SYNTHESIS_TOTAL_TIMEOUT must be non-negative integers (0 = no limit)"
     exit 1
 fi
+# An explicitly selected Carbon synthesis never falls through to another model.
+if [[ "$SELECTED_SYNTH_CLI" != gemini ]] && { is_carbon_model "${SYNTHESIS_MODEL:-}" || { [[ "${SYNTHESIS_CMD:-}" == gemini ]] && is_carbon_model "$(synthesis_model_for_cli gemini)"; }; }; then
+    log_error "Carbon synthesis requires an eligible Gemini CLI; no substitute is selected"
+    exit 1
+fi
+if [[ "$SELECTED_SYNTH_CLI" == gemini ]] && is_carbon_model "$(synthesis_model_for_cli gemini)"; then
+    if ! gemini_cli_exposes_requested_model "$(synthesis_model_for_cli gemini)"; then
+        log_error "$GEMINI_PROBE_REASON"
+        exit 1
+    fi
+    SYNTH_CANDIDATES=(gemini)
+fi
+
 for candidate in "${SYNTH_CANDIDATES[@]}"; do
     [[ "$candidate" == "$avoid_synth" ]] && continue
     if [[ "$candidate" != "$SELECTED_SYNTH_CLI" ]] && ! _synthesis_cli_ready "$candidate"; then

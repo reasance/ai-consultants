@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For longer-form release notes (rationale, upgrade guides, performance numbers), see `docs/releases/v<VERSION>.md`.
 
+## [Unreleased]
+
+- Support effort-aware economy/escalation on Hydrogen's single API model ID, keep automatic overrides scoped to each request, and include the effective economy effort in cache identity. Explicit Carbon selections remain pinned across routing and escalation.
+- Use Hydrogen/medium, high and xhigh for Google economy, standard and premium/default maximum. Add an explicit Carbon/high CLI maximum option with exact account-inventory checks and no API substitution. Preserve current unmarked choices and pins.
+
+- Use Fable 5.2/high for Claude premium and max for maximum. Keep explicit current-model pins and standard Opus/medium. Update official Fable token rates to $8/$40 per million.
+- Refresh model references to AA v5.0.1. Carbon CLI IDs are verified from official agy documentation; access is checked per account.
+
+
 ## [5.8.0] - 2026-10-28
 
 ### Changed

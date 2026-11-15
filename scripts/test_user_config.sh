@@ -428,7 +428,7 @@ test_env_example_is_sourceable_and_loader_compatible() {
     # template instead of the template's own value. Unset in both subshells.
     out=$(bash -c 'set -e; unset GEMINI_MODEL
         source .env.example; printf "%s" "$GEMINI_MODEL"')
-    assert_eq "gemini-4-argon-high" \
+    assert_eq "gemini-4-hydrogen-xhigh" \
         "$out" ".env.example is safely sourceable"
     mkdir -p "$cfg"
     cp .env.example "$cfg/.env"
@@ -438,7 +438,7 @@ test_env_example_is_sourceable_and_loader_compatible() {
         load_user_config
         printf "%s" "$GEMINI_MODEL"
     ')
-    assert_eq "gemini-4-argon-high" \
+    assert_eq "gemini-4-hydrogen-xhigh" \
         "$out" "custom loader preserves quoted template semantics"
 }
 

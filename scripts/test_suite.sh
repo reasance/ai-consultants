@@ -664,7 +664,7 @@ test_cost_per1k_contract() {
     assert_equals "0.002" "$(get_input_cost_per_1k 'grok-4.7')" "Grok 4.7 input rate is 2 USD/MTok"
     assert_equals "0.006" "$(get_output_cost_per_1k 'grok-4.7')" "Grok 4.7 output rate is 6 USD/MTok"
     assert_equals "0.00075" "$(get_input_cost_per_1k 'Gemini 3.8 Flash (High)')" "promoted Gemini CLI default resolves its promotional rate"
-    assert_equals gemini-4-argon-high "$(get_consultant_fallback_model gemini)" "legacy Gemini responses use the promoted CLI fallback"
+    assert_equals gemini-4-hydrogen-xhigh "$(get_consultant_fallback_model gemini)" "legacy Gemini responses use the promoted CLI fallback"
     assert_equals "0.004" "$(get_input_cost_per_1k 'Gemini 4 Argon (High)')" "Argon CLI estimate uses the list input rate"
     assert_equals "0.02" "$(get_output_cost_per_1k gemini-4-argon)" "Argon API estimate uses the list output rate"
     assert_equals "0.0015" "$(get_input_cost_per_1k mistral-medium-3-5)" "Mistral Medium 3.5 API input is priced"
@@ -1074,8 +1074,8 @@ test_query_classification() {
 test_economic_models() {
     suite "costs.sh: get_economic_model"
 
-    assert_equals gemini-3.8-flash-low "$(get_economic_model "gemini" cli)" "Gemini CLI economy is hermetic"
-    assert_equals "gemini-3.8-flash" "$(get_economic_model "gemini" api)" "Gemini API economy is hermetic"
+    assert_equals gemini-4-hydrogen-medium "$(get_economic_model "gemini" cli)" "Gemini CLI economy is hermetic"
+    assert_equals "gemini-4-hydrogen" "$(get_economic_model "gemini" api)" "Gemini API economy is hermetic"
     assert_equals "gpt-6-luna"       "$(get_economic_model "codex")"  "codex economy is gpt-6-luna"
     assert_equals "claude-haiku-5-5" "$(get_economic_model "claude")" "claude economy is claude-haiku-5-5"
     assert_equals "glm-5.3-flash"    "$(get_economic_model "glm")"    "glm economy is glm-5.3-flash"
@@ -1451,17 +1451,17 @@ test_escalation() {
 test_model_for_tier() {
     suite "config.sh: get_model_for_tier"
 
-    assert_equals "claude-opus-5-5"      "$(get_model_for_tier "claude" "premium")"  "claude premium is Opus 5.5"
+    assert_equals "claude-fable-5-2"      "$(get_model_for_tier "claude" "premium")"  "claude premium is Fable 5.2"
     assert_equals "claude-opus-5-5"       "$(get_model_for_tier "claude" "standard")" "claude standard is Opus 5.5"
     assert_equals "claude-haiku-5-5"      "$(get_model_for_tier "claude" "economy")"  "claude economy is claude-haiku-5-5"
-    assert_equals gemini-4-argon-high "$(get_model_for_tier "gemini" "premium" cli)" "gemini CLI premium is gemini-4-argon-high"
-    assert_equals "gemini-4-argon" "$(get_model_for_tier "gemini" "premium" api)" "gemini API premium uses the Argon provider ID"
-    assert_equals gemini-4-argon-high "$(get_model_for_tier "gemini" "maximum" cli)" "Gemini 4 Argon serves the CLI maximum tier"
-    assert_equals "gemini-4-argon" "$(get_model_for_tier "gemini" "maximum" api)" "Gemini 4 Argon serves the API maximum tier"
-    assert_equals gemini-3.8-flash-high "$(get_model_for_tier "gemini" "standard" cli)" "Gemini 3.8 Flash (High) keeps the CLI standard tier"
-    assert_equals gemini-3.8-flash-low "$(get_model_for_tier "gemini" "economy" cli)" "Gemini 3.8 Flash (Low) serves the CLI economy tier"
-    assert_equals "gemini-3.8-flash" "$(get_model_for_tier "gemini" "standard" api)" "Gemini 3.8 Flash serves the API standard tier"
-    assert_equals "gemini-3.8-flash" "$(get_model_for_tier "gemini" "economy" api)" "Gemini 3.8 Flash serves the API economy tier"
+    assert_equals gemini-4-hydrogen-xhigh "$(get_model_for_tier "gemini" "premium" cli)" "gemini CLI premium is gemini-4-hydrogen-xhigh"
+    assert_equals "gemini-4-hydrogen" "$(get_model_for_tier "gemini" "premium" api)" "gemini API premium uses the Hydrogen provider ID"
+    assert_equals gemini-4-hydrogen-xhigh "$(get_model_for_tier "gemini" "maximum" cli)" "Hydrogen serves the default CLI maximum tier"
+    assert_equals "gemini-4-hydrogen" "$(get_model_for_tier "gemini" "maximum" api)" "Hydrogen serves the default API maximum tier"
+    assert_equals gemini-4-hydrogen-high "$(get_model_for_tier "gemini" "standard" cli)" "Hydrogen/high serves the CLI standard tier"
+    assert_equals gemini-4-hydrogen-medium "$(get_model_for_tier "gemini" "economy" cli)" "Hydrogen/medium serves the CLI economy tier"
+    assert_equals "gemini-4-hydrogen" "$(get_model_for_tier "gemini" "standard" api)" "Hydrogen serves the API standard tier"
+    assert_equals "gemini-4-hydrogen" "$(get_model_for_tier "gemini" "economy" api)" "Hydrogen serves the API economy tier"
     assert_equals "mistral-medium-3.5" "$(get_model_for_tier "mistral" "premium" cli)" "Mistral CLI premium uses the Vibe alias"
     assert_equals "mistral-large-4" "$(get_model_for_tier "mistral" "maximum" api)" "Mistral API maximum is Large 4"
     assert_equals "mistral-large-4" "$(get_model_for_tier "mistral" "premium" api)" "Mistral API premium is Large 4"
@@ -1494,7 +1494,7 @@ test_model_for_tier() {
     assert_equals "glm-5.3-flash"         "$(get_model_for_tier "glm" "standard")"      "glm standard is glm-5.3-flash"
     assert_equals "grok-4.7"              "$(get_model_for_tier "grok" "economy")"      "grok economy is grok-4.7"
     assert_equals "glm-5.3-flash"         "$(get_model_for_tier "glm" "economy")"       "glm economy is glm-5.3-flash"
-    assert_equals "claude-opus-5-5"      "$(get_model_for_tier "claude" "maximum")"    "Claude maximum is Opus 5.5"
+    assert_equals "claude-fable-5-2"      "$(get_model_for_tier "claude" "maximum")"    "Claude maximum is Fable 5.2"
     assert_equals "kimi-code/k3.1-pro"    "$(get_model_for_tier "kimi" "maximum")"      "maximum tier uses Kimi K3.1 Pro"
     assert_equals "qwen3.8-max"           "$(get_model_for_tier "qwen3" "maximum")"     "maximum catalog includes Qwen3.8-Max"
     assert_equals "MiniMax-M3.1-Flash"    "$(get_model_for_tier "minimax" "maximum")"   "maximum tier uses MiniMax-M3.1-Flash"
@@ -1552,7 +1552,7 @@ test_model_for_tier() {
         apply_model_tier maximum
         printf '%s|%s|%s|%s\n' "$GEMINI_API_MODEL" "$MISTRAL_CLI_MODEL" "$MISTRAL_MODEL" "$QWEN3_MODEL"
     )
-    assert_equals "gemini-4-argon|mistral-medium-3.5|mistral-large-4|qwen3.8-max" \
+    assert_equals "gemini-4-hydrogen|mistral-medium-3.5|mistral-large-4|qwen3.8-max" \
         "$maximum_unconfigured" "maximum selects Qwen3.8-Max on every Qwen transport"
 
     local maximum_cli_qwen
@@ -1619,7 +1619,7 @@ test_model_for_tier() {
         apply_model_tier economy
         printf '%s|%s|%s|%s\n' "$GEMINI_MODEL" "$GEMINI_API_MODEL" "$MISTRAL_CLI_MODEL" "$MISTRAL_MODEL"
     )
-    assert_equals "gemini-3.8-flash-low|gemini-3.8-flash|mistral-medium-3.5|mistral-large-4" \
+    assert_equals "gemini-4-hydrogen-medium|gemini-4-hydrogen|mistral-medium-3.5|mistral-large-4" \
         "$economy_exports" "economy exports are transport-stable and hermetic"
 
     # Unknown tier returns empty

@@ -160,7 +160,7 @@ make_model_echo_stub() {
 if [[ ! -t 0 ]]; then cat >/dev/null; fi
 if [[ "${1:-}" == "models" ]]; then
     # agy prints each model ID, a tab, then its display name.
-    printf '%s\t%s\n' gemini-4-argon-high 'Gemini 4 Argon (High)' gemini-3.8-flash-high 'Gemini 3.8 Flash (High)' \
+    printf '%s\t%s\n' gemini-4-carbon-high 'Gemini 4 Carbon (High)' gemini-4-hydrogen-xhigh 'Gemini 4 Hydrogen (XHigh)' gemini-4-hydrogen-medium 'Gemini 4 Hydrogen (Medium)' gemini-4-hydrogen-high 'Gemini 4 Hydrogen (High)' gemini-4-argon-high 'Gemini 4 Argon (High)' gemini-3.8-flash-high 'Gemini 3.8 Flash (High)' \
         gemini-3.8-flash-low 'Gemini 3.8 Flash (Low)'
     exit 0
 fi
@@ -172,7 +172,7 @@ for arg in "$@"; do
 done
 printf '%s\n' "$model" >> "$STUB_MODEL_LOG"
 score=9
-case "$model" in *luna*|*Low*|*-low) score=4 ;; esac
+case "$model" in *luna*|*Low*|*-low|gemini-4-hydrogen-medium|gemini-4-carbon-high) score=4 ;; esac
 answer=$(jq -n --argjson s "$score" --arg m "$model" \
     '{response:{summary:("answer from " + $m),detailed:"d",approach:"a",pros:[],cons:[],caveats:[]},confidence:{score:$s,reasoning:"r"}}')
 if [[ -n "$payload" ]]; then
@@ -201,7 +201,7 @@ run_model_echo_panel() {
         INVOKING_AGENT=none DEFAULT_PRESET= \
         ENABLE_CLAUDE=false ENABLE_CODEX=true ENABLE_GEMINI=true ENABLE_MISTRAL=false \
         ENABLE_KIMI=false ENABLE_QWEN3=false ENABLE_GLM=false ENABLE_GROK=false \
-        ENABLE_DEEPSEEK=false ENABLE_MINIMAX=false CODEX_USE_API=false GEMINI_USE_API=false \
+        ENABLE_DEEPSEEK=false ENABLE_MINIMAX=false ENABLE_META=false CODEX_USE_API=false GEMINI_USE_API=false \
         CODEX_CMD="$MODEL_ECHO_STUB" GEMINI_CMD="$MODEL_ECHO_STUB" \
         ENABLE_SYNTHESIS=false ENABLE_CLASSIFICATION=false ENABLE_SMART_ROUTING=false \
         ENABLE_HEALTH_GATE=false LAUNCH_STAGGER_MAX_SECONDS=0 MAX_RETRIES=1 \
@@ -226,7 +226,7 @@ test_cost_aware_escalation_and_cache_identity() {
     dir=$(printf '%s\n' "$out" | tail -n 1)
     assert_eq "gpt-6.1-sol|9" "$(jq -r '"\(.metadata.requested_model)|\(.confidence.score)"' "$dir/codex.json" 2>/dev/null)" \
         "a low-confidence economy Codex answer is re-asked on the premium model"
-    assert_eq "gemini-4-argon-high|9" "$(jq -r '"\(.metadata.requested_model)|\(.confidence.score)"' "$dir/gemini.json" 2>/dev/null)" \
+    assert_eq "gemini-4-hydrogen-xhigh|9" "$(jq -r '"\(.metadata.requested_model)|\(.confidence.score)"' "$dir/gemini.json" 2>/dev/null)" \
         "a low-confidence economy Gemini answer is re-asked on the premium model"
 
     : > "$STUB_MODEL_LOG"
@@ -235,11 +235,88 @@ test_cost_aware_escalation_and_cache_identity() {
     out=$(run_model_echo_panel "$home" ENABLE_COST_AWARE_ROUTING=false ENABLE_SEMANTIC_CACHE=true \
         "Pick a cache key" 2>"$home/cache.err")
     dir=$(printf '%s\n' "$out" | tail -n 1)
-    assert_eq "gpt-6.1-sol|gemini-4-argon-high" \
+    assert_eq "gpt-6.1-sol|gemini-4-hydrogen-xhigh" \
         "$(jq -rs 'map(.metadata.requested_model) | join("|")' "$dir/codex.json" "$dir/gemini.json" 2>/dev/null)" \
         "a cached cost-aware economy answer is not served to a premium run"
-    assert_eq "2" "$(grep -cE '^(gpt-6\.1-sol|gemini-4-argon-high)$' "$STUB_MODEL_LOG")" \
+    assert_eq "2" "$(grep -cE '^(gpt-6\.1-sol|gemini-4-hydrogen-xhigh)$' "$STUB_MODEL_LOG")" \
         "the premium run queries the configured models"
+    unset STUB_MODEL_LOG
+}
+
+# One API model ID can have different economy and premium efforts.
+test_hydrogen_api_cost_aware_effort_and_cache_identity() {
+    local api_case_dir="$TEST_TMPDIR/hydrogen-api" out dir
+    MODEL_ECHO_STUB="$TEST_TMPDIR/api-codex-stub"
+    make_model_echo_stub "$MODEL_ECHO_STUB"
+    mkdir -p "$api_case_dir/bin"
+    export STUB_MODEL_LOG="$api_case_dir/models.log" HYDROGEN_EFFORT_LOG="$api_case_dir/efforts.log"
+    : > "$STUB_MODEL_LOG"; : > "$HYDROGEN_EFFORT_LOG"
+    cat > "$api_case_dir/bin/curl" <<'EOF'
+#!/bin/bash
+out=""; headers=""; body=""
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -o) shift; out="$1" ;;
+        -D) shift; headers="$1" ;;
+        --data-binary) shift; body=$(cat "${1#@}") ;;
+    esac
+    shift
+done
+effort=$(jq -r '.generationConfig.thinkingConfig.thinkingLevel' <<<"$body")
+printf '%s\n' "$effort" >> "$HYDROGEN_EFFORT_LOG"
+score=9; [[ "$effort" != medium ]] || score=4
+answer=$(jq -n --argjson score "$score" '{response:{summary:"synthetic API answer",detailed:"detail",approach:"fixture",pros:[],cons:[],caveats:[]},confidence:{score:$score,reasoning:"fixture",uncertainty_factors:[]}}')
+jq -n --arg text "$answer" '{modelVersion:"gemini-4-hydrogen",candidates:[{content:{parts:[{text:$text}]}}],usageMetadata:{promptTokenCount:10,candidatesTokenCount:10,thoughtsTokenCount:20}}' > "$out"
+: > "$headers"
+printf 200
+EOF
+    chmod +x "$api_case_dir/bin/curl"
+    out=$(run_model_echo_panel "$api_case_dir" PATH="$api_case_dir/bin:$PATH" \
+        GEMINI_USE_API=true GEMINI_API_KEY=test-key GEMINI_API_MODEL=gemini-4-hydrogen \
+        GEMINI_REASONING_EFFORT='' ENABLE_COST_AWARE_ROUTING=true ENABLE_SEMANTIC_CACHE=false \
+        "Pick a queue" 2>"$api_case_dir/api.err")
+    dir=$(printf '%s\n' "$out" | tail -1)
+    assert_eq 'medium|xhigh' "$(paste -sd '|' "$HYDROGEN_EFFORT_LOG")" \
+        "same-ID Hydrogen API requests use economy effort and escalate to premium effort"
+    assert_eq 9 "$(jq -r '.confidence.score' "$dir/gemini.json")" "the higher-confidence Hydrogen API answer replaces the economy answer"
+
+    : > "$HYDROGEN_EFFORT_LOG"
+    run_model_echo_panel "$api_case_dir" PATH="$api_case_dir/bin:$PATH" \
+        GEMINI_USE_API=true GEMINI_API_KEY=test-key GEMINI_API_MODEL=gemini-4-hydrogen \
+        GEMINI_REASONING_EFFORT='' ENABLE_COST_AWARE_ROUTING=true ENABLE_SEMANTIC_CACHE=true \
+        FALLBACK_CONFIDENCE_THRESHOLD=1 "API cache separation" >/dev/null 2>&1
+    assert_eq medium "$(cat "$HYDROGEN_EFFORT_LOG")" "the API cache fixture was actually populated at economy effort"
+    : > "$HYDROGEN_EFFORT_LOG"
+    run_model_echo_panel "$api_case_dir" PATH="$api_case_dir/bin:$PATH" \
+        GEMINI_USE_API=true GEMINI_API_KEY=test-key GEMINI_API_MODEL=gemini-4-hydrogen \
+        GEMINI_REASONING_EFFORT='' ENABLE_COST_AWARE_ROUTING=false ENABLE_SEMANTIC_CACHE=true \
+        "API cache separation" >/dev/null 2>&1
+    assert_eq xhigh "$(cat "$HYDROGEN_EFFORT_LOG")" "a same-ID economy API cache entry cannot satisfy a premium run"
+
+    : > "$HYDROGEN_EFFORT_LOG"
+    run_model_echo_panel "$api_case_dir" PATH="$api_case_dir/bin:$PATH" \
+        GEMINI_USE_API=true GEMINI_API_KEY=test-key GEMINI_API_MODEL=gemini-4-hydrogen \
+        GEMINI_REASONING_EFFORT=low ENABLE_COST_AWARE_ROUTING=true ENABLE_SEMANTIC_CACHE=false \
+        "Explicit effort pin" >/dev/null 2>&1
+    assert_eq low "$(cat "$HYDROGEN_EFFORT_LOG")" "an explicit Hydrogen effort pin survives automatic economy routing"
+    unset STUB_MODEL_LOG HYDROGEN_EFFORT_LOG
+}
+
+test_explicit_carbon_is_not_replaced_by_cost_aware_routing_or_escalation() {
+    local carbon_case_dir="$TEST_TMPDIR/carbon-pinned" out dir
+    MODEL_ECHO_STUB="$TEST_TMPDIR/carbon-echo-stub"
+    make_model_echo_stub "$MODEL_ECHO_STUB"
+    mkdir -p "$carbon_case_dir"
+    export STUB_MODEL_LOG="$carbon_case_dir/models.log"
+    : > "$STUB_MODEL_LOG"
+    out=$(run_model_echo_panel "$carbon_case_dir" GEMINI_MODEL=gemini-4-carbon-high \
+        ENABLE_COST_AWARE_ROUTING=true ENABLE_SEMANTIC_CACHE=false \
+        "Pick a queue" 2>"$carbon_case_dir/pinned.err")
+    dir=$(printf '%s\n' "$out" | tail -1)
+    assert_eq gemini-4-carbon-high "$(jq -r '.metadata.requested_model' "$dir/gemini.json")" \
+        "an explicit Carbon selection is never changed to an economy or premium Hydrogen model"
+    assert_eq gemini-4-carbon-high "$(grep '^gemini-' "$STUB_MODEL_LOG")" \
+        "low-confidence Carbon is called once without automatic model substitution"
     unset STUB_MODEL_LOG
 }
 
@@ -558,4 +635,6 @@ run_test "Test 9: a terminal Ctrl-C continues with the answers received" test_te
 run_test "Test 10: a second terminal Ctrl-C aborts during synthesis" test_second_terminal_ctrl_c_aborts_during_synthesis
 run_test "Test 11: an offline panel reports the network cause" test_offline_panel_reports_the_network_cause
 
+run_test "Hydrogen API effort and cache" test_hydrogen_api_cost_aware_effort_and_cache_identity
+run_test "Explicit Carbon stays pinned across automatic routing" test_explicit_carbon_is_not_replaced_by_cost_aware_routing_or_escalation
 test_summary "test_e2e"

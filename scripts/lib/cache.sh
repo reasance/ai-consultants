@@ -82,6 +82,11 @@ cache_identity() {
     if declare -f get_cost_aware_model >/dev/null 2>&1; then
         lower=$(printf '%s' "${1:-}" | tr '[:upper:]' '[:lower:]')
         out+="|cost_aware_model=$(get_cost_aware_model "$lower" "${QUERY_COMPLEXITY:-5}" 2>/dev/null || true)"
+        if declare -f get_cost_aware_effort >/dev/null 2>&1; then
+            local economic_effort
+            economic_effort=$(get_cost_aware_effort "$lower" "${QUERY_COMPLEXITY:-5}" 2>/dev/null || true)
+            [[ -z "$economic_effort" ]] || out+="|cost_aware_effort=$economic_effort"
+        fi
     fi
     printf '%s' "$out"
 }
