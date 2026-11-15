@@ -97,12 +97,16 @@ run_api_mode_query() {
             # before spending a request when Google receives an unsupported level.
             local google_thinking_level=""
             case "$model" in
-                gemini-3.8-flash|gemini-4-argon)
+                gemini-3.8-flash|gemini-4-argon|gemini-4-hydrogen)
                     if [[ -n "$effort" ]]; then
                         case "$effort" in
                             low|medium|high) google_thinking_level="$effort" ;;
+                            xhigh)
+                                if [[ "$model" == gemini-4-hydrogen ]]; then google_thinking_level=xhigh;
+                                else log_error "[$consultant_name] xhigh is only supported by Hydrogen"; return 1; fi
+                                ;;
                             *)
-                                log_error "[$consultant_name] $effort_var=$effort is unsupported for $model on the 'google_ai' wire format (expected low|medium|high)"
+                                log_error "[$consultant_name] $effort_var=$effort is unsupported for $model on the 'google_ai' wire format (expected low|medium|high; Hydrogen also supports xhigh)"
                                 return 1
                                 ;;
                         esac
@@ -114,7 +118,7 @@ run_api_mode_query() {
                     ;;
                 *)
                     if [[ -n "$effort" ]]; then
-                        log_warn "[$consultant_name] $effort_var is only transported to Gemini 3.7/3.8 Flash and 4 Argon on the 'google_ai' wire format and is ignored for $model."
+                        log_warn "[$consultant_name] $effort_var is only transported to Gemini 3.8 Flash, 4 Argon and 4 Hydrogen on the 'google_ai' wire format and is ignored for $model."
                     fi
                     ;;
             esac

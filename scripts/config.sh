@@ -145,15 +145,14 @@ AGY_EXIT_GRACE_SECONDS="${AGY_EXIT_GRACE_SECONDS:-60}"
 # GEMINI CONFIGURATION - The Architect
 # =============================================================================
 
-# CLI mode uses the Antigravity CLI (`agy`), successor to the deprecated
-# Gemini CLI (transitioned 2026-06-18). Models are passed by display name.
-GEMINI_MODEL="${GEMINI_MODEL:-gemini-4-argon-high}"
+# CLI mode uses Antigravity (`agy`) with exact account-visible model IDs.
+GEMINI_MODEL="${GEMINI_MODEL:-gemini-4-hydrogen-xhigh}"
 GEMINI_TIMEOUT_SECONDS="${GEMINI_TIMEOUT:-0}"
 GEMINI_CMD="${GEMINI_CMD:-agy}"
 # API mode (GEMINI_USE_API=true) talks to the Google AI generativelanguage
 # endpoint, which expects an API model ID, not an `agy` display name.
-GEMINI_API_MODEL="${GEMINI_API_MODEL:-gemini-4-argon}"
-# Argon's thinking tokens count toward this budget; Google advises at least
+GEMINI_API_MODEL="${GEMINI_API_MODEL:-gemini-4-hydrogen}"
+# Thinking tokens count toward this budget; Google advises at least
 # 32768, which is also its per-request non-streaming output cap.
 GEMINI_API_MAX_TOKENS="${GEMINI_API_MAX_TOKENS:-32768}"
 
@@ -365,7 +364,7 @@ KIMI_CMD="${KIMI_CMD:-kimi}"
 # CLAUDE CONFIGURATION - The Synthesizer (v2.2)
 # =============================================================================
 
-CLAUDE_MODEL="${CLAUDE_MODEL:-claude-opus-5-5}"
+CLAUDE_MODEL="${CLAUDE_MODEL:-claude-fable-5-2}"
 CLAUDE_API_MAX_TOKENS="${CLAUDE_API_MAX_TOKENS:-16384}"
 CLAUDE_TIMEOUT_SECONDS="${CLAUDE_TIMEOUT:-0}"
 CLAUDE_CMD="${CLAUDE_CMD:-claude}"
@@ -680,11 +679,17 @@ get_model_for_tier() {
         esac
     fi
 
+    if [[ "$consultant" == gemini && "$transport" == cli ]]; then
+        case "$tier" in maximum|max_quality|max-quality)
+            if [[ -n "${GEMINI_FRONTIER_CLI_MODEL:-}" ]]; then echo "$GEMINI_FRONTIER_CLI_MODEL"; return; fi ;;
+        esac
+    fi
+
     case "$tier" in
         maximum|max_quality|max-quality)
             case "$consultant" in
-                claude)   echo "claude-opus-5-5" ;;
-                gemini)   [[ "$transport" == "api" ]] && echo "gemini-4-argon" || echo "gemini-4-argon-high" ;;
+                claude)   echo "claude-fable-5-2" ;;
+                gemini)   [[ "$transport" == "api" ]] && echo "gemini-4-hydrogen" || echo "gemini-4-hydrogen-xhigh" ;;
                 codex)    echo "gpt-6-astra" ;;
                 mistral)  [[ "$transport" == "api" ]] && echo "mistral-large-4" || echo "mistral-medium-3.5" ;;
                 deepseek) echo "deepseek-flash" ;;
@@ -699,8 +704,8 @@ get_model_for_tier() {
             ;;
         premium|max|best)
             case "$consultant" in
-                claude)   echo "claude-opus-5-5" ;;
-                gemini)   [[ "$transport" == "api" ]] && echo "gemini-4-argon" || echo "gemini-4-argon-high" ;;
+                claude)   echo "claude-fable-5-2" ;;
+                gemini)   [[ "$transport" == "api" ]] && echo "gemini-4-hydrogen" || echo "gemini-4-hydrogen-xhigh" ;;
                 codex)    echo "gpt-6.1-sol" ;;
                 mistral)  [[ "$transport" == "api" ]] && echo "mistral-large-4" || echo "mistral-medium-3.5" ;;
                 deepseek) echo "deepseek-flash" ;;
@@ -716,7 +721,7 @@ get_model_for_tier() {
         standard|medium|balanced)
             case "$consultant" in
                 claude)   echo "claude-opus-5-5" ;;
-                gemini)   [[ "$transport" == "api" ]] && echo "gemini-3.8-flash" || echo "gemini-3.8-flash-high" ;;
+                gemini)   [[ "$transport" == "api" ]] && echo "gemini-4-hydrogen" || echo "gemini-4-hydrogen-high" ;;
                 codex)    echo "gpt-6.1-sol" ;;
                 mistral)  [[ "$transport" == "api" ]] && echo "mistral-large-4" || echo "mistral-medium-3.5" ;;
                 deepseek) echo "deepseek-flash" ;;
@@ -732,7 +737,7 @@ get_model_for_tier() {
         economy|fast|quick)
             case "$consultant" in
                 claude)   echo "claude-haiku-5-5" ;;
-                gemini)   [[ "$transport" == "api" ]] && echo "gemini-3.8-flash" || echo "gemini-3.8-flash-low" ;;
+                gemini)   [[ "$transport" == "api" ]] && echo "gemini-4-hydrogen" || echo "gemini-4-hydrogen-medium" ;;
                 codex)    echo "gpt-6-luna" ;;
                 mistral)  [[ "$transport" == "api" ]] && echo "mistral-large-4" || echo "mistral-medium-3.5" ;;
                 deepseek) echo "deepseek-flash" ;;
@@ -755,23 +760,27 @@ get_effort_for_tier() {
         maximum|max_quality|max-quality)
             case "$1" in
                 claude) echo "max" ;;
+                gemini) if [[ -n "${GEMINI_FRONTIER_CLI_MODEL:-}" ]]; then echo high; else echo "xhigh"; fi ;;
                 codex) echo "max" ;;
                 *) echo "" ;;
             esac ;;
         premium|max|best)
             case "$1" in
-                claude) echo "xhigh" ;;
+                claude) echo "high" ;;
+                gemini) echo "xhigh" ;;
                 codex) echo "max" ;;
                 *) echo "" ;;
             esac ;;
         standard|medium|balanced)
             case "$1" in
                 claude) echo "medium" ;;
+                gemini) echo "high" ;;
                 codex) echo "high" ;;
                 *) echo "" ;;
             esac ;;
         economy|fast|quick)
             case "$1" in
+                gemini) echo "medium" ;;
                 *) echo "" ;;
             esac ;;
         *) echo "" ;;
@@ -826,6 +835,17 @@ apply_model_tier() {
             ;;
     esac
 
+    # Carbon is an explicit CLI-only maximum-tier option, never a fallback.
+    case "$tier" in
+        maximum|max_quality|max-quality)
+            if [[ -n "${GEMINI_FRONTIER_CLI_MODEL:-}" ]]; then
+                if [[ "$GEMINI_FRONTIER_CLI_MODEL" != gemini-4-carbon-high || "${GEMINI_USE_API:-false}" == true ]]; then
+                    echo "Carbon maximum requires GEMINI_FRONTIER_CLI_MODEL=gemini-4-carbon-high and GEMINI_USE_API=false" >&2
+                    return 1
+                fi
+            fi ;;
+    esac
+
     # Child adapters resolve tier defaults per request; explicit effort wins.
     export _AI_CONSULTANTS_MODEL_TIER="$tier"
 
@@ -842,7 +862,7 @@ apply_model_tier() {
 
     # Gemini and Mistral intentionally carry both transport-specific IDs so a
     # later transport choice cannot send a CLI display name to an HTTP API (or
-    # an API slug to a CLI). Gemini 3.8 Flash and 4 Argon use one API ID plus a thinking level.
+    # an API slug to a CLI). Gemini uses one API ID plus an explicit thinking level.
     export GEMINI_MODEL="$(get_model_for_tier gemini "$tier" cli)"
     export GEMINI_API_MODEL="$(get_model_for_tier gemini "$tier" api)"
     export MISTRAL_CLI_MODEL="$(get_model_for_tier mistral "$tier" cli)"

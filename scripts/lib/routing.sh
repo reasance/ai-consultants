@@ -14,6 +14,8 @@
 # docs/SMART_ROUTING.md for the schema and customization guide.
 
 _ROUTING_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=model_contracts.sh
+source "$_ROUTING_LIB_DIR/model_contracts.sh"
 
 # Single source of truth for user-config dir resolution: lib/user_config.sh.
 # Sourced defensively here so routing.sh works when imported standalone
@@ -309,6 +311,12 @@ get_cost_aware_model() {
         return
     fi
 
+    # Carbon is an explicit frontier selection, never an automatic economy candidate.
+    if [[ "$consultant" == gemini ]] && is_carbon_model "${GEMINI_MODEL:-}"; then
+        echo ""
+        return
+    fi
+
     local simple_threshold="${COMPLEXITY_THRESHOLD_SIMPLE:-3}"
 
     # Simple queries: use economic model
@@ -322,6 +330,17 @@ get_cost_aware_model() {
 
     # Complex queries: use default model
     echo ""
+}
+
+# An economy API request can use another effort on the same Hydrogen model ID.
+# Explicit effort pins always win; other providers retain their existing policy.
+get_cost_aware_effort() {
+    local consultant="$1" model
+    [[ "$consultant" == gemini && "${GEMINI_USE_API:-false}" == true && -z "${GEMINI_REASONING_EFFORT:-}" ]] || return 0
+    model=$(get_cost_aware_model "$consultant" "${2:-5}")
+    if [[ "$model" == gemini-4-hydrogen ]] && declare -f get_effort_for_tier >/dev/null 2>&1; then
+        get_effort_for_tier gemini economy
+    fi
 }
 
 # =============================================================================

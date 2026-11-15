@@ -13,7 +13,7 @@ models programmatically.
 | Tier | Description | Cost Level |
 |------|-------------|------------|
 | **Premium** | Latest flagship models (default) | Highest |
-| **Maximum** | Smoke-tested separate-plan or highest-cost targets | Varies / may be unpriced |
+| **Maximum** | Explicit highest-quality targets; live validation is reported separately | Varies / may be unpriced |
 | **Standard** | Good quality at reasonable cost | Medium |
 | **Economy** | Optimized for speed and low cost | Lowest |
 
@@ -23,19 +23,22 @@ models programmatically.
 
 | Model | Tier | Cost/1K | Consultant |
 |-------|------|---------|------------|
-| gemini-4-argon-high | Maximum/Premium | $0.004 | Gemini (CLI smoke passed; API-equivalent list-rate estimate) |
+| gemini-4-hydrogen / level IDs | Default Google tiers | $0.0015 | Gemini (API-equivalent CLI estimate) |
+| gemini-4-carbon / level IDs | Explicit CLI frontier option | $0.004 | Gemini (conservative list estimate; eligible account required) |
+| gemini-4-argon-high | Explicit opt-in | $0.004 | Gemini (CLI smoke passed; API-equivalent list-rate estimate) |
 | gemini-4-argon-medium, gemini-4-argon-low | CLI opt-in | $0.004 | Gemini (agy CLI; API-equivalent list-rate estimate) |
-| gemini-4-argon | API Maximum/Premium | $0.004 | Gemini API (list rate; offline-tested) |
-| gemini-3.8-flash-high | Standard | $0.00075 | Gemini (CLI smoke passed; API-equivalent estimate; promotional through 2026-12-31) |
-| gemini-3.8-flash-low | Economy | $0.00075 | Gemini (CLI smoke passed; API-equivalent estimate; promotional through 2026-12-31) |
+| gemini-4-argon | API opt-in | $0.004 | Gemini API (list rate; offline-tested) |
+| gemini-3.8-flash-high | Explicit opt-in | $0.00075 | Gemini (CLI smoke passed; API-equivalent estimate; promotional through 2026-12-31) |
+| gemini-3.8-flash-low | Explicit opt-in | $0.00075 | Gemini (CLI smoke passed; API-equivalent estimate; promotional through 2026-12-31) |
 | gemini-3.8-flash-medium | CLI opt-in | $0.00075 | Gemini (agy CLI; promotional through 2026-12-31) |
-| gemini-3.8-flash | API Standard/Economy | $0.00075 | Gemini API (promotional through 2026-12-31; offline-tested) |
+| gemini-3.8-flash | API opt-in | $0.00075 | Gemini API (promotional through 2026-12-31; offline-tested) |
 | gpt-6-astra | Maximum | $0.010 | Codex |
 | gpt-6.1-sol | Default/Premium/Standard | $0.002 | Codex |
 | gpt-6.1-terra | Opt-in | $0.001 | Codex |
 | gpt-6-luna | Economy | $0.0001 | Codex |
+| claude-fable-5-2 | Maximum/Premium | $0.008 | Claude (standard API rates; CLI >=2.1.321) |
 | claude-fable-5-1 | Opt-in | $0.010 | Claude |
-| claude-opus-5-5 | Maximum/Premium/Standard | $0.004 | Claude |
+| claude-opus-5-5 | Standard / explicit opt-in | $0.004 | Claude |
 | claude-haiku-5-5 | Economy | $0.0001 | Claude (prompts over 100K: 5x for the whole request) |
 | mistral-large-4 / mistral-large-4-0 | API all tiers (preview, list rate) | $0.00136 | Mistral |
 | mistral-medium-3.5 / mistral-medium-3-5 | CLI all tiers / API opt-in | $0.0015 | Mistral |
@@ -58,19 +61,22 @@ models programmatically.
 
 | Model | Tier | Cost/1K | Consultant |
 |-------|------|---------|------------|
-| gemini-4-argon-high | Maximum/Premium | $0.020 | Gemini (CLI smoke passed; API-equivalent list-rate estimate) |
+| gemini-4-hydrogen / level IDs | Default Google tiers | $0.0075 | Gemini (thinking included) |
+| gemini-4-carbon / level IDs | Explicit CLI frontier option | $0.020 | Gemini (conservative list estimate) |
+| gemini-4-argon-high | Explicit opt-in | $0.020 | Gemini (CLI smoke passed; API-equivalent list-rate estimate) |
 | gemini-4-argon-medium, gemini-4-argon-low | CLI opt-in | $0.020 | Gemini (agy CLI; API-equivalent list-rate estimate) |
-| gemini-4-argon | API Maximum/Premium | $0.020 | Gemini API (list rate; offline-tested) |
-| gemini-3.8-flash-high | Standard | $0.00375 | Gemini (CLI smoke passed; API-equivalent estimate; promotional through 2026-12-31) |
-| gemini-3.8-flash-low | Economy | $0.00375 | Gemini (CLI smoke passed; API-equivalent estimate; promotional through 2026-12-31) |
+| gemini-4-argon | API opt-in | $0.020 | Gemini API (list rate; offline-tested) |
+| gemini-3.8-flash-high | Explicit opt-in | $0.00375 | Gemini (CLI smoke passed; API-equivalent estimate; promotional through 2026-12-31) |
+| gemini-3.8-flash-low | Explicit opt-in | $0.00375 | Gemini (CLI smoke passed; API-equivalent estimate; promotional through 2026-12-31) |
 | gemini-3.8-flash-medium | CLI opt-in | $0.00375 | Gemini (agy CLI; promotional through 2026-12-31) |
-| gemini-3.8-flash | API Standard/Economy | $0.00375 | Gemini API (promotional through 2026-12-31; offline-tested) |
+| gemini-3.8-flash | API opt-in | $0.00375 | Gemini API (promotional through 2026-12-31; offline-tested) |
 | gpt-6-astra | Maximum | $0.050 | Codex |
 | gpt-6.1-sol | Default/Premium/Standard | $0.010 | Codex |
 | gpt-6.1-terra | Opt-in | $0.005 | Codex |
 | gpt-6-luna | Economy | $0.0005 | Codex |
+| claude-fable-5-2 | Maximum/Premium | $0.040 | Claude (thinking included) |
 | claude-fable-5-1 | Opt-in | $0.050 | Claude |
-| claude-opus-5-5 | Maximum/Premium/Standard | $0.020 | Claude |
+| claude-opus-5-5 | Standard / explicit opt-in | $0.020 | Claude |
 | claude-haiku-5-5 | Economy | $0.0005 | Claude (prompts over 100K: 5x for the whole request) |
 | mistral-large-4 / mistral-large-4-0 | API all tiers (preview, list rate) | $0.00418 | Mistral |
 | mistral-medium-3.5 / mistral-medium-3-5 | CLI all tiers / API opt-in | $0.0075 | Mistral |

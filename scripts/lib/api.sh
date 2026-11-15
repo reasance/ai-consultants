@@ -238,7 +238,7 @@ build_openai_request() {
 # default applies (medium on Opus 5.5 and Haiku 5.5, high elsewhere).
 build_anthropic_request() {
     local prompt="$1"
-    local model="${2:-claude-fable-5-1}"
+    local model="${2:-claude-fable-5-2}"
     local max_tokens="${3:-16384}"
     local effort="${4:-}"
 

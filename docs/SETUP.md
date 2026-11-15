@@ -964,10 +964,11 @@ pinned, and `--set` refuses them. Unrelated IDs survive.
 The existing capability/model inventory probes, strict sandbox and OAuth
 isolation still apply; the Grok 4.7 Fast variant is not implicitly selected.
 
-Claude uses `claude-opus-5-5`: maximum/max, premium/xhigh and standard/medium.
-Economy keeps Haiku 5.5. Fable 5.1 remains an explicit opt-in. Configure migrates
-the marked managed Fable default to Opus; unmarked and pinned current Fable
-choices remain. Pinned retired models still move to their same-family successor.
+Claude uses Fable 5.2/max for maximum, Fable 5.2/high for premium and
+Opus 5.5/medium for standard. Economy keeps Haiku 5.5. Fable 5.1 remains an
+explicit opt-in. Claude Code requires version 2.1.321 or later for Fable 5.2.
+Configure migrates only marked managed current defaults to Fable 5.2;
+unmarked and pinned current-model choices remain. Pinned retired models still move to their same-family successor.
 
 Opus 5.5 has always-on adaptive thinking, including empty thinking display
 blocks. Our tool-free single-turn API request omits thinking overrides, sampling
@@ -982,26 +983,26 @@ P1.6 benchmark IDs/efforts/preregistration are not changed by this update.
 See the [Opus migration guide](https://platform.claude.com/docs/en/models/opus-5-5/migration-guide)
 and [Grok 4.7](https://docs.x.ai/developers/grok-4-7).
 
-### Gemini 4 Argon
+### Gemini 4 Hydrogen and optional Carbon
 
-Gemini 4 Argon (GA 2026-10-13) serves the default (premium) and maximum tiers:
-`gemini-4-argon-high` on `agy` (the model ID `agy models` prints before the
-display name "Gemini 4 Argon (High)"; Medium and Low variants exist) and
-`gemini-4-argon` on the API. One authorized `agy` consultation smoke passed on
-2026-10-16 by display name: structured answer, capability-probed identity,
-about 49 s for a short question. Another passed on 2026-10-25 by model ID: a
-code hidden in a 24K-token document, found and returned in the response
-schema, in about 21 s. The API transport has offline tests only; it needs a
-paid-tier key, because Google excludes Argon from the Free tier and the AI Pro
-plan. On the API, Argon defaults to the `high` thinking level, takes no sampling
-parameters, and spends thinking from `GEMINI_API_MAX_TOKENS` (default 32768).
+Google economy uses Hydrogen/medium, standard high, premium and default maximum
+xhigh. agy uses exact IDs such as `gemini-4-hydrogen-xhigh`; the API uses
+`gemini-4-hydrogen` with low/medium/high/xhigh thinking. Explicit effort wins.
+The API output cap remains 32,768, including thinking. Long decode is not
+implemented by this integration.
 
-Configure migrates an unpinned `Gemini 3.8 Flash (High)`, `Gemini 3.7 Flash (High)`
-or `Gemini 3.1 Pro (High)` CLI value, or the previous display-name default
-`Gemini 4 Argon (High)`, to `gemini-4-argon-high`, and an unpinned
-`gemini-3.1-pro-preview` API value to `gemini-4-argon`. Pin `Gemini 3.8 Flash
-(High)` with `# ai-consultants:pin` to keep it; Gemini 3.7 Flash and 3.1 Pro
-are retired and migrate even when pinned.
+Carbon/high is optional on Ultra/Enterprise accounts. Configure
+`GEMINI_FRONTIER_CLI_MODEL=gemini-4-carbon-high` and `GEMINI_USE_API=false` to
+select it in `max_quality`. With that setting empty, maximum stays Hydrogen.
+For standalone selection without a preset, set `GEMINI_MODEL=gemini-4-carbon-high`
+and `GEMINI_USE_API=false`. Carbon must match the exact account inventory before
+dispatch, including when selected for synthesis; a similarly named model or
+Orchestrator is not accepted. No alternate provider or API is substituted.
+
+Only marked managed current defaults follow Hydrogen. Existing unmarked and
+pinned active choices, including Flash and Argon, stay user-owned. Historical
+retired scaffolds migrate; pinned retired models keep their same-line successor.
+Sources and benchmark figures: [model reference](MODEL_BENCHMARKS.md).
 
 ### Gemini 3.8 Flash
 

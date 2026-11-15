@@ -277,6 +277,22 @@ EOF
     assert_eq medium "$(jq -r '.generationConfig.thinkingConfig.thinkingLevel' "$body_file")" "an explicit Argon level wins"
     assert_eq 40000 "$(jq -r '.generationConfig.maxOutputTokens' "$body_file")" "GEMINI_API_MAX_TOKENS is honored"
 
+    # Each Hydrogen API tier carries its own effort rather than inheriting high.
+    local tier expected
+    for tier in maximum premium standard economy; do
+        case "$tier" in maximum|premium) expected=xhigh ;; standard) expected=high ;; economy) expected=medium ;; esac
+        PATH="$td:$PATH" GEMINI_USE_API=true GEMINI_API_KEY=test-key \
+            GEMINI_API_MODEL=gemini-4-hydrogen GEMINI_REASONING_EFFORT='' GEMINI_FRONTIER_CLI_MODEL='' \
+            _AI_CONSULTANTS_MODEL_TIER="$tier" REQUEST_BODY_FILE="$body_file" MAX_RETRIES=1 \
+            "$SCRIPT_DIR/query_gemini.sh" "hydrogen tier" "" "$output_file" >/dev/null 2>&1 || true
+        assert_eq "$expected" "$(jq -r '.generationConfig.thinkingConfig.thinkingLevel' "$body_file")" "Hydrogen/$tier effort reaches the native API"
+    done
+    rm -f "$body_file"
+    PATH="$td:$PATH" GEMINI_USE_API=true GEMINI_API_KEY=test-key \
+        GEMINI_API_MODEL=gemini-4-hydrogen GEMINI_REASONING_EFFORT=max REQUEST_BODY_FILE="$body_file" MAX_RETRIES=1 \
+        "$SCRIPT_DIR/query_gemini.sh" "unsupported hydrogen effort" "" "$output_file" >/dev/null 2>&1 || true
+    assert_eq absent "$([[ -e "$body_file" ]] && echo called || echo absent)" "unsupported Hydrogen effort is rejected before an HTTP call"
+
     # No wall-clock limit unless one is configured: curl gets -m only then.
     local args_file="$td/curl.args"
     printf '%s\n' '#!/bin/bash' 'printf "%s\n" "$@" > "$CURL_ARGS_FILE"' "exec \"$fake_curl\" \"\$@\"" > "$td/curl_args_wrapper"

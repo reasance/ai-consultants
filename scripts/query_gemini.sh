@@ -8,10 +8,10 @@
 # Usage: ./query_gemini.sh "question" [context_file] [output_file]
 #
 # Environment variables:
-#   GEMINI_MODEL - agy model ID (default: gemini-4-argon-high; `agy models` lists them)
+#   GEMINI_MODEL - agy model ID (default: gemini-4-hydrogen-xhigh; `agy models` lists them)
 #   GEMINI_TIMEOUT - Timeout in seconds (default: 180)
 #   GEMINI_USE_API - Use Google AI API mode instead of the agy CLI (default: false)
-#   GEMINI_API_MODEL - API model ID for API mode (default: gemini-4-argon)
+#   GEMINI_API_MODEL - API model ID for API mode (default: gemini-4-hydrogen)
 #   GEMINI_API_MAX_TOKENS - API output budget, thinking included (default: 32768)
 #   GEMINI_API_KEY - API key for API mode
 #   GEMINI_REASONING_EFFORT - Optional CLI reasoning effort
@@ -56,34 +56,11 @@ MODEL_IDENTITY_SOURCE="requested-only"
 EFFECTIVE_MODEL=""
 GEMINI_PROBE_REASON=""
 
-gemini_cli_exposes_requested_model() {
-    local inventory requested_norm rc=0 detail
-    inventory=$(run_with_timeout 10 "${AGY_ENV_PREFIX[@]}" "$GEMINI_CMD" models 2>&1 </dev/null) || rc=$?
-    if (( rc != 0 )); then
-        # Name the cause agy printed (a sandbox that forbids its local
-        # server, a login prompt, ...) instead of guessing between them.
-        if (( rc == 124 )); then
-            detail="timed out after 10s"
-        else
-            detail=$(printf '%s\n' "$inventory" | pick_error_line)
-        fi
-        GEMINI_PROBE_REASON="Antigravity model inventory failed: ${detail:-exit $rc without a message (is agy signed in?)}"
-        printf '%s\n' "$inventory" >&2
-        return 1
-    fi
-    requested_norm=$(printf '%s' "$GEMINI_MODEL" | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:]')
-    if ! printf '%s\n' "$inventory" | awk -v requested="$requested_norm" '
-        {
-            line = tolower($0)
-            gsub(/[^[:alnum:]]/, "", line)
-            if (index(line, requested) > 0) found = 1
-        }
-        END { exit(found ? 0 : 1) }
-    '; then
-        GEMINI_PROBE_REASON="Antigravity model inventory does not include $GEMINI_MODEL"
-        return 1
-    fi
-}
+
+if is_api_mode "gemini" && { is_carbon_model "$GEMINI_MODEL" || is_carbon_model "$GEMINI_API_MODEL"; }; then
+    log_error "[$CONSULTANT_NAME] Carbon is CLI-only: select GEMINI_USE_API=false and a model listed by agy models"
+    exit 1
+fi
 
 if is_api_mode "gemini"; then
     # --- API Mode ---
@@ -148,6 +125,12 @@ else
             effort_ok=false
             exit_code=1
         else
+            case "$GEMINI_MODEL:$cli_effort" in
+                gemini-4-hydrogen-*:low|gemini-4-hydrogen-*:medium|gemini-4-hydrogen-*:high|gemini-4-hydrogen-*:xhigh|gemini-4-carbon-*:low|gemini-4-carbon-*:medium|gemini-4-carbon-*:high) ;;
+                gemini-4-hydrogen-*:*|gemini-4-carbon-*:*)
+                    log_error "[$CONSULTANT_NAME] unsupported effort for $GEMINI_MODEL: $cli_effort"
+                    effort_ok=false; exit_code=1 ;;
+            esac
             GEMINI_ARGS+=(--effort "$cli_effort")
         fi
     fi
