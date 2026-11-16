@@ -157,6 +157,10 @@ run_api_mode_query() {
             auth_style="anthropic"
             ;;
         qwen)
+            if [[ "$model" == qwen4-max ]]; then
+                log_error "[$consultant_name] qwen4-max does not use the legacy DashScope text-generation wire. Set QWEN3_FORMAT=openai and a matching QwenCloud OpenAI-compatible QWEN3_API_URL and key."
+                return 1
+            fi
             # The DashScope envelope has no reasoning_effort field. Say so
             # rather than accepting the setting and dropping it.
             if [[ -n "$effort" ]]; then

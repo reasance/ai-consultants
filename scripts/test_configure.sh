@@ -560,7 +560,7 @@ test_catalog_default_migrations_and_pins() {
         'QWEN3_MODEL=qwen3.7-max' \
         'GROK_MODEL=grok-4.5' > "$cfg/.env"
     run_clean_configure "$cfg" --force >/dev/null 2>&1
-    assert_eq qwen3.8-max "$(read_env "$cfg/.env" QWEN3_MODEL)" "managed Qwen default migrates to 3.8-max"
+    assert_eq qwen4-max "$(read_env "$cfg/.env" QWEN3_MODEL)" "managed Qwen default migrates to Qwen4"
     assert_eq gemini-4-hydrogen-xhigh "$(read_env "$cfg/.env" GEMINI_MODEL)" "managed Gemini CLI default migrates"
     assert_eq mistral-large-4 "$(read_env "$cfg/.env" MISTRAL_MODEL)" "managed Mistral API default migrates to Large 4"
     assert_eq mistral-medium-3.5 "$(read_env "$cfg/.env" MISTRAL_CLI_MODEL)" "new Mistral CLI field is populated"
@@ -591,6 +591,15 @@ test_catalog_default_migrations_and_pins() {
     done
     assert_contains "$(grep '^GEMINI_MODEL=' "$cfg/.env")" "migrated-from=Gemini_3.1_Pro_(High)" \
         "a display-name origin is recorded without spaces"
+
+    local marker expected
+    for marker in '# ai-consultants:default' '# ai-consultants:auto' '# ai-consultants:pin' ''; do
+        printf '%s\n' "QWEN3_MODEL=qwen3.8-max $marker" 'QWEN3_REASONING_EFFORT=low' > "$cfg/.env"
+        run_clean_configure "$cfg" --force >/dev/null 2>&1
+        case "$marker" in *default*) expected=qwen4-max ;; *) expected=qwen3.8-max ;; esac
+        assert_eq "$expected" "$(read_env "$cfg/.env" QWEN3_MODEL)" "Qwen4 migration honors ownership: $marker"
+        assert_eq low "$(read_env "$cfg/.env" QWEN3_REASONING_EFFORT)" "Qwen4 migration preserves explicit effort"
+    done
 
     cfg="$TMP/catalog-current-glm-default"
     mkdir -p "$cfg"

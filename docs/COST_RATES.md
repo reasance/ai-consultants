@@ -52,7 +52,7 @@ models programmatically.
 | muse-spark-1.3-contributor | Opt-in | $0.0001 | Meta (Contributor mode: Meta may train on the content) |
 | glm-5.3 | Maximum | Unpriced | GLM coding-plan endpoint |
 | glm-5.3-flash | Premium/Standard/Economy | Unpriced | GLM coding-plan endpoint |
-| qwen3.8-max | Maximum/Premium | Unpriced | Qwen3 Token Plan |
+| qwen4-max | Maximum/Premium | Unpriced | Qwen3 Token Plan |
 | qwen3.8-flash | Standard/Economy | Unpriced | Qwen3 Token Plan |
 | kimi-code/k3.1-pro | All tiers | Unpriced | Kimi subscription |
 | any other model | - | Unpriced | Named in the session report; never priced at a guessed rate |
@@ -90,7 +90,7 @@ models programmatically.
 | muse-spark-1.3-contributor | Opt-in | $0.0002 | Meta (Contributor mode: Meta may train on the content) |
 | glm-5.3 | Maximum | Unpriced | GLM coding-plan endpoint |
 | glm-5.3-flash | Premium/Standard/Economy | Unpriced | GLM coding-plan endpoint |
-| qwen3.8-max | Maximum/Premium | Unpriced | Qwen3 Token Plan |
+| qwen4-max | Maximum/Premium | Unpriced | Qwen3 Token Plan |
 | qwen3.8-flash | Standard/Economy | Unpriced | Qwen3 Token Plan |
 | kimi-code/k3.1-pro | All tiers | Unpriced | Kimi subscription |
 | any other model | - | Unpriced | Named in the session report; never priced at a guessed rate |
@@ -126,8 +126,8 @@ pricing page on 2026-10-24: [Anthropic](https://platform.claude.com/docs/en/abou
 [Kimi](https://platform.kimi.ai/docs/pricing/chat) and
 [Meta](https://dev.meta.ai/docs/pricing-rate-limits). DeepSeek V4 Pro moved from
 $0.435/$0.87 to its current $1.32/$3.96 per 1M. The subscription-billed models
-have published API prices for reference: Kimi K3.1 Pro $2/$10, Qwen3.8-Max
-$2/$6, Qwen3.8-Flash $0.15/$0.47, GLM-5.3 $1.40/$4.40 and GLM-5.3-Flash
+have published API prices for reference: Kimi K3.1 Pro $2/$10, Qwen4 Max
+$1.50/$4.50 (Singapore), Qwen3.8-Flash $0.15/$0.47, GLM-5.3 $1.40/$4.40 and GLM-5.3-Flash
 $0.15/$0.50 per 1M; their CLI or plan transports are billed by quota instead.
 
 GPT-6.1 Terra is opt-in through `CODEX_MODEL=gpt-6.1-terra`; no tier selects
@@ -231,7 +231,7 @@ Argon and Mistral Large 4 use their list rates, not the introductory or preview
 prices. A small built-in table in `lib/costs.sh` prices the current tier models
 when the catalog file is missing.
 
-`glm-5.3-flash`, `glm-5.3`, `qwen3.8-max`, `qwen3.8-flash` and
+`glm-5.3-flash`, `glm-5.3`, `qwen4-max`, `qwen3.8-max`, `qwen3.8-flash` and
 `kimi-code/k3.1-pro` are explicitly unpriced on the transports used here. Their zero catalog entries prevent the estimator from
 inventing a dollar figure; session reports disclose their exclusion rather than
 presenting them as free.

@@ -499,7 +499,7 @@ use `max`. Unsupported transport capabilities fail explicitly instead of reducin
 effort silently.
 
 The maximum preset also applies the transport budgets proven by the live panel
-smoke: four bounded advisory turns for Mistral/Grok, the maximum-tier Qwen3.8-Max
+smoke: four bounded advisory turns for Mistral/Grok, the then maximum-tier Qwen3.8-Max
 and DeepSeek timeouts (`QWEN3_MAX_QUALITY_TIMEOUT`/`DEEPSEEK_MAX_QUALITY_TIMEOUT`,
 default 0: no limit), and larger OpenAI-compatible output budgets for Qwen, GLM,
 and DeepSeek. MiniMax-M3.1-Flash always reasons, so it receives a 16,384-token
@@ -530,7 +530,7 @@ and cannot support a comprehensive coverage claim.
 | DeepSeek | deepseek-flash | deepseek-flash | deepseek-flash | deepseek-flash |
 | GLM | glm-5.3 | glm-5.3-flash | glm-5.3-flash | glm-5.3-flash |
 | Grok | grok-4.7 | grok-4.7 | grok-4.7 | grok-4.7 |
-| Qwen3 | qwen3.8-max | qwen3.8-max | qwen3.8-flash | qwen3.8-flash |
+| Qwen3 | qwen4-max | qwen4-max | qwen3.8-flash | qwen3.8-flash |
 | Kimi | kimi-code/k3.1-pro | kimi-code/k3.1-pro | kimi-code/k3.1-pro | kimi-code/k3.1-pro |
 | MiniMax | MiniMax-M3.1-Flash | MiniMax-M3.1-Flash | MiniMax-M3.1-Flash | MiniMax-M3.1-Flash |
 | Meta | muse-wonder-1.0 | muse-wonder-1.0 | muse-spark-1.3 | muse-spark-1.3 |
@@ -589,10 +589,13 @@ be version 2.1.321 or later. Astra uses `max` in maximum; Sol uses `max` in prem
 and `high` in standard. Explicit reasoning-effort settings win. Fable 5.1
 remains an opt-in, with current pins preserved. Selecting a preset later intentionally reapplies that
 preset's tier and can replace an explicit model override for the run.
-Qwen3.8-Max serves the default, premium and maximum tiers on every Qwen
-transport (the `qwen` CLI, the Token Plan and DashScope); `max_quality` adds
-`xhigh` effort only on the OpenAI-compatible wire and never repoints a key or
-endpoint.
+Qwen4 Max serves the default, premium and maximum tiers; Flash keeps standard
+and economy. Qwen4 API mode uses a matching QwenCloud OpenAI-compatible
+endpoint and key, never the legacy text-only DashScope wire. `max_quality`
+requests `xhigh` only on the OpenAI-compatible wire; CLI effort remains a
+user-owned Qwen Code setting. The authenticated API ping passed on November
+16; CLI and Anthropic compatibility have not been live-qualified. Existing
+Qwen3.8 Max pins remain supported. See [the Qwen recipe](docs/RECIPES.md#qwen-via-qwen-cloud-token-plan).
 
 ### Usage
 
@@ -899,5 +902,5 @@ Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 <!-- BEGIN controller-models: benchmark-reference -->
 ## Model benchmarks and availability
 
-[Current v5.0.1 reference](docs/MODEL_BENCHMARKS.md): Fable 5.2 and Carbon scores, provider contracts and integration choices. Carbon is optional via agy; agy selections use exact inventory checks; Carbon needs Ultra/Enterprise.
+[Current v5.0.1 reference](docs/MODEL_BENCHMARKS.md): Qwen4 Max, Fable 5.2 and Carbon scores, provider contracts and integration choices. Carbon is optional via agy; agy selections use exact inventory checks; Carbon needs Ultra/Enterprise.
 <!-- END controller-models: benchmark-reference -->

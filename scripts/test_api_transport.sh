@@ -457,6 +457,22 @@ EOF
         assert_match "always reasons" "$err" "the $minimax_effort rejection says why"
     done
 
+    rm -f "$request_body"
+    PATH="$td:$PATH" QWEN3_API_KEY=test QWEN3_FORMAT=openai QWEN3_MODEL=qwen4-max \
+        QWEN3_API_URL=https://token-plan.maas.qwencloudapi.com/compatible-mode/v1/chat/completions \
+        QWEN3_REASONING_EFFORT=xhigh QWEN3_API_MAX_TOKENS=16384 \
+        REQUEST_BODY_FILE="$request_body" RATE_LIMIT_DIR="$td/rate-qwen4" MAX_RETRIES=1 \
+        run_api_consultant Qwen3 test "" "$output" >/dev/null 2>&1
+    assert_eq "qwen4-max|xhigh|16384" "$(jq -r '"\(.model)|\(.reasoning_effort)|\(.max_tokens)"' "$request_body")" \
+        "Qwen4 final ID, effort and combined thinking/answer budget reach the wire"
+    rm -f "$request_body"
+    rc=0
+    PATH="$td:$PATH" QWEN3_API_KEY=test QWEN3_FORMAT=qwen QWEN3_MODEL=qwen4-max \
+        REQUEST_BODY_FILE="$request_body" RATE_LIMIT_DIR="$td/rate-qwen4-legacy" MAX_RETRIES=1 \
+        run_api_consultant Qwen3 test "" "$output" >/dev/null 2>&1 || rc=$?
+    assert_eq "1|false" "$rc|$([[ -e "$request_body" ]] && echo true || echo false)" \
+        "Qwen4 rejects the legacy text-only DashScope wire before dispatch"
+
     rc=0
     rm -f "$output"
     PATH="$td:$PATH" DEEPSEEK_API_KEY=test DEEPSEEK_FORMAT=openai \
@@ -727,6 +743,28 @@ test_network_failure_reports_the_cause() {
     rm -rf "$td"
 }
 
+test_qwen_endpoint_defaults_preserve_pins() {
+    local td model actual
+    td=$(mktemp -d "${TMPDIR:-/tmp}/qwen-endpoints.XXXXXX")
+    for model in qwen4-max qwen3.8-max qwen3.8-flash; do
+        actual=$(AI_CONSULTANTS_CONFIG_DIR="$td" QWEN3_MODEL="$model" \
+            bash -c 'unset QWEN3_API_URL QWEN3_FORMAT; source "$1/config.sh"; printf "%s|%s" "$QWEN3_API_URL" "$QWEN3_FORMAT"' _ "$SCRIPT_DIR")
+        if [[ "$model" == qwen4-max ]]; then
+            assert_eq 'https://token-plan.maas.qwencloudapi.com/compatible-mode/v1/chat/completions|openai' "$actual" \
+                "Qwen4 fresh API configuration selects its compatible Token Plan wire"
+        else
+            assert_eq 'https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation|qwen' "$actual" \
+                "an explicit $model pin preserves its legacy implicit endpoint and key contract"
+        fi
+    done
+    actual=$(AI_CONSULTANTS_CONFIG_DIR="$td" QWEN3_MODEL=qwen4-max \
+        bash -c 'QWEN3_API_URL=https://custom.example/v1/chat/completions; QWEN3_FORMAT=openai; source "$1/config.sh"; printf "%s|%s" "$QWEN3_API_URL" "$QWEN3_FORMAT"' _ "$SCRIPT_DIR")
+    assert_eq 'https://custom.example/v1/chat/completions|openai' "$actual" \
+        "Qwen4 never repoints an explicit endpoint"
+    rm -rf "$td"
+}
+
+run_test "Qwen model and endpoint ownership" test_qwen_endpoint_defaults_preserve_pins
 run_test "validate_reasoning_effort" test_effort_validation
 run_test "build_openai_request: with reasoning_effort" test_openai_body_with_effort
 run_test "build_google_ai_request: with thinking level" test_google_ai_body_with_thinking_level
