@@ -122,7 +122,7 @@ the observed version is recorded only as response provenance.
 
 The `max_quality` preset enables all 11 consultants. It uses the separately
 Kimi K3.1 Pro at max thinking effort (every Kimi tier), MiniMax-M3.1-Flash (every MiniMax tier), GLM-5.3 (the flagship; Flash serves
-premium/standard/economy) and Qwen3.8-Max (also the Qwen default; Flash serves
+premium/standard/economy) and Qwen4 Max (also the Qwen default; Flash serves
 standard/economy). Hydrogen uses xhigh for Google premium and default maximum, high for standard,
 and medium for economy. Carbon/high is an explicit CLI-only maximum option
 with `GEMINI_FRONTIER_CLI_MODEL=gemini-4-carbon-high` and `GEMINI_USE_API=false`;

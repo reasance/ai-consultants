@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For longer-form release notes (rationale, upgrade guides, performance numbers), see `docs/releases/v<VERSION>.md`.
 
+## [Unreleased]
+
+### Changed
+
+- Qwen4 Max becomes the Qwen default/premium and maximum target; Flash stays standard/economy. Fresh API configuration uses QwenCloud Token Plan OpenAI compatibility, and the incompatible legacy text-generation wire fails before dispatch. Generated current defaults migrate while explicit model pins and efforts remain user-owned. Updated all-model AA v5.0.1 snapshot and model contracts; the final API access ping is verified, CLI paths are not live-qualified.
+
 ## [5.9.0] - 2026-11-15
 
 ### Added

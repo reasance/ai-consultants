@@ -1481,10 +1481,9 @@ test_model_for_tier() {
     assert_equals "glm-5.3-flash"         "$(get_model_for_tier "glm" "premium")"      "glm premium is glm-5.3-flash"
     assert_equals "grok-4.7"              "$(get_model_for_tier "grok" "premium")"     "grok premium is grok-4.7"
     assert_equals "grok-4.7"              "$(get_model_for_tier "grok" "standard")"    "grok standard is grok-4.7"
-    # qwen3.8-max is served on the qwen CLI, Token Plan and DashScope alike
-    # (verified live 2026-10-02), so it is the premium default; Flash serves
-    # standard and economy. The retired -preview ID is never selected.
-    assert_equals "qwen3.8-max"           "$(get_model_for_tier "qwen3" "premium")"    "qwen3 premium is qwen3.8-max"
+    # Qwen4 is the final premium model; Flash keeps standard/economy.
+    # API access was verified on Token Plan; CLI needs its provider entry.
+    assert_equals "qwen4-max"           "$(get_model_for_tier "qwen3" "premium")"    "qwen3 premium is qwen4-max"
     assert_equals "qwen3.8-flash"         "$(get_model_for_tier "qwen3" "standard")"   "qwen3 standard is qwen3.8-flash"
     assert_equals "qwen3.8-flash"         "$(get_model_for_tier "qwen3" "economy")"    "qwen3 economy is qwen3.8-flash"
     assert_not_equals "qwen3.8-max-preview" "$(get_model_for_tier "qwen3" "premium")"  "qwen3 premium is not the retired preview ID"
@@ -1496,7 +1495,7 @@ test_model_for_tier() {
     assert_equals "glm-5.3-flash"         "$(get_model_for_tier "glm" "economy")"       "glm economy is glm-5.3-flash"
     assert_equals "claude-fable-5-2"      "$(get_model_for_tier "claude" "maximum")"    "Claude maximum is Fable 5.2"
     assert_equals "kimi-code/k3.1-pro"    "$(get_model_for_tier "kimi" "maximum")"      "maximum tier uses Kimi K3.1 Pro"
-    assert_equals "qwen3.8-max"           "$(get_model_for_tier "qwen3" "maximum")"     "maximum catalog includes Qwen3.8-Max"
+    assert_equals "qwen4-max"           "$(get_model_for_tier "qwen3" "maximum")"     "maximum catalog includes Qwen4 Max"
     assert_equals "MiniMax-M3.1-Flash"    "$(get_model_for_tier "minimax" "maximum")"   "maximum tier uses MiniMax-M3.1-Flash"
 
     local max_quality_state
@@ -1552,8 +1551,8 @@ test_model_for_tier() {
         apply_model_tier maximum
         printf '%s|%s|%s|%s\n' "$GEMINI_API_MODEL" "$MISTRAL_CLI_MODEL" "$MISTRAL_MODEL" "$QWEN3_MODEL"
     )
-    assert_equals "gemini-4-hydrogen|mistral-medium-3.5|mistral-large-4|qwen3.8-max" \
-        "$maximum_unconfigured" "maximum selects Qwen3.8-Max on every Qwen transport"
+    assert_equals "gemini-4-hydrogen|mistral-medium-3.5|mistral-large-4|qwen4-max" \
+        "$maximum_unconfigured" "maximum selects Qwen4 Max on every Qwen transport"
 
     local maximum_cli_qwen
     maximum_cli_qwen=$(
@@ -1565,7 +1564,7 @@ test_model_for_tier() {
         apply_model_tier maximum
         printf '%s|%s|%s\n' "$QWEN3_MODEL" "${QWEN3_REASONING_EFFORT:-}" "$QWEN3_TIMEOUT_SECONDS"
     )
-    assert_equals "qwen3.8-max||600" "$maximum_cli_qwen" \
+    assert_equals "qwen4-max||600" "$maximum_cli_qwen" \
         "maximum on the qwen CLI extends the timeout without an untransportable effort"
 
     local qwen_tier_output
@@ -1586,9 +1585,9 @@ test_model_for_tier() {
         apply_model_tier maximum
         printf '%s|%s|%s\n' "$QWEN3_MODEL" "$QWEN3_REASONING_EFFORT" "$QWEN3_TIMEOUT_SECONDS"
     )
-    assert_equals "qwen3.8-max|xhigh|600" "$(sed -n '1p' <<<"$qwen_tier_output")" "configured Token Plan promotes Qwen3.8-Max with managed xhigh and extended timeout"
+    assert_equals "qwen4-max|xhigh|600" "$(sed -n '1p' <<<"$qwen_tier_output")" "configured Token Plan promotes Qwen4 Max with managed xhigh and extended timeout"
     assert_equals "qwen3.8-flash||180" "$(sed -n '2p' <<<"$qwen_tier_output")" "leaving maximum clears managed Qwen effort and restores timeout"
-    assert_equals "qwen3.8-max|low|600" "$(sed -n '3p' <<<"$qwen_tier_output")" "maximum preserves a user-pinned Qwen effort while extending timeout"
+    assert_equals "qwen4-max|low|600" "$(sed -n '3p' <<<"$qwen_tier_output")" "maximum preserves a user-pinned Qwen effort while extending timeout"
 
     local child_tier_state
     child_tier_state=$(

@@ -206,7 +206,7 @@ MISTRAL_MAX_TURNS="${MISTRAL_MAX_TURNS:-4}"
 # QWEN3 CONFIGURATION - The Analyst (CLI/API switchable v2.7)
 # =============================================================================
 
-QWEN3_MODEL="${QWEN3_MODEL:-qwen3.8-max}"
+QWEN3_MODEL="${QWEN3_MODEL:-qwen4-max}"
 if [[ -n "${QWEN3_TIMEOUT+x}" ]]; then
     QWEN3_TIMEOUT_SECONDS="$QWEN3_TIMEOUT"
 elif [[ -z "${QWEN3_TIMEOUT_SECONDS+x}" ]]; then
@@ -215,8 +215,18 @@ fi
 QWEN3_MAX_QUALITY_TIMEOUT="${QWEN3_MAX_QUALITY_TIMEOUT:-0}"
 QWEN3_API_MAX_TOKENS="${QWEN3_API_MAX_TOKENS:-16384}"
 QWEN3_CMD="${QWEN3_CMD:-qwen}"
-QWEN3_API_URL="${QWEN3_API_URL:-https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation}"
-QWEN3_FORMAT="${QWEN3_FORMAT:-qwen}"
+if [[ -z "${QWEN3_API_URL:-}" ]]; then
+    case "$QWEN3_MODEL" in
+        qwen4-max) QWEN3_API_URL=https://token-plan.maas.qwencloudapi.com/compatible-mode/v1/chat/completions ;;
+        *) QWEN3_API_URL=https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation ;;
+    esac
+fi
+if [[ -z "${QWEN3_FORMAT:-}" ]]; then
+    case "$QWEN3_API_URL" in
+        */api/v1/services/aigc/text-generation/generation) QWEN3_FORMAT=qwen ;;
+        *) QWEN3_FORMAT=openai ;;
+    esac
+fi
 # CLI mode: npm install -g @qwen-code/qwen-code@latest
 # API key: Set QWEN3_API_KEY environment variable
 
@@ -695,7 +705,7 @@ get_model_for_tier() {
                 deepseek) echo "deepseek-flash" ;;
                 glm)      echo "glm-5.3" ;;
                 grok)     echo "grok-4.7" ;;
-                qwen3)    echo "qwen3.8-max" ;;
+                qwen3)    echo "qwen4-max" ;;
                 kimi)     echo "kimi-code/k3.1-pro" ;;
                 minimax)  echo "MiniMax-M3.1-Flash" ;;
                 meta)     echo "muse-wonder-1.0" ;;
@@ -711,7 +721,7 @@ get_model_for_tier() {
                 deepseek) echo "deepseek-flash" ;;
                 glm)      echo "glm-5.3-flash" ;;
                 grok)     echo "grok-4.7" ;;
-                qwen3)    echo "qwen3.8-max" ;;
+                qwen3)    echo "qwen4-max" ;;
                 kimi)     echo "kimi-code/k3.1-pro" ;;
                 minimax)  echo "MiniMax-M3.1-Flash" ;;
                 meta)     echo "muse-wonder-1.0" ;;
@@ -946,7 +956,7 @@ apply_model_tier() {
             # no limit) to all of them, restored when a later tier is applied.
             # Reasoning effort is only transportable on the OpenAI-compatible
             # wire; elsewhere it would just warn.
-            export QWEN3_MODEL="qwen3.8-max"
+            export QWEN3_MODEL="qwen4-max"
             if [[ "${QWEN3_USE_API:-false}" == "true" && "${QWEN3_FORMAT:-qwen}" == "openai" \
                 && -z "${QWEN3_REASONING_EFFORT:-}" ]]; then
                 export QWEN3_REASONING_EFFORT=xhigh

@@ -217,7 +217,7 @@ GEMINI_USE_API=false         # Force agy CLI; set true to force Google AI API
 CODEX_USE_API=false          # Use OpenAI API instead of codex CLI
 CLAUDE_USE_API=false         # Use Anthropic API instead of claude CLI
 MISTRAL_USE_API=false        # Use Mistral API instead of vibe CLI
-QWEN3_USE_API=false          # Use qwen CLI (default) or DashScope API
+QWEN3_USE_API=false          # Use qwen CLI (default) or QwenCloud API
 GROK_USE_API=false           # Use Grok Build (default); API is fallback
 MINIMAX_USE_API=false        # Use mmx CLI (default) or MiniMax API
 # META_USE_API unset = auto (API if META_API_KEY set, else muse CLI)
@@ -231,7 +231,7 @@ MINIMAX_USE_API=false        # Use mmx CLI (default) or MiniMax API
 | Codex | `OPENAI_API_KEY` | OpenAI API key |
 | Claude | `ANTHROPIC_API_KEY` | Anthropic API key |
 | Mistral | `MISTRAL_API_KEY` | Mistral API key |
-| Qwen3 | `QWEN3_API_KEY` | DashScope API key |
+| Qwen3 | `QWEN3_API_KEY` | Key matching QWEN3_API_URL (Token Plan by default) |
 | MiniMax | `MINIMAX_API_KEY` | MiniMax API key (API mode only; the mmx CLI uses OAuth) |
 | Meta | `META_API_KEY` | Meta Model API key (`LLM_...`); Muse Code also reads it headless |
 | GLM | `GLM_API_KEY` | Required when `ENABLE_GLM=true` |
@@ -278,7 +278,7 @@ MISTRAL_MAX_TURNS=4
 MISTRAL_API_MAX_TOKENS=16384  # API only: Large 4 thinking + visible output
 KIMI_MODEL=kimi-code/k3.1-pro
 KIMI_REASONING_EFFORT=max   # passed as KIMI_MODEL_THINKING_EFFORT; empty = CLI default
-QWEN3_MODEL=qwen3.8-max     # standard/economy tiers use qwen3.8-flash
+QWEN3_MODEL=qwen4-max     # standard/economy tiers use qwen3.8-flash
 QWEN3_MAX_QUALITY_TIMEOUT=0  # 0 = no limit
 QWEN3_API_MAX_TOKENS=16384
 GLM_MODEL=glm-5.3-flash
@@ -363,7 +363,7 @@ explicit `QWEN3_REASONING_EFFORT` pin is preserved in the maximum tier.
 
 The preset gives Mistral and Grok four bounded advisory turns, applies
 `QWEN3_MAX_QUALITY_TIMEOUT` and `DEEPSEEK_MAX_QUALITY_TIMEOUT` (default 0, no
-limit) to Qwen3.8-Max and DeepSeek, sets Meta to `max` effort, and uses the configured
+limit) to Qwen4 Max and DeepSeek, sets Meta to `max` effort, and uses the configured
 per-consultant `*_API_MAX_TOKENS` budget. Maximum temporarily raises Codex,
 Mistral, Grok, and MiniMax API budgets to `MAX_QUALITY_API_MAX_TOKENS` and
 restores them when leaving the tier; Qwen, GLM, and DeepSeek already default to

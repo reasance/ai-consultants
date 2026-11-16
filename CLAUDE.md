@@ -308,7 +308,7 @@ New environment variables in `config.sh`:
 | `CODEX_USE_API` | false | Use OpenAI API instead of codex CLI |
 | `CLAUDE_USE_API` | false | Use Anthropic API instead of claude CLI |
 | `MISTRAL_USE_API` | false | Use Mistral API instead of vibe CLI |
-| `QWEN3_USE_API` | false | Use DashScope API instead of qwen CLI (v2.7) |
+| `QWEN3_USE_API` | false | Use QwenCloud API instead of qwen CLI (v2.7) |
 | `GROK_USE_API` | auto | Use xAI API when Grok Build is unavailable |
 | `MINIMAX_USE_API` | false | Use MiniMax API instead of the mmx CLI (v2.21) |
 | `META_USE_API` | auto | Meta Model API when `META_API_KEY` is set, otherwise the muse CLI (v5.5) |
@@ -325,7 +325,7 @@ New environment variables in `config.sh`:
 | Codex | `OPENAI_API_KEY` | Same as existing OpenAI key |
 | Claude | `ANTHROPIC_API_KEY` | Anthropic API key |
 | Mistral | `MISTRAL_API_KEY` | Same as existing Mistral key |
-| Qwen3 | `QWEN3_API_KEY` | DashScope API key |
+| Qwen3 | `QWEN3_API_KEY` | Key matching QWEN3_API_URL (Token Plan by default) |
 
 ### Mode Checking Functions
 New functions in `lib/common.sh`:
@@ -620,7 +620,7 @@ for f in scripts/*.sh scripts/lib/*.sh; do bash -n "$f" && echo "OK: $f"; done
 | `ENABLE_COMPACT_REPORT` | true | Compact report format (v2.3) |
 | `ENABLE_BUDGET_LIMIT` | false | Budget enforcement (v2.4, opt-in) |
 | `BUDGET_ACTION` | warn | Action on budget exceeded: warn/stop (v2.4) |
-| `QWEN3_USE_API` | false | Use DashScope API instead of qwen CLI (v2.7) |
+| `QWEN3_USE_API` | false | Use QwenCloud API instead of qwen CLI (v2.7) |
 | `QWEN3_CMD` | qwen | Qwen CLI command (v2.7) |
 | `ENABLE_KIMI` | true | Enable Kimi consultant (v2.9) |
 | `KIMI_CMD` | kimi | Kimi CLI command (v2.9) |
@@ -718,6 +718,17 @@ Consequence worth knowing: the skill's `finalize.sh` re-verifies the same versio
 1. **Preflight**: `~/.claude/skills/ai-consultants-release/scripts/preflight.sh <VERSION>` — read-only gate on both repos (branch, cleanliness, origin sync, forward semver, free tag, tooling)
 2. **Bump the version**: `scripts/release.sh <VERSION>` — rewrites 9 anchored surfaces across 7 files (`package.json`, `scripts/config.sh`, `SKILL.md` ×2, `README.md` ×2, `CLAUDE.md`, `docs/cost_rates.json`, `docs/COST_RATES.md`), validates them, and runs `npm test` + `npm run lint`. Never commits, tags, or publishes.
 3. **Write the three changelogs** (hand-written — see "Why three changelog surfaces?" below): `CHANGELOG.md` entry at the top, `## Changelog
+
+### Unreleased — Qwen4 Max
+
+Controller-generated defaults select final `qwen4-max` for Qwen premium/maximum
+and keep Flash standard/economy. `QWEN3_*` names remain compatible. Fresh API
+configuration uses QwenCloud Token Plan OpenAI compatibility; a Qwen4 request
+on the legacy text-generation wire is rejected before dispatch. Current
+marked generated 3.8 defaults migrate; explicit active pins and efforts stay
+user-owned. The 742-row AA v5.0.1 snapshot has a single 42.9 default Qwen4
+variant with no disclosed effort. The direct API ping passed, with thinking
+disabled; CLI, reasoning and coding quality are not live-qualified.
 
 ### v5.9.0 — Fable, Hydrogen and explicit Carbon CLI
 

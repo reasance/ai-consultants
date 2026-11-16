@@ -220,77 +220,89 @@ source of truth is [`scripts/config.sh`](../scripts/config.sh).
 
 ## Qwen via Qwen Cloud Token Plan
 
-`qwen3.8-max` is the default and premium Qwen model, and `qwen3.8-flash`
-serves standard and economy. Both are served by the `qwen` CLI, the Token Plan
-endpoint and DashScope/Model Studio; on 2026-10-02 `qwen3.8-max` passed live
-checks through the CLI and the Token Plan API, and `qwen3.8-flash` through the
-CLI. A Token Plan subscription has its own base URL and its own
-plan-specific API key (shown in the Model Studio console under Token Plan).
+`qwen4-max` is the final default/premium model; maximum requests `xhigh` on
+OpenAI-compatible API calls. `qwen3.8-flash` stays standard/economy.
+`QWEN3_*` environment names remain compatible. Qwen3.8 Max remains an explicit
+choice; a current unmarked or pinned model and an explicit effort are preserved.
+`configure` upgrades only marked generated Qwen3.8 defaults. Retired older IDs
+still follow their recorded migration rules.
 
-Understand the tradeoffs:
+On November 16, 2026, the authenticated Token Plan endpoint listed both
+`qwen4-max` and `qwen4-max-preview`. One non-thinking ping to **qwen4-max**
+returned HTTP 200, `PONG` and provider-reported `qwen4-max` in 4.03 seconds,
+with 32 input and 3 output tokens, no retry and no fallback. That verifies API
+access, not coding quality or the Qwen/Claude CLI paths. The preview is a
+separate deployment and is never substituted.
 
-- **Billed in prepaid plan quota** on the Token Plan, not per token — cost
-  reports exclude `qwen3.8-max`/`qwen3.8-flash` and say so explicitly rather
-  than estimating a figure. Pay-as-you-go DashScope usage is billed per token
-  by the provider but is not priced by the local estimator either.
-- **The key belongs to the current plan.** Renewing or repurchasing a plan can
-  issue a new plan-specific key; an old key then fails with HTTP 401
-  ("Invalid API-key provided"). A DashScope key without model access fails with
-  403 `AccessDenied.Unpurchased`. Both reasons are shown in the consultant's
-  failure line.
-
-`qwen3.8-max-preview` was a separate, older Token Plan deployment; as of
-2026-10-02 the Token Plan model list no longer includes it. `configure`
-migrates `qwen3.8-max-preview` (or the previous default `qwen3.7-max`) to
-`qwen3.8-max`, even when pinned: both are retired since 5.5.0.
-
-### API mode (the effort knob works here)
+### API mode
 
 ```bash
 QWEN3_USE_API=true
-QWEN3_FORMAT=openai      # Token Plan is OpenAI-compatible; DashScope is not
-QWEN3_API_URL=https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1/chat/completions
-QWEN3_MODEL=qwen3.8-max
-QWEN3_API_KEY=<your Token Plan key>
-QWEN3_REASONING_EFFORT=high    # none|minimal|low|medium|high|xhigh|max; default xhigh
+QWEN3_FORMAT=openai
+QWEN3_API_URL=https://token-plan.maas.qwencloudapi.com/compatible-mode/v1/chat/completions
+QWEN3_MODEL=qwen4-max
+QWEN3_API_KEY=<your matching Token Plan key>
+QWEN3_REASONING_EFFORT=high
+QWEN3_API_MAX_TOKENS=16384
 ```
 
-Pass the **full** URL including `/chat/completions` — it is used verbatim. Use
-`QWEN3_API_KEY` for the Token Plan key; there is deliberately no separate
-key variable, so the key always matches whatever `QWEN3_API_URL` points at.
+Pass the full `/chat/completions` URL. Fresh configurations default to this
+Token Plan endpoint and the OpenAI-compatible wire. An existing explicit
+endpoint or key is never repointed. Qwen4 refuses the old DashScope
+text-generation wire before dispatch; its native DashScope protocol uses the
+multimodal endpoint even for text. To use pay-as-you-go, explicitly set the
+regional QwenCloud compatible URL and its matching pay-as-you-go key.
 
-Accepted effort values are the provider's own enum:
-`none|minimal|low|medium|high|xhigh|max`. Verified against the live endpoint on
-2026-07-21 — note this is wider than the `low|high|xhigh` reported in the public
-write-ups. The one value this model rejects is `none`: thinking is always
-enabled and cannot be disabled (`The value of the enable_thinking parameter is
-restricted to True`). Anything unsupported comes back as a 400, never as a
-silently ignored setting.
+The final model's canonical thinking levels are `low`, `high` and `xhigh`
+(default `high`). The provider maps `minimal` to low, `medium` to high and
+`max` to xhigh. Use canonical values when comparing runs. The API budget
+limits thinking **plus** the visible answer; a short answer-only budget can
+truncate reasoning. The configured 16,384-token ceiling can be raised explicitly
+up to the provider's 262,144-token combined limit. Non-thinking output is
+limited to 131,072 tokens. The preview's 393,216 limit does not apply.
 
-### CLI mode (the effort knob does NOT work here)
+Token Plan spends credits. Qwen models remain explicitly unpriced in local
+session totals; zero does not mean free. Singapore list prices ($1.50/$4.50
+per million input/output tokens) are reference API rates, not a subscription
+invoice. A key must match its endpoint and current plan; authentication and
+request errors are surfaced without switching providers or models.
 
-The `qwen` CLI has no reasoning-effort flag. Effort is a user-owned setting, so
-ai-consultants cannot deliver it per call and warns if you set
-`QWEN3_REASONING_EFFORT` in CLI mode. Configure it yourself in
-`~/.qwen/settings.json`:
+
+An explicit Qwen3.8 Max or Flash model pin without a custom endpoint keeps the
+legacy implicit DashScope endpoint/wire. Existing keys are not silently moved
+to a different plan. New Qwen4 configurations use the compatible Token Plan
+endpoint; set its matching key deliberately.
+
+### CLI mode
+
+The `qwen` CLI has no per-request reasoning-effort flag. ai-consultants warns
+when `QWEN3_REASONING_EFFORT` is set in CLI mode; the setting belongs in Qwen
+Code. Append this provider entry to the existing `modelProviders.openai`
+array in `~/.qwen/settings.json`, keeping other entries and credentials:
 
 ```json
 {
-  "modelProviders": {
-    "openai": [
-      {
-        "id": "qwen3.8-max",
-        "name": "[Token Plan] qwen3.8-max",
-        "baseUrl": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
-        "envKey": "BAILIAN_TOKEN_PLAN_API_KEY",
-        "generationConfig": { "reasoning": { "effort": "high" } }
-      }
-    ]
-  }
+  "id": "qwen4-max",
+  "name": "[QwenCloud Token Plan] qwen4-max",
+  "baseUrl": "https://token-plan.maas.qwencloudapi.com/compatible-mode/v1",
+  "envKey": "QWENCLOUD_TOKEN_PLAN_API_KEY",
+  "capabilities": {
+    "reasoning": {
+      "thinking": true,
+      "efforts": ["low", "high", "xhigh"],
+      "defaultEffort": "high",
+      "disableField": "reasoning_effort"
+    }
+  },
+  "generationConfig": { "contextWindowSize": 1000000 }
 }
 ```
 
-**Caveat worth knowing**: if you also set `generationConfig.samplingParams` on an
-OpenAI-compatible provider, Qwen Code ships those keys to the wire verbatim and
-**skips the `reasoning` injection entirely** — so setting both silently gives you
-no effort control at all.
+Provide `QWENCLOUD_TOKEN_PLAN_API_KEY` privately through Qwen Code's credential
+configuration or the environment. Set `model.reasoningEffort` to the intended
+level. This is configuration guidance; the API ping above did not test this
+CLI entry. No installer rewrites an existing Qwen provider or credential.
+
+[Final model and limits](https://docs.qwencloud.com/developer-guides/getting-started/latest-model)
+· [Official pricing](https://docs.qwencloud.com/developer-guides/getting-started/pricing)
+· [AA benchmark](https://artificialanalysis.ai/models/qwen4-max)

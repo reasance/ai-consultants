@@ -321,12 +321,12 @@ qwen --version
 
 # Or use API mode
 export QWEN3_USE_API=true
-export QWEN3_API_KEY="your-dashscope-key"
+export QWEN3_API_KEY="your-token-plan-key"
 ```
 
-Get API key: [Alibaba Cloud DashScope](https://dashscope.console.aliyun.com/)
+Get the matching key from [QwenCloud Token Plan](https://docs.qwencloud.com/token-plan/personal/token-plan-personal-quickstart). See the [Qwen4 API and CLI recipe](RECIPES.md#qwen-via-qwen-cloud-token-plan) for the explicit provider entry.
 
-**CLI/API Mode**: Qwen3 defaults to CLI mode (`QWEN3_USE_API=false`). Set to `true` to use the DashScope API.
+**CLI/API Mode**: Qwen3 defaults to CLI mode (`QWEN3_USE_API=false`). Set to `true` to use the QwenCloud Token Plan API.
 
 ### Kimi K3.1 Pro via Kimi Code CLI (The Eastern Sage) - v5.4
 
@@ -476,7 +476,7 @@ export GROK_USE_API=true
 export GROK_API_KEY="your-xai-key"
 
 export QWEN3_USE_API=true   # Enable API mode for Qwen3
-export QWEN3_API_KEY="your-dashscope-key"
+export QWEN3_API_KEY="your-token-plan-key"
 ```
 
 ### API Endpoints (Custom)
@@ -486,12 +486,20 @@ GEMINI_API_URL=https://generativelanguage.googleapis.com/v1beta/models
 CODEX_API_URL=https://api.openai.com/v1/chat/completions
 CLAUDE_API_URL=https://api.anthropic.com/v1/messages
 MISTRAL_API_URL=https://api.mistral.ai/v1/chat/completions
-QWEN3_API_URL=https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation
+QWEN3_API_URL=https://token-plan.maas.qwencloudapi.com/compatible-mode/v1/chat/completions
 ```
 
-The Qwen default is the native DashScope endpoint (`QWEN3_FORMAT=qwen`). For an
-OpenAI-compatible endpoint such as the Token Plan, set `QWEN3_FORMAT=openai` and
-the full `/chat/completions` URL; see [`RECIPES.md`](RECIPES.md).
+The Qwen API default is the OpenAI-compatible QwenCloud Token Plan endpoint
+(`QWEN3_FORMAT=openai`). Supply its matching Token Plan key; an existing
+explicit URL, format or key is never repointed. Qwen4 rejects the legacy
+DashScope text-generation wire before dispatch. See [`RECIPES.md`](RECIPES.md)
+for final-model limits, CLI setup and explicit pay-as-you-go configuration.
+
+
+An explicit Qwen3.8 Max or Flash model pin without a custom endpoint keeps the
+legacy implicit DashScope endpoint/wire. Existing keys are not silently moved
+to a different plan. New Qwen4 configurations use the compatible Token Plan
+endpoint; set its matching key deliberately.
 
 ### Mode Detection
 

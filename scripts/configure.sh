@@ -403,11 +403,19 @@ unset migrated_timeouts timeout_spec timeout_key
 case "$(read_value "$WORK_FILE" QWEN3_MODEL 2>/dev/null || true)" in
     qwen3.7-max|qwen3.8-max-preview)
         if ! has_value_marker "$WORK_FILE" QWEN3_MODEL "$PIN_MARKER"; then
-            set_value QWEN3_MODEL "qwen3.8-max $DEFAULT_MARKER"
-            echo "Migrated managed Qwen default to qwen3.8-max" >&2
+            set_value QWEN3_MODEL "qwen4-max $DEFAULT_MARKER"
+            echo "Migrated managed Qwen default to qwen4-max" >&2
         fi
         ;;
 esac
+
+# A current explicit selection is user-owned. Only a generated 3.8 default
+# moves to Qwen4; existing endpoint, credential and effort settings stay put.
+if [[ "$(read_value "$WORK_FILE" QWEN3_MODEL 2>/dev/null || true)" == qwen3.8-max ]] \
+    && has_value_marker "$WORK_FILE" QWEN3_MODEL "$DEFAULT_MARKER" \
+    && ! has_value_marker "$WORK_FILE" QWEN3_MODEL "$PIN_MARKER"; then
+    set_value QWEN3_MODEL "qwen4-max $DEFAULT_MARKER"
+fi
 
 # Mistral Large 3 was the generated API default through 5.1.2. The setting is
 # API-only (Vibe reads MISTRAL_CLI_MODEL), so CLI users are unaffected.
