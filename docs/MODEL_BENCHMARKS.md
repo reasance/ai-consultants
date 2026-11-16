@@ -21,7 +21,7 @@ Generated from controller-models; snapshot 2026-11-16. Each score belongs to its
 | Gemini 3.8 Flash | high | 30.8 | $7.77 | registered transports |
 | Gemini 3.8 Flash | medium | 30.1 | $6.26 | registered transports |
 | Gemini 3.8 Flash | low | 22.5 | unknown | registered transports |
-| Qwen4 Max | default | 42.9 | $3.27 | Token Plan API and Claude/Anthropic checked; Qwen CLI pending |
+| Qwen4 Max | default | 42.9 | $3.27 | Token Plan API and Qwen Code CLI checked; CLI identity requested-only |
 
 ## Integration decision
 
@@ -58,3 +58,7 @@ AA USD/task is a weighted benchmark cost. This refreshed snapshot uses the API's
 Under the existing 8/20-point rule, the maximum is 64.6: frontier starts at 56.6 and mid at 44.6. Bands are relative, so an unchanged model can move down when a new leader arrives. In particular Terra/high and Sonnet/high now fall below the mid floor. A generic index is advisory evidence and does not qualify a reviewer for a specific repository.
 
 Sources: [AA methodology](https://artificialanalysis.ai/methodology/intelligence-benchmarking), [AA API](https://artificialanalysis.ai/data-api/docs/reference), [Fable 5.2](https://platform.claude.com/docs/en/models/fable-5-2/overview), [Carbon API](https://aistudio.google.com/docs/models/gemini-4-carbon), [Carbon Cloud limits](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/4-carbon), [Carbon pricing](https://aistudio.google.com/docs/pricing#gemini-4-carbon).
+
+## Native Qwen Code check
+
+On November 16, Qwen Code 0.27.1 with an isolated final-model provider configuration at high returned the exact hidden code and all five paragraphs through ai-consultants in 13.2 seconds. The response was structured; CLI identity remains requested-only, and token counts are estimates. Script/SDK retries and model fallbacks were disabled. Two earlier test-wrapper initializations failed; the successful invocation had its own explicit approval. This verifies configuration, dispatch, parsing and context use, not coding quality or an AA score at high/xhigh.

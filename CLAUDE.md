@@ -6,7 +6,7 @@ AI Consultants is a multi-model coverage system that queries up to 11 AI consult
 
 **Self-Exclusion**: The invoking agent is automatically excluded from both the panel and synthesis. Claude Code won't query or synthesize with Claude, Codex CLI won't query or synthesize with Codex, etc.
 
-**Version**: 5.9.0
+**Version**: 5.10.0
 
 ## Distribution
 
@@ -717,30 +717,7 @@ Consequence worth knowing: the skill's `finalize.sh` re-verifies the same versio
 
 1. **Preflight**: `~/.claude/skills/ai-consultants-release/scripts/preflight.sh <VERSION>` — read-only gate on both repos (branch, cleanliness, origin sync, forward semver, free tag, tooling)
 2. **Bump the version**: `scripts/release.sh <VERSION>` — rewrites 9 anchored surfaces across 7 files (`package.json`, `scripts/config.sh`, `SKILL.md` ×2, `README.md` ×2, `CLAUDE.md`, `docs/cost_rates.json`, `docs/COST_RATES.md`), validates them, and runs `npm test` + `npm run lint`. Never commits, tags, or publishes.
-3. **Write the three changelogs** (hand-written — see "Why three changelog surfaces?" below): `CHANGELOG.md` entry at the top, `## Changelog
-
-### Unreleased — Qwen4 Max
-
-Controller-generated defaults select final `qwen4-max` for Qwen premium/maximum
-and keep Flash standard/economy. `QWEN3_*` names remain compatible. Fresh API
-configuration uses QwenCloud Token Plan OpenAI compatibility; a Qwen4 request
-on the legacy text-generation wire is rejected before dispatch. Current
-marked generated 3.8 defaults migrate; explicit active pins and efforts stay
-user-owned. The 742-row AA v5.0.1 snapshot has a single 42.9 default Qwen4
-variant with no disclosed effort. The direct API ping passed, with thinking
-disabled; CLI, reasoning and coding quality are not live-qualified.
-
-### v5.9.0 — Fable, Hydrogen and explicit Carbon CLI
-
-**Preset and migration boundary.** `scripts/config.sh` and controller-generated tier data choose Fable 5.2/high for premium and max for maximum; Google tiers use Hydrogen medium/high/xhigh. `scripts/configure.sh` migrates only marked managed current defaults. Unmarked current selections and model/effort pins remain user-owned. Fable 5.1, Argon and Flash remain explicit choices.
-
-**Same-ID effort bug.** Google API tiers share `gemini-4-hydrogen`. The model-only economy override previously retained the premium effort; `scripts/lib/routing.sh` now returns the economy effort, `scripts/consult_all.sh` scopes it to the child request and compares effort during escalation, and `scripts/lib/cache.sh` includes it in cache identity. The recorded pre-fix boundary probe failed with xhigh instead of medium then xhigh; the repaired probe and full offline gate exercise serialization, escalation, explicit pins and cache separation.
-
-**Carbon remains explicit.** `scripts/lib/model_contracts.sh` owns family detection. The inventory check in `scripts/lib/common.sh` matches the exact requested CLI ID. Query and synthesis paths reject unavailable Carbon and API substitution; cost-aware routing and escalation keep an explicit Carbon model pinned. Account entitlement is separate from Google's public API release. The November 15 agy 1.5.9 inventory lists Hydrogen but not Carbon.
-
-**Evidence and pricing.** Controller-generated references use the complete 741-row AA v5.0.1 snapshot, with measured-effort scores, current task-cost figures and explicit serving contracts. Official prices remain provider-sourced. The integration does not enable provider long decode or rewrite personal router choices, and no live new-model quality qualification is claimed.
-
-` entry in this file, and `docs/releases/v<VERSION>.md`
+3. **Write the three changelogs** (hand-written — see "Why three changelog surfaces?" below): the top entry in `CHANGELOG.md`, the first entry under `## Changelog` in this file, and `docs/releases/v<VERSION>.md`.
 4. **Update workspace sync surfaces**: `../CLAUDE.md` workspace guide ("Latest at time of last sync" + Recent release line)
 5. **Finalize**: `~/.claude/skills/ai-consultants-release/scripts/finalize.sh <VERSION> --message-file … --tag-message-file …` — re-verifies all 9 version surfaces *and* the 3 doc surfaces, re-runs the gate, then commits, creates the annotated tag, and pushes both
 6. **Publishing is automatic**: pushing the `v*` tag triggers `.github/workflows/publish.yml`, which re-runs the gate, verifies the tag matches `package.json`, publishes to npm via **Trusted Publishing (OIDC — no `NPM_TOKEN`)** with provenance, and creates the GitHub release from the release note. Both terminal steps are idempotent, so a failed run can be re-run after a fix — **never move or delete a pushed tag**, and never `npm publish` from a workstation.
@@ -811,6 +788,55 @@ curl -fsSL https://raw.githubusercontent.com/reasance/ai-consultants/main/script
 - **No internal jargon**: Avoid referencing issue tracker IDs or internal codenames without context.
 
 ## Changelog
+
+
+### v5.10.0 — Qwen4 Max e Artificial Analysis v5.0.1
+
+**Qwen selection and wire contract.** Controller-generated `scripts/config.sh`
+tiers select final `qwen4-max` for the Qwen default/premium and maximum tiers;
+Flash retains standard/economy. `QWEN3_*` identifiers remain stable. Fresh Qwen4
+API setup uses QwenCloud Token Plan's OpenAI-compatible endpoint. An explicit
+Qwen3.8 Max/Flash pin without a custom URL retains its legacy implicit endpoint
+and wire, and custom endpoints/credentials are never repointed. Qwen4 refuses
+the obsolete text-generation wire before dispatch. The independent before/after
+probe confirms the former request reached the fake HTTP boundary and the fixed
+path refuses it. The budget includes thinking and visible answer tokens.
+
+**Migration and ownership.** `configure.sh` upgrades a Qwen3.8 Max value only
+when marked `# ai-consultants:default`. Explicit, unmarked and other-provenance
+active model choices and explicit efforts are preserved. Maximum requests
+xhigh only on the compatible API; Qwen CLI effort stays user-owned in its
+provider settings. No key is silently moved to a different plan.
+
+**Evidence.** The complete 742-row AA v5.0.1 snapshot contains one Qwen4
+default result, 42.9, at an undisclosed effort. High/xhigh scores remain null,
+with no reviewer or router promotion. Official Singapore token prices are
+USD 1.50/4.50 per million, while local Qwen session totals retain explicit
+unpriced/credit disclosure. The direct final-model API ping and a separate
+Bottega Claude/Anthropic context check passed. Native Qwen Code 0.27.1 with an isolated high configuration passed the
+structured code/count check in 13.2 seconds; its identity remains requested-only.
+Two test-wrapper setup failures preceded the separately approved successful
+invocation. Script/SDK retries and model fallbacks were disabled.
+
+**Release proof.** Full local and PR CI gates pass 37/37. Endpoint ownership,
+legacy-wire rejection and configuration migration have focused regressions.
+The new configure fixture initially treated an `auto` marker as a model default;
+that expectation was corrected, and its 237 checks passed before the clean
+full rerun. API transport has 171 checks. Native checks are reachability and
+parsing evidence, not coding or effort-specific benchmark qualification.
+
+**Maintainer prose repair.** Move the existing v5.9.0 entry out of the quoted
+release-process step and into this actual changelog; preserve its contents.
+
+### v5.9.0 — Fable, Hydrogen and explicit Carbon CLI
+
+**Preset and migration boundary.** `scripts/config.sh` and controller-generated tier data choose Fable 5.2/high for premium and max for maximum; Google tiers use Hydrogen medium/high/xhigh. `scripts/configure.sh` migrates only marked managed current defaults. Unmarked current selections and model/effort pins remain user-owned. Fable 5.1, Argon and Flash remain explicit choices.
+
+**Same-ID effort bug.** Google API tiers share `gemini-4-hydrogen`. The model-only economy override previously retained the premium effort; `scripts/lib/routing.sh` now returns the economy effort, `scripts/consult_all.sh` scopes it to the child request and compares effort during escalation, and `scripts/lib/cache.sh` includes it in cache identity. The recorded pre-fix boundary probe failed with xhigh instead of medium then xhigh; the repaired probe and full offline gate exercise serialization, escalation, explicit pins and cache separation.
+
+**Carbon remains explicit.** `scripts/lib/model_contracts.sh` owns family detection. The inventory check in `scripts/lib/common.sh` matches the exact requested CLI ID. Query and synthesis paths reject unavailable Carbon and API substitution; cost-aware routing and escalation keep an explicit Carbon model pinned. Account entitlement is separate from Google's public API release. The November 15 agy 1.5.9 inventory lists Hydrogen but not Carbon.
+
+**Evidence and pricing.** Controller-generated references use the complete 741-row AA v5.0.1 snapshot, with measured-effort scores, current task-cost figures and explicit serving contracts. Official prices remain provider-sourced. The integration does not enable provider long decode or rewrite personal router choices, and no live new-model quality qualification is claimed.
 
 ### v5.8.0 — AA Intelligence Index v5 panel choices
 

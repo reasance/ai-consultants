@@ -231,7 +231,9 @@ On November 16, 2026, the authenticated Token Plan endpoint listed both
 `qwen4-max` and `qwen4-max-preview`. One non-thinking ping to **qwen4-max**
 returned HTTP 200, `PONG` and provider-reported `qwen4-max` in 4.03 seconds,
 with 32 input and 3 output tokens, no retry and no fallback. That verifies API
-access, not coding quality or the Qwen/Claude CLI paths. The preview is a
+access. A separate native Qwen Code 0.27.1 check with the configuration below
+returned the exact code/count through ai-consultants in 13.2 seconds; CLI
+identity remains requested-only. It does not qualify coding quality. The preview is a
 separate deployment and is never substituted.
 
 ### API mode
@@ -300,8 +302,8 @@ array in `~/.qwen/settings.json`, keeping other entries and credentials:
 
 Provide `QWENCLOUD_TOKEN_PLAN_API_KEY` privately through Qwen Code's credential
 configuration or the environment. Set `model.reasoningEffort` to the intended
-level. This is configuration guidance; the API ping above did not test this
-CLI entry. No installer rewrites an existing Qwen provider or credential.
+level. This provider configuration was exercised separately through the native
+CLI; the original API ping alone did not test it. No installer rewrites an existing Qwen provider or credential.
 
 [Final model and limits](https://docs.qwencloud.com/developer-guides/getting-started/latest-model)
 · [Official pricing](https://docs.qwencloud.com/developer-guides/getting-started/pricing)

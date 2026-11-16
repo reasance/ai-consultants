@@ -1,8 +1,8 @@
-# AI Consultants v5.9.0
+# AI Consultants v5.10.0
 
 > **Coverage, not a single guess.** A panel of up to 11 frontier models from different vendors fans out on your question in parallel and hands you the *union* of what they collectively see — the risks, edge cases, and approaches a single model misses.
 
-[![Version](https://img.shields.io/badge/version-5.9.0-blue.svg)](https://github.com/reasance/ai-consultants)
+[![Version](https://img.shields.io/badge/version-5.10.0-blue.svg)](https://github.com/reasance/ai-consultants)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code Skill](https://img.shields.io/badge/Claude%20Code-Skill-orange.svg)](https://docs.anthropic.com/en/docs/claude-code/skills)
 [![GitHub stars](https://img.shields.io/github/stars/reasance/ai-consultants?style=social)](https://github.com/reasance/ai-consultants)
@@ -593,8 +593,9 @@ Qwen4 Max serves the default, premium and maximum tiers; Flash keeps standard
 and economy. Qwen4 API mode uses a matching QwenCloud OpenAI-compatible
 endpoint and key, never the legacy text-only DashScope wire. `max_quality`
 requests `xhigh` only on the OpenAI-compatible wire; CLI effort remains a
-user-owned Qwen Code setting. The authenticated API ping passed on November
-16; CLI and Anthropic compatibility have not been live-qualified. Existing
+user-owned Qwen Code setting. The authenticated API ping and the separate native Qwen Code context check
+passed on November 16; CLI identity remains requested-only. The optional
+Bottega Claude/Anthropic path was checked separately. Existing
 Qwen3.8 Max pins remain supported. See [the Qwen recipe](docs/RECIPES.md#qwen-via-qwen-cloud-token-plan).
 
 ### Usage

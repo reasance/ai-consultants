@@ -7,11 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For longer-form release notes (rationale, upgrade guides, performance numbers), see `docs/releases/v<VERSION>.md`.
 
-## [Unreleased]
+## [5.10.0] - 2026-11-16
 
 ### Changed
 
-- Qwen4 Max becomes the Qwen default/premium and maximum target; Flash stays standard/economy. Fresh API configuration uses QwenCloud Token Plan OpenAI compatibility, and the incompatible legacy text-generation wire fails before dispatch. Generated current defaults migrate while explicit model pins and efforts remain user-owned. Updated all-model AA v5.0.1 snapshot and model contracts; the final API access ping is verified, CLI paths are not live-qualified.
+- Use final Qwen4 Max for the Qwen default/premium and maximum tiers; keep Flash standard/economy and preserve `QWEN3_*` names.
+- Use the compatible QwenCloud Token Plan API for fresh Qwen4 setups. Preserve explicit model/effort pins, old-model implicit endpoints, custom URLs and credentials.
+- Refresh the complete 742-row AA v5.0.1 snapshot and provider contracts. Keep Qwen4's unnamed 42.9 result separate from high/xhigh and retain explicit Token Plan cost disclosure.
+
+### Verified
+
+- Exercise final Qwen4 through native Qwen Code at configured high: structured context extraction passes, with requested-only identity and no automatic retry or model fallback.
+
+### Fixed
+
+- Reject Qwen4 on the incompatible DashScope text-generation wire before sending a request, with instructions to configure the matching endpoint, format and key.
+- Upgrade only marked generated Qwen3.8 defaults; preserve intentional current selections and their effort.
 
 ## [5.9.0] - 2026-11-15
 
