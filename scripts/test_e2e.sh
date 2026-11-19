@@ -436,9 +436,12 @@ test_host_proceed_stops_a_consultant_that_never_answers() {
     make_never_answering_stub "$slow" "$pid_log"
     start_host_controlled_panel "$home" ENABLE_GEMINI=true ENABLE_CODEX=true ENABLE_MISTRAL=true \
         GEMINI_CMD="$STUB_CLI" CODEX_CMD="$STUB_CLI" MISTRAL_CMD="$slow" ENABLE_SYNTHESIS=false
-    if ! wait_until 60 pid_log_has_entry "$pid_log" || ! wait_until 60 log_mentions "Still waiting after"; then
+    if ! wait_until 60 pid_log_has_entry "$pid_log" ||
+       ! wait_until 60 log_mentions "Still waiting after" ||
+       ! wait_until 60 log_mentions "Codex: OK" ||
+       ! wait_until 60 log_mentions "Gemini: OK"; then
         stop_background_run
-        assert_eq ready timeout "the slow consultant started and the run reported it was waiting"
+        assert_eq ready timeout "both answers were collected while the slow consultant remained pending"
         return
     fi
     assert_contains "Mistral" "$(grep 'Still waiting after' "$HC_ERR" | tail -n 1)" "the heartbeat names the consultant still running"
