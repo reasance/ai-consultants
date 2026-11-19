@@ -59,17 +59,18 @@ grok_oauth_release_lock() {
 }
 
 grok_oauth_acquire_lock() {
-    local owner_pid=""
+    local owner_pid="" owner_file
     [[ -d "$GROK_OAUTH_SOURCE_HOME" && ! -L "$GROK_OAUTH_SOURCE_HOME" ]] || return 1
     GROK_OAUTH_LOCK_PATH="$GROK_OAUTH_SOURCE_HOME/.ai-consultants-oauth.lock.d"
     [[ ! -L "$GROK_OAUTH_LOCK_PATH" ]] || return 1
+    owner_file="$GROK_OAUTH_LOCK_PATH/owner"
 
     if ! mkdir "$GROK_OAUTH_LOCK_PATH" 2>/dev/null; then
-        if [[ -f "$GROK_OAUTH_LOCK_PATH/owner" && ! -L "$GROK_OAUTH_LOCK_PATH/owner" ]]; then
-            owner_pid=$(<"$GROK_OAUTH_LOCK_PATH/owner")
+        if [[ -f "$owner_file" && ! -L "$owner_file" ]]; then
+            owner_pid=$(<"$owner_file")
         fi
         if [[ "$owner_pid" =~ ^[1-9][0-9]*$ ]] && ! kill -0 "$owner_pid" 2>/dev/null; then
-            rm -f -- "$GROK_OAUTH_LOCK_PATH/owner"
+            rm -f -- "$owner_file"
             rmdir "$GROK_OAUTH_LOCK_PATH" >/dev/null 2>&1 || return 2
             mkdir "$GROK_OAUTH_LOCK_PATH" 2>/dev/null || return 2
         else
@@ -77,10 +78,20 @@ grok_oauth_acquire_lock() {
         fi
     fi
 
-    if ! printf '%s\n' "$$" > "$GROK_OAUTH_LOCK_PATH/owner" ||
-       ! chmod 700 "$GROK_OAUTH_LOCK_PATH" ||
-       ! chmod 600 "$GROK_OAUTH_LOCK_PATH/owner"; then
-        rm -f -- "$GROK_OAUTH_LOCK_PATH/owner"
+    # Some mkdir implementations report success to both concurrent callers.
+    # Claim the owner file exclusively before entering the critical section.
+    if [[ -e "$owner_file" || -L "$owner_file" ]]; then
+        return 2
+    fi
+    if ! (umask 077; set -o noclobber; printf '%s\n' "$$" > "$owner_file") 2>/dev/null; then
+        if [[ -e "$owner_file" || -L "$owner_file" || ! -d "$GROK_OAUTH_LOCK_PATH" ]]; then
+            return 2
+        fi
+        rmdir "$GROK_OAUTH_LOCK_PATH" >/dev/null 2>&1 || true
+        return 1
+    fi
+    if ! chmod 700 "$GROK_OAUTH_LOCK_PATH" || ! chmod 600 "$owner_file"; then
+        rm -f -- "$owner_file"
         rmdir "$GROK_OAUTH_LOCK_PATH" >/dev/null 2>&1 || true
         return 1
     fi
