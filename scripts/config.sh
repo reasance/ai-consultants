@@ -770,7 +770,7 @@ get_effort_for_tier() {
         maximum|max_quality|max-quality)
             case "$1" in
                 claude) echo "max" ;;
-                gemini) if [[ -n "${GEMINI_FRONTIER_CLI_MODEL:-}" ]]; then echo high; else echo "xhigh"; fi ;;
+                gemini) case "${GEMINI_FRONTIER_CLI_MODEL:-}" in gemini-4-carbon-high|gemini-4-neon-high) echo high ;; gemini-4-neon-xhigh) echo xhigh ;; *) echo "xhigh" ;; esac ;;
                 codex) echo "max" ;;
                 *) echo "" ;;
             esac ;;
@@ -845,12 +845,16 @@ apply_model_tier() {
             ;;
     esac
 
-    # Carbon is an explicit CLI-only maximum-tier option, never a fallback.
+    # The explicit frontier override for maximum is an Antigravity ID.
     case "$tier" in
         maximum|max_quality|max-quality)
             if [[ -n "${GEMINI_FRONTIER_CLI_MODEL:-}" ]]; then
-                if [[ "$GEMINI_FRONTIER_CLI_MODEL" != gemini-4-carbon-high || "${GEMINI_USE_API:-false}" == true ]]; then
-                    echo "Carbon maximum requires GEMINI_FRONTIER_CLI_MODEL=gemini-4-carbon-high and GEMINI_USE_API=false" >&2
+                case "$GEMINI_FRONTIER_CLI_MODEL" in
+                    gemini-4-carbon-high|gemini-4-neon-high|gemini-4-neon-xhigh) ;;
+                    *) echo "Unsupported GEMINI_FRONTIER_CLI_MODEL=$GEMINI_FRONTIER_CLI_MODEL" >&2; return 1 ;;
+                esac
+                if [[ "${GEMINI_USE_API:-false}" == true ]]; then
+                    echo "GEMINI_FRONTIER_CLI_MODEL requires GEMINI_USE_API=false" >&2
                     return 1
                 fi
             fi ;;

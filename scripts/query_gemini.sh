@@ -114,9 +114,7 @@ else
     # AGY_RUN_PREFIX adds agy_exit_guard.sh: agy can print its answer and
     # then never exit.
     #
-    # Optional CLI effort: when GEMINI_REASONING_EFFORT is set, pass --effort.
-    # agy accepts only a subset (e.g. low|medium|high); unsupported values fail
-    # at the provider and surface as diagnosed errors — no local allowlist.
+    # Validate known model-specific effort constraints before passing --effort.
     GEMINI_ARGS=("${AGY_RUN_PREFIX[@]}" "$GEMINI_CMD" -p "$FULL_QUERY" --model "$GEMINI_MODEL")
     effort_ok=true
     if [[ -n "${GEMINI_REASONING_EFFORT:-}" ]]; then
@@ -126,6 +124,10 @@ else
             exit_code=1
         else
             case "$GEMINI_MODEL:$cli_effort" in
+                gemini-4-neon-low:low|gemini-4-neon-medium:medium|gemini-4-neon-high:high|gemini-4-neon-xhigh:xhigh) ;;
+                gemini-4-neon*:*)
+                    log_error "[$CONSULTANT_NAME] Neon CLI model ID must match the selected effort: $GEMINI_MODEL / $cli_effort"
+                    effort_ok=false; exit_code=1 ;;
                 gemini-4-hydrogen-*:low|gemini-4-hydrogen-*:medium|gemini-4-hydrogen-*:high|gemini-4-hydrogen-*:xhigh|gemini-4-carbon-*:low|gemini-4-carbon-*:medium|gemini-4-carbon-*:high) ;;
                 gemini-4-hydrogen-*:*|gemini-4-carbon-*:*)
                     log_error "[$CONSULTANT_NAME] unsupported effort for $GEMINI_MODEL: $cli_effort"

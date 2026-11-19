@@ -1098,8 +1098,8 @@ if is_escalation_enabled && [[ $SUCCESS_COUNT -gt 0 ]]; then
             # the configured variable still names the premium model here.
             current_model=$(jq -r '.metadata.requested_model // .model // empty' "$response_file" 2>/dev/null || true)
             [[ -n "$current_model" ]] || current_model="${!model_var:-}"
-            if [[ "$consultant_lower" == gemini ]] && is_carbon_model "$current_model"; then
-                log_debug "Carbon remains pinned; no automatic model substitution"
+            if [[ "$consultant_lower" == gemini ]] && is_pinned_gemini_model "$current_model"; then
+                log_debug "Keeping the explicit Gemini model $current_model"
                 continue
             fi
             economic_effort=$(get_cost_aware_effort "$consultant_lower" "${QUERY_COMPLEXITY:-5}" 2>/dev/null || true)

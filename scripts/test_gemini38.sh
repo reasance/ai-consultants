@@ -58,3 +58,15 @@ GEMINI_USE_API=false GEMINI_FRONTIER_CLI_MODEL=gemini-4-carbon-high bash -c '
 if GEMINI_USE_API=true GEMINI_FRONTIER_CLI_MODEL=gemini-4-carbon-high bash -c '
     source "$1/lib/common.sh"; apply_model_tier maximum
 ' _ "$SCRIPT_DIR" 2>/dev/null; then exit 1; fi
+
+for level in high xhigh; do
+    GEMINI_USE_API=false GEMINI_FRONTIER_CLI_MODEL="gemini-4-neon-$level" bash -c '
+        source "$1/lib/common.sh"
+        source "$1/lib/routing.sh"
+        apply_model_tier maximum
+        [[ "$GEMINI_MODEL" == "gemini-4-neon-$2" ]]
+        [[ $(get_effort_for_tier gemini maximum) == "$2" ]]
+        ENABLE_COST_AWARE_ROUTING=true
+        [[ -z $(get_cost_aware_model gemini 1) ]]
+    ' _ "$SCRIPT_DIR" "$level"
+done

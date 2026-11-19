@@ -405,13 +405,14 @@ if ! [[ "$SYNTHESIS_TIMEOUT" =~ ^[0-9]+$ && "$SYNTHESIS_TOTAL_TIMEOUT" =~ ^[0-9]
     log_error "SYNTHESIS_TIMEOUT and SYNTHESIS_TOTAL_TIMEOUT must be non-negative integers (0 = no limit)"
     exit 1
 fi
-# An explicitly selected Carbon synthesis never falls through to another model.
-if [[ "$SELECTED_SYNTH_CLI" != gemini ]] && { is_carbon_model "${SYNTHESIS_MODEL:-}" || { [[ "${SYNTHESIS_CMD:-}" == gemini ]] && is_carbon_model "$(synthesis_model_for_cli gemini)"; }; }; then
-    log_error "Carbon synthesis requires an eligible Gemini CLI; no substitute is selected"
+# Explicit Carbon and Neon synthesis requires exact CLI access.
+gemini_synth_model=$(synthesis_model_for_cli gemini)
+if [[ "$SELECTED_SYNTH_CLI" != gemini ]] && { is_pinned_gemini_model "${SYNTHESIS_MODEL:-}" || { [[ "${SYNTHESIS_CMD:-}" == gemini ]] && is_pinned_gemini_model "$gemini_synth_model"; }; }; then
+    log_error "The selected Gemini synthesis model requires an eligible Gemini CLI"
     exit 1
 fi
-if [[ "$SELECTED_SYNTH_CLI" == gemini ]] && is_carbon_model "$(synthesis_model_for_cli gemini)"; then
-    if ! gemini_cli_exposes_requested_model "$(synthesis_model_for_cli gemini)"; then
+if [[ "$SELECTED_SYNTH_CLI" == gemini ]] && is_pinned_gemini_model "$gemini_synth_model"; then
+    if ! gemini_cli_exposes_requested_model "$gemini_synth_model"; then
         log_error "$GEMINI_PROBE_REASON"
         exit 1
     fi

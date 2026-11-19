@@ -125,6 +125,7 @@ _builtin_rate() {
         gemini-3.8-flash|gemini-3.8-flash-low|gemini-3.8-flash-medium|gemini-3.8-flash-high|"gemini 3.8 flash (low)"|"gemini 3.8 flash (medium)"|"gemini 3.8 flash (high)") pair="0.00075 0.00375" ;;
         gemini-4-carbon|gemini-4-carbon-low|gemini-4-carbon-medium|gemini-4-carbon-high|"gemini 4 carbon (low)"|"gemini 4 carbon (medium)"|"gemini 4 carbon (high)") pair="0.004 0.02" ;;
         gemini-4-hydrogen|gemini-4-hydrogen-low|gemini-4-hydrogen-medium|gemini-4-hydrogen-high|gemini-4-hydrogen-xhigh|"gemini 4 hydrogen (low)"|"gemini 4 hydrogen (medium)"|"gemini 4 hydrogen (high)"|"gemini 4 hydrogen (xhigh)") pair="0.0015 0.0075" ;;
+        gemini-4-neon|gemini-4-neon-low|gemini-4-neon-medium|gemini-4-neon-high|gemini-4-neon-xhigh|"gemini 4 neon (low)"|"gemini 4 neon (medium)"|"gemini 4 neon (high)"|"gemini 4 neon (xhigh)") pair="0.003 0.015" ;;
         gpt-6-astra) pair="0.01 0.05" ;;
         gpt-6.1-sol) pair="0.002 0.01" ;;
         gpt-6.1-terra) pair="0.001 0.005" ;;
