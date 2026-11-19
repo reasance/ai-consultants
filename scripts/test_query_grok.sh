@@ -704,6 +704,30 @@ test_dead_runner_lock_is_recovered() {
         "dead runner lock is removed after recovery"
 }
 
+test_reported_mkdir_success_does_not_replace_a_live_owner() {
+    local source_home="$TMP_ROOT/contended-lock-home" fake_bin="$TMP_ROOT/contended-lock-bin"
+    local lock_dir="$source_home/.ai-consultants-oauth.lock.d" rc=0
+    mkdir -p "$lock_dir" "$fake_bin"
+    printf '%s\n' "$$" > "$lock_dir/owner"
+    cat > "$fake_bin/mkdir" <<'EOF'
+#!/bin/bash
+if [[ $# -eq 1 && "$1" == "$GROK_TEST_LOCK_PATH" ]]; then
+    exit 0
+fi
+exec "$GROK_TEST_REAL_MKDIR" "$@"
+EOF
+    chmod +x "$fake_bin/mkdir"
+
+    GROK_TEST_LOCK_PATH="$lock_dir" GROK_TEST_REAL_MKDIR="$(command -v mkdir)" \
+        PATH="$fake_bin:$PATH" bash -c '
+            source "$1"
+            GROK_OAUTH_SOURCE_HOME="$2"
+            grok_oauth_acquire_lock
+        ' _ "$SCRIPT_DIR/lib/grok_oauth.sh" "$source_home" || rc=$?
+    assert_eq 2 "$rc" "the competing lock acquisition reports that OAuth state is busy"
+    assert_eq "$$" "$(cat "$lock_dir/owner")" "the live OAuth lock owner is preserved"
+}
+
 test_shared_configuration_is_reconciled_atomically() {
     local fake_grok="$TMP_ROOT/grok-config-reconcile"
     local source_home="$TMP_ROOT/config-reconcile-home" output="$TMP_ROOT/config-reconcile.json"
@@ -1004,6 +1028,7 @@ run_test "Test 13: shared OAuth rotation is published and reused" test_shared_oa
 run_test "Test 14: external login wins the shared OAuth CAS" test_external_login_wins_shared_oauth_cas
 run_test "Test 15: corrupt refresh never replaces ambient OAuth" test_corrupt_refresh_never_replaces_ambient_oauth
 run_test "Test 16: dead runner lock is recovered" test_dead_runner_lock_is_recovered
+run_test "A misleading mkdir status cannot replace a live lock owner" test_reported_mkdir_success_does_not_replace_a_live_owner
 run_test "Test 17: shared configuration is reconciled atomically" test_shared_configuration_is_reconciled_atomically
 run_test "Test 18: legacy runner config supersedes generation" test_legacy_runner_config_supersedes_generation
 run_test "Test 19: tokens never leave credential files" test_tokens_never_leave_credential_files
