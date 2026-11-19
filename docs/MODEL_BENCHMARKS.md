@@ -1,6 +1,6 @@
 # Model reference: Artificial Analysis Intelligence Index v5.0.1
 
-Generated from controller-models; snapshot 2026-11-16. Each score belongs to its measured effort and benchmark revision.
+Generated from controller-models; snapshot 2026-11-19. Each score belongs to its measured effort and benchmark revision.
 
 | Model | Measured effort | Index v5.0.1 | AA USD/task | Serving evidence |
 |---|---|---:|---:|---|
@@ -9,6 +9,10 @@ Generated from controller-models; snapshot 2026-11-16. Each score belongs to its
 | Claude Fable 5.2 | high | 61.8 | $9.08 | API / Claude Code >=2.1.321 |
 | Claude Fable 5.2 | medium | 56.4 | $3.80 | API / Claude Code >=2.1.321 |
 | Claude Fable 5.2 | low | 53.9 | $3.10 | API / Claude Code >=2.1.321 |
+| Gemini 4 Neon | xhigh | 61.4 | $6.44 | available |
+| Gemini 4 Neon | high | 59.6 | $3.74 | available |
+| Gemini 4 Neon | medium | 54.9 | $1.90 | available |
+| Gemini 4 Neon | low | 44.1 | $0.75 | available |
 | Gemini 4 Carbon | high | 60 | $5.48 | agy documented; Ultra/Enterprise; inventory required |
 | Gemini 4 Carbon | medium | 58.3 | $4.68 | agy documented; Ultra/Enterprise; inventory required |
 | Gemini 4 Carbon | low | 54.2 | $5.22 | agy documented; Ultra/Enterprise; inventory required |

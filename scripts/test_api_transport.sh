@@ -293,6 +293,21 @@ EOF
         "$SCRIPT_DIR/query_gemini.sh" "unsupported hydrogen effort" "" "$output_file" >/dev/null 2>&1 || true
     assert_eq absent "$([[ -e "$body_file" ]] && echo called || echo absent)" "unsupported Hydrogen effort is rejected before an HTTP call"
 
+    PATH="$td:$PATH" GEMINI_USE_API=true GEMINI_API_KEY=test-key \
+        GEMINI_API_MODEL=gemini-4-neon GEMINI_REASONING_EFFORT=xhigh GEMINI_API_MAX_TOKENS=65536 \
+        REQUEST_BODY_FILE="$body_file" MAX_RETRIES=1 \
+        "$SCRIPT_DIR/query_gemini.sh" "neon xhigh" "" "$output_file" >/dev/null 2>&1 || true
+    assert_eq 'xhigh|65536' "$(jq -r '.generationConfig | [.thinkingConfig.thinkingLevel, .maxOutputTokens] | join("|")' "$body_file")" \
+        "Neon sends xhigh and its synchronous output limit on the native API"
+    for setting in GEMINI_REASONING_EFFORT=max GEMINI_API_MAX_TOKENS=65537; do
+        rm -f "$body_file"; rc=0
+        env PATH="$td:$PATH" GEMINI_USE_API=true GEMINI_API_KEY=test-key \
+            GEMINI_API_MODEL=gemini-4-neon "$setting" REQUEST_BODY_FILE="$body_file" MAX_RETRIES=1 \
+            "$SCRIPT_DIR/query_gemini.sh" "neon invalid" "" "$output_file" >/dev/null 2>&1 || rc=$?
+        assert_ne 0 "$rc" "Neon rejects $setting"
+        assert_eq absent "$([[ -e "$body_file" ]] && echo called || echo absent)" "invalid Neon option never dispatches"
+    done
+
     # No wall-clock limit unless one is configured: curl gets -m only then.
     local args_file="$td/curl.args"
     printf '%s\n' '#!/bin/bash' 'printf "%s\n" "$@" > "$CURL_ARGS_FILE"' "exec \"$fake_curl\" \"\$@\"" > "$td/curl_args_wrapper"

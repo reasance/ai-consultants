@@ -1,6 +1,6 @@
 {
   "version": "5.10.0",
-  "updated": "2026-11-16",
+  "updated": "2026-11-19",
   "models": {
     "_comment_units": "All rates are USD per 1,000 tokens (per-1K). lib/costs.sh computes cost as (token_count / 1000) * rate, so every value here MUST be a per-1K rate = (provider $/1M price) / 1000. Do NOT paste $/MTok figures directly.",
     "_comment_scope": "Current models only (5.5.0). Superseded models are listed in retired_models with their replacement; configure migrates them and the runtime warns. A model absent from this table is reported as unpriced, never priced at a guessed rate. Rates are official list prices, Verified 2026-10-24.",
@@ -189,6 +189,52 @@
       "input": 0.0015,
       "output": 0.0075,
       "notes": "API-equivalent estimate for Gemini 4 Hydrogen (XHigh) (gemini-4-hydrogen); not a CLI invoice."
+    },
+    "gemini-4-neon": {
+      "input": 0.003,
+      "output": 0.015,
+      "provider": "Google",
+      "notes": "Standard API list rate ($3/$15 per 1M). Paid Standard API rates per 1M tokens, including thinking in output. Implicit cached input $0.15. Subscription usage is billed separately. Verified 2026-11-19 (https://aistudio.google.com/docs/pricing#gemini-4-neon)."
+    },
+    "gemini-4-neon-low": {
+      "input": 0.003,
+      "output": 0.015,
+      "notes": "API-equivalent estimate for gemini-4-neon-low (gemini-4-neon); not a CLI invoice."
+    },
+    "gemini-4-neon-medium": {
+      "input": 0.003,
+      "output": 0.015,
+      "notes": "API-equivalent estimate for gemini-4-neon-medium (gemini-4-neon); not a CLI invoice."
+    },
+    "gemini-4-neon-high": {
+      "input": 0.003,
+      "output": 0.015,
+      "notes": "API-equivalent estimate for gemini-4-neon-high (gemini-4-neon); not a CLI invoice."
+    },
+    "gemini-4-neon-xhigh": {
+      "input": 0.003,
+      "output": 0.015,
+      "notes": "API-equivalent estimate for gemini-4-neon-xhigh (gemini-4-neon); not a CLI invoice."
+    },
+    "Gemini 4 Neon (Low)": {
+      "input": 0.003,
+      "output": 0.015,
+      "notes": "API-equivalent estimate for Gemini 4 Neon (Low) (gemini-4-neon); not a CLI invoice."
+    },
+    "Gemini 4 Neon (Medium)": {
+      "input": 0.003,
+      "output": 0.015,
+      "notes": "API-equivalent estimate for Gemini 4 Neon (Medium) (gemini-4-neon); not a CLI invoice."
+    },
+    "Gemini 4 Neon (High)": {
+      "input": 0.003,
+      "output": 0.015,
+      "notes": "API-equivalent estimate for Gemini 4 Neon (High) (gemini-4-neon); not a CLI invoice."
+    },
+    "Gemini 4 Neon (XHigh)": {
+      "input": 0.003,
+      "output": 0.015,
+      "notes": "API-equivalent estimate for Gemini 4 Neon (XHigh) (gemini-4-neon); not a CLI invoice."
     },
     "gpt-6-astra": {
       "input": 0.01,
@@ -526,6 +572,10 @@
       "gpt-6.1-terra"
     ],
     "gemini_cli": [
+      "gemini-4-neon-high",
+      "gemini-4-neon-xhigh",
+      "gemini-4-neon-medium",
+      "gemini-4-neon-low",
       "gemini-4-hydrogen-low",
       "gemini-4-carbon-high",
       "gemini-4-argon-high",

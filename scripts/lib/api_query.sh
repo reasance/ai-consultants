@@ -97,16 +97,16 @@ run_api_mode_query() {
             # before spending a request when Google receives an unsupported level.
             local google_thinking_level=""
             case "$model" in
-                gemini-3.8-flash|gemini-4-argon|gemini-4-hydrogen)
+                gemini-3.8-flash|gemini-4-argon|gemini-4-hydrogen|gemini-4-neon)
                     if [[ -n "$effort" ]]; then
                         case "$effort" in
                             low|medium|high) google_thinking_level="$effort" ;;
                             xhigh)
-                                if [[ "$model" == gemini-4-hydrogen ]]; then google_thinking_level=xhigh;
-                                else log_error "[$consultant_name] xhigh is only supported by Hydrogen"; return 1; fi
+                                if [[ "$model" == gemini-4-hydrogen || "$model" == gemini-4-neon ]]; then google_thinking_level=xhigh;
+                                else log_error "[$consultant_name] xhigh is only supported by Hydrogen and Neon"; return 1; fi
                                 ;;
                             *)
-                                log_error "[$consultant_name] $effort_var=$effort is unsupported for $model on the 'google_ai' wire format (expected low|medium|high; Hydrogen also supports xhigh)"
+                                log_error "[$consultant_name] $effort_var=$effort is unsupported for $model on the 'google_ai' wire format (expected low|medium|high; Hydrogen and Neon also support xhigh)"
                                 return 1
                                 ;;
                         esac
@@ -118,7 +118,7 @@ run_api_mode_query() {
                     ;;
                 *)
                     if [[ -n "$effort" ]]; then
-                        log_warn "[$consultant_name] $effort_var is only transported to Gemini 3.8 Flash, 4 Argon and 4 Hydrogen on the 'google_ai' wire format and is ignored for $model."
+                        log_warn "[$consultant_name] $effort_var is only transported to Gemini 3.8 Flash, 4 Argon, 4 Hydrogen and 4 Neon on the 'google_ai' wire format and is ignored for $model."
                     fi
                     ;;
             esac
@@ -128,6 +128,10 @@ run_api_mode_query() {
             api_max_tokens="${!max_tokens_var:-32768}"
             if ! [[ "$api_max_tokens" =~ ^[1-9][0-9]*$ ]]; then
                 log_error "[$consultant_name] $max_tokens_var must be a positive integer (got: $api_max_tokens)"
+                return 1
+            fi
+            if [[ "$model" == gemini-4-neon ]] && (( ${#api_max_tokens} > 5 || api_max_tokens > 65536 )); then
+                log_error "[$consultant_name] $max_tokens_var exceeds Neon's synchronous API limit of 65536"
                 return 1
             fi
             request_body=$(build_google_ai_request "$query" "$google_thinking_level" "$api_max_tokens")

@@ -311,10 +311,13 @@ get_cost_aware_model() {
         return
     fi
 
-    # Carbon is an explicit frontier selection, never an automatic economy candidate.
-    if [[ "$consultant" == gemini ]] && is_carbon_model "${GEMINI_MODEL:-}"; then
-        echo ""
-        return
+    if [[ "$consultant" == gemini ]]; then
+        local model_var
+        model_var=$(model_env_var_for gemini)
+        if is_carbon_model "${GEMINI_MODEL:-}" || is_neon_model "${!model_var:-}"; then
+            echo ""
+            return
+        fi
     fi
 
     local simple_threshold="${COMPLEXITY_THRESHOLD_SIMPLE:-3}"

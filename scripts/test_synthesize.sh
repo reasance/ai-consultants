@@ -778,25 +778,28 @@ test_synthesis_artifacts_conform_to_schema() {
         "a missing coverage list is not a structural failure for compare_only"
 }
 
-test_carbon_synthesis_requires_exact_access_without_provider_substitution() {
+test_pinned_gemini_synthesis_requires_exact_access() {
     local responses="$TMP_ROOT/carbon-responses" output="$TMP_ROOT/carbon-synthesis.json"
-    local fake="$TMP_ROOT/carbon-agy" sentinel="$TMP_ROOT/carbon-dispatched" rc=0 errors="$TMP_ROOT/carbon-errors"
+    local fake="$TMP_ROOT/carbon-agy" sentinel="$TMP_ROOT/carbon-dispatched" model rc errors="$TMP_ROOT/carbon-errors"
     mkdir -p "$responses"
     printf '%s\n' '{"consultant":"Claude","model":"claude-fable-5-2","response":{"summary":"Synthetic finding","detailed":"detail","approach":"test","pros":[],"cons":[],"caveats":[]},"confidence":{"score":8,"reasoning":"fixture","uncertainty_factors":[]}}' > "$responses/claude.json"
     cat > "$fake" <<'EOF'
 #!/bin/bash
-if [[ "${1:-}" == models ]]; then printf '%s\n' gemini-4-carbon-high-extra; exit 0; fi
-: > "$CARBON_DISPATCH_SENTINEL"
+if [[ "${1:-}" == models ]]; then printf '%s\n' "${GEMINI_MODEL}-extra"; exit 0; fi
+: > "$GEMINI_DISPATCH_SENTINEL"
 exit 1
 EOF
     chmod +x "$fake"
-    GEMINI_CMD="$fake" GEMINI_MODEL=gemini-4-carbon-high GEMINI_USE_API=false \
-      SYNTHESIS_MODEL=gemini-4-carbon-high SYNTHESIS_CMD=gemini INVOKING_AGENT=unknown \
-      CARBON_DISPATCH_SENTINEL="$sentinel" LOG_LEVEL=INFO \
-      "$SCRIPT_DIR/synthesize.sh" "$responses" "$output" test >/dev/null 2>"$errors" || rc=$?
-    assert_eq 1 "$rc" "Carbon synthesis refuses an inventory prefix instead of substituting another provider"
-    assert_eq absent "$([[ -e "$sentinel" ]] && echo called || echo absent)" "unavailable Carbon synthesis never dispatches"
-    assert_contains "does not include gemini-4-carbon-high" "$(cat "$errors")" "the rejection comes from the exact Carbon access guard"
+    for model in gemini-4-carbon-high gemini-4-neon-xhigh; do
+        rc=0
+        GEMINI_CMD="$fake" GEMINI_MODEL="$model" GEMINI_USE_API=false \
+          SYNTHESIS_MODEL="$model" SYNTHESIS_CMD=gemini INVOKING_AGENT=unknown \
+          GEMINI_DISPATCH_SENTINEL="$sentinel" LOG_LEVEL=INFO \
+          "$SCRIPT_DIR/synthesize.sh" "$responses" "$output" test >/dev/null 2>"$errors" || rc=$?
+        assert_eq 1 "$rc" "$model synthesis refuses an inventory prefix instead of substituting another provider"
+        assert_eq absent "$([[ -e "$sentinel" ]] && echo called || echo absent)" "unavailable $model synthesis never dispatches"
+        assert_contains "does not include $model" "$(cat "$errors")" "the rejection comes from the exact $model access guard"
+    done
 }
 
 run_test "Synthesis filters errors and preserves usable detail" test_synthesis_excludes_errors_and_keeps_fallback_detail
@@ -816,5 +819,5 @@ run_test "Synthesis with no ready CLI uses local fallback" test_synthesis_with_n
 run_test "Claude invoker never uses Claude for synthesis" test_claude_invoker_never_uses_claude_for_synthesis
 run_test "Codex invoker never uses Codex for synthesis" test_codex_invoker_never_uses_codex_for_synthesis
 run_test "Gemini invoker never uses Gemini for synthesis" test_gemini_invoker_never_uses_gemini_for_synthesis
-run_test "Carbon synthesis is pinned and gated before dispatch" test_carbon_synthesis_requires_exact_access_without_provider_substitution
+run_test "Pinned Gemini synthesis is gated before dispatch" test_pinned_gemini_synthesis_requires_exact_access
 test_summary "synthesize"

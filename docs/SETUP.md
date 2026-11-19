@@ -1012,6 +1012,16 @@ pinned active choices, including Flash and Argon, stay user-owned. Historical
 retired scaffolds migrate; pinned retired models keep their same-line successor.
 Sources and benchmark figures: [model reference](MODEL_BENCHMARKS.md).
 
+### Gemini 4 Neon
+
+Use `GEMINI_MODEL=gemini-4-neon-high` with `GEMINI_USE_API=false` to select
+Neon in Antigravity. For deeper work, use `gemini-4-neon-xhigh`. The exact ID
+must be available in `agy models`, and any explicit effort must match the ID.
+For `max_quality`, set `GEMINI_FRONTIER_CLI_MODEL` to either of those two IDs.
+On the paid Gemini API, set `GEMINI_USE_API=true`,
+`GEMINI_API_MODEL=gemini-4-neon`, and `GEMINI_REASONING_EFFORT=high` or `xhigh`.
+The synchronous API accepts at most 65,536 output tokens, including thinking.
+
 ### Gemini 3.8 Flash
 
 The installed `agy models` inventory on 2026-09-27 listed Gemini 3.8 Flash
