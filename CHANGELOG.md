@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For longer-form release notes (rationale, upgrade guides, performance numbers), see `docs/releases/v<VERSION>.md`.
 
+## [5.11.0] - 2026-11-25
+
+### Added
+
+- Select Gemini 4 Neon explicitly for Antigravity at high or xhigh, or through the Gemini API with the matching reasoning effort.
+
+### Changed
+
+- Refresh the model reference to Artificial Analysis Intelligence Index v5.0.2, with measured scores and benchmark costs for each effort.
+
+### Fixed
+
+- Claim the Grok OAuth lock owner atomically during concurrent startup.
+
 ## [5.10.0] - 2026-11-16
 
 ### Changed

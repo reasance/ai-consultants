@@ -6,7 +6,7 @@ AI Consultants is a multi-model coverage system that queries up to 11 AI consult
 
 **Self-Exclusion**: The invoking agent is automatically excluded from both the panel and synthesis. Claude Code won't query or synthesize with Claude, Codex CLI won't query or synthesize with Codex, etc.
 
-**Version**: 5.10.0
+**Version**: 5.11.0
 
 ## Distribution
 
@@ -789,6 +789,12 @@ curl -fsSL https://raw.githubusercontent.com/reasance/ai-consultants/main/script
 
 ## Changelog
 
+
+### v5.11.0 — explicit Gemini 4 Neon and AA v5.0.2
+
+- `scripts/config.sh` accepts Neon/high and Neon/xhigh as explicit maximum CLI choices. The Gemini query, routing and synthesis paths carry the selected effort to the API and require the exact model ID from the Antigravity account before a CLI dispatch.
+- `docs/MODEL_BENCHMARKS.md` reflects the November 25 AA v5.0.2 snapshot. Neon scores 59.8 at high and 61.5 at xhigh. Benchmark task costs are separate from official per-token rates.
+- `scripts/lib/grok_oauth.sh` claims the lock owner atomically. Regression tests cover concurrent acquisition and wait for quorum before asserting host proceed.
 
 ### v5.10.0 — Qwen4 Max e Artificial Analysis v5.0.1
 
