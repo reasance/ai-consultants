@@ -1,31 +1,31 @@
-# Model reference: Artificial Analysis Intelligence Index v5.0.1
+# Model reference: Artificial Analysis Intelligence Index v5.0.2
 
-Generated from controller-models; snapshot 2026-11-19. Each score belongs to its measured effort and benchmark revision.
+Generated from controller-models; snapshot 2026-11-25. Each score belongs to its measured effort and benchmark revision.
 
-| Model | Measured effort | Index v5.0.1 | AA USD/task | Serving evidence |
+| Model | Measured effort | Index v5.0.2 | AA USD/task | Serving evidence |
 |---|---|---:|---:|---|
-| Claude Fable 5.2 | max | 64.6 | $26.54 | API / Claude Code >=2.1.321 |
+| Claude Fable 5.2 | max | 64.8 | $26.54 | API / Claude Code >=2.1.321 |
 | Claude Fable 5.2 | xhigh | 62.2 | $14.83 | API / Claude Code >=2.1.321 |
-| Claude Fable 5.2 | high | 61.8 | $9.08 | API / Claude Code >=2.1.321 |
-| Claude Fable 5.2 | medium | 56.4 | $3.80 | API / Claude Code >=2.1.321 |
+| Claude Fable 5.2 | high | 61.9 | $9.08 | API / Claude Code >=2.1.321 |
+| Claude Fable 5.2 | medium | 56.3 | $3.80 | API / Claude Code >=2.1.321 |
 | Claude Fable 5.2 | low | 53.9 | $3.10 | API / Claude Code >=2.1.321 |
-| Gemini 4 Neon | xhigh | 61.4 | $6.44 | available |
-| Gemini 4 Neon | high | 59.6 | $3.74 | available |
+| Gemini 4 Neon | xhigh | 61.5 | $6.44 | available |
+| Gemini 4 Neon | high | 59.8 | $3.74 | available |
 | Gemini 4 Neon | medium | 54.9 | $1.90 | available |
 | Gemini 4 Neon | low | 44.1 | $0.75 | available |
-| Gemini 4 Carbon | high | 60 | $5.48 | agy documented; Ultra/Enterprise; inventory required |
-| Gemini 4 Carbon | medium | 58.3 | $4.68 | agy documented; Ultra/Enterprise; inventory required |
-| Gemini 4 Carbon | low | 54.2 | $5.22 | agy documented; Ultra/Enterprise; inventory required |
-| Gemini 4 Hydrogen | xhigh | 53.9 | $3.16 | agy IDs locally observed / API |
-| Gemini 4 Hydrogen | high | 50.8 | $1.87 | agy IDs locally observed / API |
-| Gemini 4 Hydrogen | medium | 41.2 | $0.80 | agy IDs locally observed / API |
+| Gemini 4 Carbon | high | 60.1 | $7.76 | agy documented; Ultra/Enterprise; inventory required |
+| Gemini 4 Carbon | medium | 58.4 | $6.59 | agy documented; Ultra/Enterprise; inventory required |
+| Gemini 4 Carbon | low | 54.2 | $7.19 | agy documented; Ultra/Enterprise; inventory required |
+| Gemini 4 Hydrogen | xhigh | 54.1 | $3.16 | agy IDs locally observed / API |
+| Gemini 4 Hydrogen | high | 51 | $1.87 | agy IDs locally observed / API |
+| Gemini 4 Hydrogen | medium | 41.1 | $0.80 | agy IDs locally observed / API |
 | Gemini 4 Hydrogen | low | 26.9 | $0.29 | agy IDs locally observed / API |
-| Gemini 4 Argon | high | 50.4 | $4.97 | registered transports |
-| Gemini 4 Argon | medium | 47.6 | $4.31 | registered transports |
-| Gemini 3.8 Flash | high | 30.8 | $7.77 | registered transports |
+| Gemini 4 Argon | high | 50.5 | $9.95 | registered transports |
+| Gemini 4 Argon | medium | 47.7 | $8.63 | registered transports |
+| Gemini 3.8 Flash | high | 30.7 | $7.77 | registered transports |
 | Gemini 3.8 Flash | medium | 30.1 | $6.26 | registered transports |
 | Gemini 3.8 Flash | low | 22.5 | unknown | registered transports |
-| Qwen4 Max | default | 42.9 | $3.27 | Token Plan API and Qwen Code CLI checked; CLI identity requested-only |
+| Qwen4 Max | default | 42.8 | $3.27 | Token Plan API and Qwen Code CLI checked; CLI identity requested-only |
 
 ## Integration decision
 
@@ -45,7 +45,7 @@ Carbon standard API input/output prices are $2/$10 per million tokens through No
 
 Qwen4 uses final `qwen4-max`; `qwen4-max-preview` is separate. The final model supports low/high/xhigh thinking (default high), 1,000,000 total context tokens, and up to 262,144 combined thinking and answer tokens (131,072 output without thinking). The maximum thinking-mode input is 983,616 tokens. OpenAI max_tokens and max_completion_tokens both cap thinking plus answer. Do not reuse the preview model's 393,216-token limit or its effort defaults.
 
-The November 16 authenticated QwenCloud Token Plan request returned HTTP 200, PONG and provider-reported qwen4-max in 4.03 seconds, with thinking disabled and no retries or fallback. This establishes account access on that API, not CLI compatibility or coding quality. AA has one default variant at 42.9 and $3.2681/task; its effort is not disclosed, so this score is not an xhigh measurement. Its model-level default score remains below the 44.6 mid floor. A high profile has no effort-matched score or automatic tier.
+The November 16 authenticated QwenCloud Token Plan request returned HTTP 200, PONG and provider-reported qwen4-max in 4.03 seconds, with thinking disabled and no retries or fallback. This establishes account access on that API, not CLI compatibility or coding quality. AA reports one default variant in the table above. Its effort is undisclosed, so named high and xhigh profiles lack an effort-matched score and an automatic tier.
 
 A separate November 16 check through bottega-kit's actual Claude harness and the QwenCloud Anthropic endpoint used final qwen4-max with requested high effort. It returned the exact hidden code and all five paragraphs in 13.5 seconds, with provider-reported qwen4-max. Claude reported 257 output tokens and no thinking tokens for this short extraction. Its displayed USD 0.0353435 has unknown cost basis, so it is not a Token Plan credit invoice or coding qualification.
 
@@ -55,11 +55,11 @@ Qwen sources: [final model](https://docs.qwencloud.com/developer-guides/getting-
 
 ## Comparison scope
 
-AA v5.0.1 incorporates a CritPt v2 regrade across models. The language/models/free API exposes major.minor as numeric 5; the patch revision is pinned from AA methodology. Refresh all rows together rather than mixing old 5.0 figures with this snapshot. The API is paginated; the retired data/llms/models endpoint returns 410.
+AA v5.0.2 uses the same 66 Terminal-Bench tasks with the 4.1 verifiers and regrades FrontierCode-AA 2.0 with updated trajectory scanning and judge review. The paginated language/models/free API reports version 5. The patch revision comes from AA methodology, and the index and task costs are refreshed together for that revision.
 
-AA USD/task is a weighted benchmark cost. This refreshed snapshot uses the API's current cost figures, including Carbon's promotional rates. It is not a forecast for repository work. Separate Coding/Agentic Index fields remain unknown where AA returns null; legacy fields are not invented from the overall Intelligence Index.
+AA USD/task is a weighted benchmark cost from the API snapshot. Repository work has its own cost profile. Separate Coding/Agentic Index fields remain unknown where AA returns null; legacy fields are not invented from the overall Intelligence Index.
 
-Under the existing 8/20-point rule, the maximum is 64.6: frontier starts at 56.6 and mid at 44.6. Bands are relative, so an unchanged model can move down when a new leader arrives. In particular Terra/high and Sonnet/high now fall below the mid floor. A generic index is advisory evidence and does not qualify a reviewer for a specific repository.
+Under the existing 8/20-point rule, the maximum is 64.8: frontier starts at 56.8 and mid at 44.8. Bands are relative, so an unchanged model can move down when a new leader arrives. In particular Terra/high and Sonnet/high now fall below the mid floor. A generic index is advisory evidence and does not qualify a reviewer for a specific repository.
 
 Sources: [AA methodology](https://artificialanalysis.ai/methodology/intelligence-benchmarking), [AA API](https://artificialanalysis.ai/data-api/docs/reference), [Fable 5.2](https://platform.claude.com/docs/en/models/fable-5-2/overview), [Carbon API](https://aistudio.google.com/docs/models/gemini-4-carbon), [Carbon Cloud limits](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/4-carbon), [Carbon pricing](https://aistudio.google.com/docs/pricing#gemini-4-carbon).
 
